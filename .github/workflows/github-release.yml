@@ -6,11 +6,6 @@ env:
 
 on:
   workflow_dispatch:
-    inputs:
-      doi:
-        description: 'USGS DOI for citation update (e.g., 10.5066/P13TADS5)'
-        required: false
-        type: string
   release:
     types: [prereleased, released]
   push:
@@ -62,7 +57,7 @@ jobs:
             conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label LTS --label main
           fi
 
-
+  
   test:
     runs-on: ${{ matrix.os }}
     needs: build
@@ -182,72 +177,3 @@ jobs:
       - name: Upload updated versions.json to S3
         run: |
           aws s3 cp ./versions.json s3://asc-public-docs/isis-site/versions.json
-
-  update-citation:
-    name: Update Citation Files
-    runs-on: ubuntu-latest
-    needs: [build, test]
-    # Run if: (1) manual trigger with DOI input, OR (2) release event
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.event.inputs.doi != '') ||
-      (github.event_name == 'release' && github.event.action == 'released')
-    env:
-      ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install dependencies
-        run: pip install PyYAML
-
-      - name: Get DOI
-        id: doi
-        run: |
-          # Check if DOI was provided manually
-          if [ -n "${{ github.event.inputs.doi }}" ]; then
-            echo "doi=${{ github.event.inputs.doi }}" >> $GITHUB_OUTPUT
-            echo "Using manual DOI: ${{ github.event.inputs.doi }}"
-          else
-            # Fetch release page HTML and extract DOI
-            RELEASE_URL="https://github.com/${{ github.repository }}/releases/tag/${{ env.ISIS_VERSION }}"
-
-            # Look for DOI pattern (10.XXXX/XXXXXX)
-            DOI=$(curl -sL "$RELEASE_URL" | grep -oP '10\.\d+/[A-Z0-9]+' | head -1)
-
-            if [ -z "$DOI" ]; then
-              echo "No DOI found on release page, skipping citation update"
-              echo "skip=true" >> $GITHUB_OUTPUT
-            else
-              echo "doi=$DOI" >> $GITHUB_OUTPUT
-              echo "Found DOI from release page: $DOI"
-            fi
-          fi
-
-      - name: Generate citation files
-        if: steps.doi.outputs.skip != 'true'
-        run: |
-          python isis/scripts/generate_citation.py \
-            --version ${{ env.ISIS_VERSION }} \
-            --doi ${{ steps.doi.outputs.doi }}
-
-      - name: Commit citation files
-        if: steps.doi.outputs.skip != 'true'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add CITATION.cff README.md
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update citation for ISIS ${{ env.ISIS_VERSION }} (DOI: ${{ steps.doi.outputs.doi }})"
-            git push origin HEAD:${{ github.event.release.target_commitish || github.ref_name }}
-            echo "✓ Citation files committed to ${{ github.event.release.target_commitish || github.ref_name }} branch"
-          fi
