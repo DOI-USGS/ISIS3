@@ -196,7 +196,7 @@ namespace Isis {
       this->addObject(isiscube);
     }
 
-    if (dataset->GetSpatialRef() && !(this->findObject("IsisCube").hasGroup("Mapping"))) {
+    if (dataset->GetSpatialRef() && this->hasObject("IsisCube") && !(this->findObject("IsisCube").hasGroup("Mapping"))) {
       char ** projStr = new char*[1];
       const OGRSpatialReference &oSRS = *dataset->GetSpatialRef();
       oSRS.exportToProj4(projStr);

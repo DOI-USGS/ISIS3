@@ -1400,7 +1400,7 @@ namespace Isis {
     // Internalize the PDS label in the PVL that was passed in
     try {
       if (pdsLabelFile.contains((QString)"/vsi")) {
-        pdsLabel = Pvl(pdsLabelFile);
+        pdsLabel.readGdal(pdsLabelFile);
       } else {
         pdsLabel.read(pdsLabelFile);
       }
