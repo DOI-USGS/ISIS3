@@ -207,6 +207,10 @@ void IsisMain() {
         " LSCALE=" + scale +
         " SSCALE=" + scale;
 
+        if (ui.GetParamPreference() != "") { 
+          parameters += " -PREFERENCE=" + ui.GetParamPreference();
+        }
+
         try {
           ProgramLauncher::RunIsisProgram("reduce", parameters);
         }

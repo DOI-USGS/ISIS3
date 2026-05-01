@@ -230,6 +230,9 @@ namespace Isis{
           CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
           incube->close();
           QString parameters = "FROM=" + cubeName;
+          if (ui.GetParamPreference() != "") { 
+            parameters += " -PREFERENCE=" + ui.GetParamPreference();
+          }
           ProgramLauncher::RunIsisProgram("spiceinit", parameters);
           if (inAtt.bands().size() != 0) {
               incube->setVirtualBands(inAtt.bands());

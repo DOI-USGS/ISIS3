@@ -362,6 +362,9 @@ void IsisMain() {
        " MODE=SCALE" +
        " LSCALE=" + scale +
        " SSCALE=" + scale;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     try {
       // iApp->Exec("reduce", parameters);
       ProgramLauncher::RunIsisProgram("reduce", parameters);

@@ -80,6 +80,9 @@ void IsisMain() {
                      " strans=" + toString(sTrans) + 
                      " ltrans=" + toString(lTrans) + 
                      " interp=" + ui.GetString("INTERP");
+    if (ui.GetParamPreference() != "") { 
+      params += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("translate",params);
   }
   return;
