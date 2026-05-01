@@ -28,7 +28,7 @@ void IsisMain() {
 
   QString labelFile = ui.GetFileName("FROM");
   if (labelFile.contains("/vsi")) {
-    QString msg = "MRO HiRISE RDR images are too large for ISIS to currently " +
+    QString msg = "MRO HiRISE RDR images are too large for ISIS to currently "
                   "import via vsicurl. Run again with the downloaded image.";
     throw IException(IException::Io, msg, _FILEINFO_);
   }
