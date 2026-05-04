@@ -58,6 +58,10 @@ void IsisMain() {
     FileName temp = FileName::createTempFile("$TEMPORARY/" + from.baseName() + ".cub");
     QString params = "from=" + from.expanded()  + " to=" + temp.expanded();
 
+    if (ui.GetParamPreference() != "") { 
+      params += " -PREFERENCE=" + ui.GetParamPreference();
+    }
+
     try {
       ProgramLauncher::RunIsisProgram("mdis2isis", params);
 

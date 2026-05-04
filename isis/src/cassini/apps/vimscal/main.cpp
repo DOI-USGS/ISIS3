@@ -1054,6 +1054,7 @@ if (!vis) {
  * @return QString
  */
 QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
+  UserInterface &ui = Application::GetUserInterface();
   int sampOffset = 1;
   int lineOffset = 1;
 
@@ -1072,6 +1073,10 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
                     "_" + FileName(icube->fileName()).name());
 
   appArgs += "to=" + tempFile.expanded();
+  if (ui.GetParamPreference() != "") { 
+    appArgs += " -PREFERENCE=" + ui.GetParamPreference();
+  }
+
 
   ProgramLauncher::RunIsisProgram("crop", appArgs);
   tempFiles.push_back(tempFile.expanded());

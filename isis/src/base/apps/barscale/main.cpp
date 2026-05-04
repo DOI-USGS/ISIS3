@@ -451,6 +451,9 @@ void IsisMain() {
 
   // Convert bar scale to ISIS cube
   QString parameters = "FROM=" + scaleTif + " TO=" + scaleCub + " MODE=GRAYSCALE";
+  if (ui.GetParamPreference() != "") { 
+    parameters += " -PREFERENCE=" + ui.GetParamPreference();
+  }
   ProgramLauncher::RunIsisProgram("std2isis", parameters);
 
   // When this program is run from the command line, it cannot alter the default
@@ -471,6 +474,9 @@ void IsisMain() {
                  " HRSMIN=255 HRSMAX=255";
   }
   delete stats;
+  if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+  }
   ProgramLauncher::RunIsisProgram("specpix", parameters);
 
   // Need to mosaic the bar scale on top of the image if requested
@@ -482,11 +488,17 @@ void IsisMain() {
                      " OUTLINE=1" + " OUTBAND=1" + " MATCHBANDBIN=NO CREATE=YES" +
                      " NSAMPLES=" + toString(numSamps) + " NLINES=" + toString(numLines) +
                      " NBANDS=" + toString(numBands);
+        if(ui.GetParamPreference() != "") { 
+          parameters += " -PREFERENCE=" + ui.GetParamPreference();
+        }
         ProgramLauncher::RunIsisProgram("handmos", parameters);
       }
       parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=" +
                    toString(placeSample) + " OUTLINE=" + toString(placeLine) + " OUTBAND=" +
                    toString(i) + " MATCHBANDBIN=NO NULL=YES HIGHSATURATION=YES";
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      }
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }
   }
@@ -494,11 +506,17 @@ void IsisMain() {
   // Need to pad the image with bar scale if requested
   if (padImage) {
     parameters = "FROM=" + inFile + " TO=" + outFile + " BOTTOM=" + toString(totalHeight);
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("pad", parameters);
     for (int i = 1; i <= numBands; i++) {
       parameters = "FROM=" + scaleStrCub + " MOSAIC=" + outFile + " PRIORITY=ONTOP OUTSAMPLE=1" +
                    " OUTLINE=" + toString(numLines+1) + " OUTBAND=" + toString(i) +
                    " MATCHBANDBIN=NO " + " NULL=YES HIGHSATURATION=YES";
+      if (ui.GetParamPreference() != "") { 
+            parameters += " -PREFERENCE=" + ui.GetParamPreference();
+        }
       ProgramLauncher::RunIsisProgram("handmos", parameters);
     }
   }

@@ -35,6 +35,9 @@ namespace Isis {
     QString parameters = QString(" FROMLIST = ")    + tempFile.expanded() +
                         QString(" TO = ")      + ui.GetCubeName("TO") +
                         QString(" PROPLAB = ") + redFile;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("cubeit", parameters);
     remove(tempFile.expanded().toLatin1().data());
 

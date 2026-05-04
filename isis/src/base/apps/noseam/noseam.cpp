@@ -96,6 +96,9 @@ namespace Isis {
     QString parameters = "FROMLIST=" + cubeListFileName.original() + 
                         " MOSAIC=" + mosaicFile.expanded() +
                         " MATCHBANDBIN=" + match;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     // Creates the highpass cubes from the cubes FileList
@@ -108,6 +111,9 @@ namespace Isis {
                    " TO=" + highpassCube.expanded() +
                    " SAMPLES=" + toString(samples) + 
                    " LINES=" + toString(lines);
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      }
       ProgramLauncher::RunIsisProgram("highpass", parameters);
       // Reads the just created highpass cube into a list file for automos
       highPassList.push_back(highpassCube);
@@ -123,6 +129,9 @@ namespace Isis {
     parameters = "FROMLIST=" + highpassListFile.expanded() +
                  " MOSAIC=" + highpassFile.expanded() +
                  " MATCHBANDBIN=" + match;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("automos", parameters);
 
     FileName lowpassFile = FileName::createTempFile("$TEMPORARY/HighpassMosaic.cub");
@@ -132,6 +141,9 @@ namespace Isis {
     parameters = "FROM=" + mosaicFile.expanded() +
                  " TO=" + lowpassFile.expanded() +
                  " SAMPLES=" + toString(samples) + " LINES=" + toString(lines);
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("lowpass", parameters);
 
     // Finally combines the highpass and lowpass mosaics
@@ -139,6 +151,9 @@ namespace Isis {
                  " FROM2=" + lowpassFile.expanded() +
                  " TO=" + ui.GetCubeName("TO") +
                  " OPERATOR= add";
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    }
     ProgramLauncher::RunIsisProgram("algebra", parameters);
 
     // Will remove all of the temp files by default
