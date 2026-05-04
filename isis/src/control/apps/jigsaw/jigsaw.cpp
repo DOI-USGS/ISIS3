@@ -202,15 +202,15 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    // ISDLIST and OUTPUT_ADJUSTED_CSMSTATE are incompatible.
+    // CSMLIST and OUTPUT_ADJUSTED_CSMSTATE are incompatible.
     // OUTPUT_ADJUSTED_CSMSTATE writes adjusted state for cubes that
-    // have CSM blobs. ISDLIST loads cameras from external files and
+    // have CSM blobs. CSMLIST loads cameras from external files and
     // keeps cubes read-only. Both write .adjusted_state.json files
     // using the same FILE_PREFIX naming convention.
-    if (ui.WasEntered("ISDLIST") && ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
-      QString msg = "Cannot use ISDLIST together with "
+    if (ui.WasEntered("CSMLIST") && ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE")) {
+      QString msg = "Cannot use CSMLIST together with "
         "OUTPUT_ADJUSTED_CSMSTATE. OUTPUT_ADJUSTED_CSMSTATE is for "
-        "cubes with CSM blobs. ISDLIST keeps cubes unmodified and "
+        "cubes with CSM blobs. CSMLIST keeps cubes unmodified and "
         "writes adjusted state to external files automatically.";
       throw IException(IException::User, msg, _FILEINFO_);
     }
@@ -234,8 +234,8 @@ namespace Isis {
 
     // Read optional ISD list
     QString isdList = "";
-    if (ui.WasEntered("ISDLIST"))
-      isdList = ui.GetFileName("ISDLIST");
+    if (ui.WasEntered("CSMLIST"))
+      isdList = ui.GetFileName("CSMLIST");
 
     BundleAdjust *bundleAdjustment = NULL;
     try {
@@ -436,11 +436,11 @@ namespace Isis {
       }
 
       // Write adjusted CSM state to external files if requested
-      // via ISDLIST or OUTPUT_ADJUSTED_CSMSTATE. This is independent
-      // of whether UPDATE is true or not. ISDLIST images always get
+      // via CSMLIST or OUTPUT_ADJUSTED_CSMSTATE. This is independent
+      // of whether UPDATE is true or not. CSMLIST images always get
       // external state files when the bundle converges, since cubes
       // are not modified.
-      bool writeIsd = ui.WasEntered("ISDLIST");
+      bool writeIsd = ui.WasEntered("CSMLIST");
       bool writeCsmState = ui.GetBoolean("OUTPUT_ADJUSTED_CSMSTATE");
       if (writeIsd || writeCsmState)
         for (int i = 0; i < bundleAdjustment->numberOfImages(); i++)

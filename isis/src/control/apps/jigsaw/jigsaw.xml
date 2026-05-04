@@ -721,7 +721,7 @@
         </filter>
       </parameter>
 
-      <parameter name="ISDLIST">
+      <parameter name="CSMLIST">
         <type>filename</type>
         <fileMode>input</fileMode>
         <internalDefault>None</internalDefault>
@@ -1896,7 +1896,7 @@
             updating the cube files. The output files are named
             &lt;cube_basename&gt;.adjusted_state.json, written to the current
             directory or prepended with FILE_PREFIX if set. Cannot be used
-            together with ISDLIST.
+            together with CSMLIST.
           </description>
           <type>boolean</type>
           <default>
@@ -2289,11 +2289,11 @@
     </example>
 
     <example>
-      <brief>Solve with external CSM cameras (ISDLIST)</brief>
+      <brief>Solve with external CSM cameras (CSMLIST)</brief>
       <description>
       <p>
         This example uses external CSM camera files instead of
-        embedded cube blobs. The ISDLIST file has one entry per
+        embedded cube blobs. The CSMLIST file has one entry per
         cube in FROMLIST. Each entry can be a CSM ISD or model
         state file. Cubes are not modified. Adjusted camera state
         is written to .adjusted_state.json files using the
@@ -2302,7 +2302,7 @@
       </p>
       </description>
       <terminalInterface>
-        <commandLine>fromlist=cubes.lis isdlist=isds.lis
+        <commandLine>fromlist=cubes.lis csmlist=isds.lis
           cnet=input.net onet=output.net
           csmsolveset=adjustable file_prefix=run/out
           point_latitude_sigma=500 point_longitude_sigma=500

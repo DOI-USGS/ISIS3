@@ -1744,7 +1744,7 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
   EXPECT_TRUE(jf.contains("center_longitude"));
   EXPECT_TRUE(jf.contains("scale"));
 
-  // Second pass: run jigsaw with ISDLIST using the adjusted state files
+  // Second pass: run jigsaw with CSMLIST using the adjusted state files
   // from the first pass. This tests constructModelFromIsdOrState with
   // model state input (not ISD).
   QStringList fNames = {"Test_A", "Test_B", "Test_C", "Test_D", "Test_E",
@@ -1758,7 +1758,7 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
 
   QString outCnetFileName2 = prefix.path() + "/outTemp2.net";
   QVector<QString> args2 = {"fromlist=" + cubeListFile,
-                            "isdlist=" + isdListPath,
+                            "csmlist=" + isdListPath,
                             "cnet=data/CSMNetwork/test.net",
                             "onet=" + outCnetFileName2,
                             "maxits=10",
@@ -1773,10 +1773,10 @@ TEST_F(CSMNetwork, FunctionalTestJigsawCSM) {
     jigsaw(options2);
   }
   catch (IException &e) {
-    FAIL() << "Failed ISDLIST bundle: " << e.what() << std::endl;
+    FAIL() << "Failed CSMLIST bundle: " << e.what() << std::endl;
   }
 
-  // Verify ISDLIST pass wrote adjusted state files
+  // Verify CSMLIST pass wrote adjusted state files
   QString isdStateB = tempDir.path() + "/isd_Test_B.adjusted_state.json";
   ASSERT_TRUE(std::filesystem::exists(isdStateB.toStdString()));
 
