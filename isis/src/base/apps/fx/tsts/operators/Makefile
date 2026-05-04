@@ -20,3 +20,6 @@ commands:
 	$(APPNAME) f1=$(INPUT)/peaks.cub+1 \
 	to=$(OUTPUT)/rads.cub \
 	equation="rads(360.0)" > /dev/null;
+	$(APPNAME) f1=$(INPUT)/peaks.cub+1 \
+	to=$(OUTPUT)/mod.cub \
+	equation="sample%2" > /dev/null;
