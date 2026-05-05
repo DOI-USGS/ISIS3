@@ -1,7 +1,8 @@
-# Include python
-include(FindPythonAnaconda.cmake)
+set(Python_FIND_VIRTUALENV FIRST)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+
 set(ISIS_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
-include_directories(${PYTHON_INCLUDE_DIR} ${ISIS_INCLUDE_DIR})
+include_directories(${ISIS_INCLUDE_DIR})
 
 set(CMAKE_SWIG_FLAGS "")
 set(CMAKE_SWIG_OUTDIR isiscore)
@@ -20,7 +21,7 @@ if (APPLE)
      # On OSX, do not link python - this causes segfaults
      swig_link_libraries(isiscore core)
 else()
-     swig_link_libraries(isiscore core ${PYTHON_LIBRARIES})
+     swig_link_libraries(isiscore core Python3::Module)
 endif()
 
 # Build out a standard directory structure
