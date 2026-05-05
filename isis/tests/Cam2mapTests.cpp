@@ -215,8 +215,8 @@ TEST_F(DefaultCube, FunctionalTestCam2mapGTiffOutputDefault) {
   labelStrm >> userMap;
   PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
 
-  QString tifPath = tempDir.path() + "/level2.cub.tif";
-  QVector<QString> args = {"to=" + tempDir.path() + "/level2.cub+gtiff",
+  QString tifPath = tempDir.path() + "/level2.tif";
+  QVector<QString> args = {"to=" + tempDir.path() + "/level2+gtiff",
                            "pixres=map"};
   UserInterface ui(APP_XML, args);
 
@@ -241,11 +241,11 @@ TEST_F(DefaultCube, FunctionalTestCam2mapGTiffOutputDefault) {
 // override path in Cube::writeLabels (the Mapping group already has
 // ProjStr from the user's projstring=, so PvlToWkt is bypassed).
 TEST_F(DefaultCube, FunctionalTestCam2mapGTiffOutputUseproj) {
-  QString outPath = tempDir.path() + "/level2_useproj.cub";
-  QString tifPath = outPath + ".tif";
+  QString outStem = tempDir.path() + "/level2_useproj";
+  QString tifPath = outStem + ".tif";
 
   QVector<QString> args = {"from=" + testCube->fileName(),
-                           "to=" + outPath + "+gtiff",
+                           "to=" + outStem + "+gtiff",
                            "useproj=true",
                            "projstring=+proj=eqc +R=3396190 +units=m"};
   UserInterface ui(APP_XML, args);
@@ -762,18 +762,17 @@ TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
   checkPixelValues(ocube, ocube.bandCount());
 }
 
-// Test cam2map asp_map=true with GTiff output: verify the resulting
-// .cub.tif carries projection geo-tags via Cube::writeLabels +
-// ProjectionFactory::PvlToWkt. Issue #6033 sibling test.
+// Test cam2map asp_map=true with GTiff output: verify the projection
+// string is written to the output GeoTIFF.
 TEST_F(DemCube, FunctionalTestCam2mapAspMapGTiffOutput) {
   QString heightDemPath = createHeightDem(tempDir.path(),
                                           -35.0, 55.0, 200.0, 290.0, 245.0);
 
-  QString outPath = tempDir.path() + "/aspmap_gtiff.cub";
-  QString tifPath = outPath + ".tif";
+  QString outStem = tempDir.path() + "/aspmap_gtiff";
+  QString tifPath = outStem + ".tif";
 
   QVector<QString> args = {"from=" + testCube->fileName(),
-                           "to=" + outPath + "+gtiff",
+                           "to=" + outStem + "+gtiff",
                            "asp_map=true",
                            "dem=" + heightDemPath,
                            "pixres=mpp",
