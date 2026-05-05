@@ -6,6 +6,8 @@ For more details about the LICENSE terms and the AUTHORS, you will
 find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
+#include <string>
+
 #include "Plugin.h"
 #include "WorldMapper.h"
 
@@ -13,6 +15,7 @@ namespace Isis {
   class Camera;
   class Cube;
   class Projection;
+  class PvlGroup;
   class RingPlaneProjection;
 
   /**
@@ -92,6 +95,15 @@ namespace Isis {
                                                    int &samples, int &lines,
                                                    Camera &cam);
 
+      // Build an OGR WKT string from an ISIS Mapping PVL group. Mirrors the
+      // per-projection logic in GDAL's ISIS3 driver
+      // (frmts/pds/isis3dataset.cpp). Throws IException for unsupported
+      // projections (e.g. PointPerspective, ObliqueCylindrical). Radii fall
+      // back to the defaults if EquatorialRadius/PolarRadius are missing
+      // from the Mapping group.
+      static std::string PvlToWkt(const Isis::PvlGroup &mapGrp,
+                                  double defaultSemiMajor = 0.0,
+                                  double defaultSemiMinor = 0.0);
 
     private:
       /**

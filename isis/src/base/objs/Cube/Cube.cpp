@@ -2990,9 +2990,20 @@ namespace Isis {
       if (this->label()->findObject("IsisCube").hasGroup("Mapping")) {
         PvlGroup &mappingGroup = this->label()->findObject("IsisCube").findGroup("Mapping");
 
+        // Use ProjStr if present. Otherwise create a WKT from the Mapping fields.
+        std::string srsString;
         if (mappingGroup.hasKeyword("ProjStr")) {
+          srsString = mappingGroup.findKeyword("ProjStr")[0].toStdString();
+        } else if (mappingGroup.hasKeyword("ProjectionName")) {
+          try {
+            srsString = ProjectionFactory::PvlToWkt(mappingGroup);
+          } catch (IException &) {
+          }
+        }
+
+        if (!srsString.empty()) {
           OGRSpatialReference *oSRS = new OGRSpatialReference();
-          oSRS->SetFromUserInput(mappingGroup.findKeyword("ProjStr")[0].toStdString().c_str());
+          oSRS->SetFromUserInput(srsString.c_str());
 
           gdalDataset()->SetSpatialRef(oSRS);
 
