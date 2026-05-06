@@ -168,9 +168,6 @@ namespace Isis {
     if ( hasHit() ) { 
       return ( m_point );
     }
-    throw IException(IException::Programmer, 
-                     "No hits in ray trace so no surface point!", 
-                     _FILEINFO_);
     return ( btVector3(0.0, 0.0, 0.0) );
   }
 
@@ -184,10 +181,6 @@ namespace Isis {
     if ( hasHit() ) {
       return ( m_normal );
     }
-
-    throw IException(IException::Programmer, 
-                     "No hits in ray trace so no normal!", 
-                     _FILEINFO_);
     return btVector3(0.0, 0.0, 0.0);
   }
 
