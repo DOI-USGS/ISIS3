@@ -41,6 +41,7 @@ namespace Isis {
       void fromBlob(Isis::Blob blob);
       void readFromXmlFile(const FileName &xmlFileName);
       const QDomDocument &ReturnLabels() const;
+      bool CheckElementsByTagName(QString tagName);
 
     protected:
       void ReadData(std::istream &stream);

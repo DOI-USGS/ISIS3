@@ -22,6 +22,8 @@ find files of those names at the top level of this repository. **/
 #include "PvlObject.h"
 #include "XmlToPvlTranslationManager.h"
 
+#include "cpl_vsi.h"
+
 
 using namespace std;
 namespace Isis {
@@ -462,24 +464,68 @@ namespace Isis {
    * @throws IException::Unknown "XML read/parse error in file."
    */
   void XmlToPvlTranslationManager::parseFile(const FileName &xmlFileName) {
-     QFile xmlFile(xmlFileName.expanded());
-     if ( !xmlFile.open(QIODevice::ReadOnly) ) {
-       QString msg = "Could not open label file [" + xmlFileName.expanded() +
-                     "].";
-       throw IException(IException::Unknown, msg, _FILEINFO_);
-     }
-
      QString errmsg;
      int errline, errcol;
-     if ( !m_xmlLabel.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
-       xmlFile.close();
-       QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
-            + "] at line [" + toString(errline) + "], column [" + toString(errcol)
-            + "], message: " + errmsg;
-       throw IException(IException::Unknown, msg, _FILEINFO_);
-     }
 
-     xmlFile.close();
-     return;
+     if (xmlFileName.expanded().contains("/vsi")) {
+      GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(xmlFileName.expanded().toStdString().c_str(), GA_ReadOnly));
+      if (!dataset) {
+        if (xmlFileName.expanded().contains("/vsi")) {
+          // Attempt to manually read the label via VSI buffer
+          // Needed for Cassini VIMS workflow
+          VSILFILE *fp = VSIFOpenL(xmlFileName.expanded().toUtf8().constData(), "rb");
+          if (fp) {
+            char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
+            size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
+            buffer[nRead] = '\0'; // end sign
+            VSIFCloseL(fp);
+            m_xmlLabel.setContent(QString::fromUtf8(buffer), &errmsg, &errline, &errcol);
+            CPLFree(buffer);
+            return;
+          }
+        }
+        // If it's not a VSI file or VSI open failed, then throw the error
+        QString msg = "Failed opening GDALDataset from [" + xmlFileName.name() + "]";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      CPLStringList metadataDomains = CPLStringList(dataset->GetMetadataDomainList(), false);
+      CPLStringList metadata;
+      const char* domainPDS4 = "xml:PDS4";
+      if (CSLFindString(metadataDomains.List(), domainPDS4) != -1) {
+        metadata = CPLStringList(dataset->GetMetadata(domainPDS4), false);
+        if (metadata.Count() > 0 && metadata[0] != nullptr) {
+          const char *metadataXmlString = metadata[0];
+          QString xmlString = QString::fromUtf8(metadataXmlString);
+          if (m_xmlLabel.setContent(xmlString, &errmsg, &errline, &errcol)) {
+            GDALClose(dataset); 
+            return; // CRITICAL: Stop here so we don't hit the QFile logic
+          } else {
+              // Handle the parse error here
+              std::cerr << "XML Parse Error: " << errmsg.toStdString() << std::endl;
+              QString msg = "Failed setting XML content from [" + xmlFileName.name() + "]";
+              throw IException(IException::Programmer, msg, _FILEINFO_);
+          }
+        }
+      } 
+      GDALClose(dataset);
+     } else {
+      QFile xmlFile(xmlFileName.expanded());
+      if ( !xmlFile.open(QIODevice::ReadOnly) ) {
+        QString msg = "Could not open label file [" + xmlFileName.expanded() +
+                      "].";
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+
+      if ( !m_xmlLabel.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
+        xmlFile.close();
+        QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+              + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+              + "], message: " + errmsg;
+        throw IException(IException::Unknown, msg, _FILEINFO_);
+      }
+      xmlFile.close();
+    }
+
+    return;
   }
 } // end namespace isis
