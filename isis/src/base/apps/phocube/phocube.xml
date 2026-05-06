@@ -378,6 +378,26 @@ xsi:noNamespaceSchemaLocation=
         </description>
       </parameter>
 
+      <parameter name="CSM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Load the camera model in CSM format from this file, rather than the
+          one from the input cube.
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          JSON file containing either a CSM ISD (Instrument Support Data) or a
+          CSM model state. When provided, the camera is built from this file
+          and used in place of the camera attached to the input cube. The
+          input cube does not need to be run through spiceinit. Only used
+          when SOURCE is CAMERA.
+        </description>
+        <filter>
+          *.json
+        </filter>
+      </parameter>
+
       <parameter name="SOURCE">
         <type>string</type>
         <brief>Specifies the source of the geometric information</brief>
@@ -409,6 +429,7 @@ xsi:noNamespaceSchemaLocation=
               band options are available.
             </description>
             <exclusions>
+              <item>CSM</item>
               <item>PHASE</item>
               <item>EMISSION</item>
               <item>INCIDENCE</item>
