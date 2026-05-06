@@ -216,7 +216,13 @@ void sanitize(std::string &input);
     if (!m_et) {
       m_et = new iTime();
     }
-    *m_et = m_refTime + m_model->getImageTime(imagePt);
+    // Catch CSM model exceptions
+    try {
+      *m_et = m_refTime + m_model->getImageTime(imagePt);
+    }
+    catch (csm::Error &e) {
+      return false;
+    }
     if (target()->isSky()) {
       target()->shape()->setHasIntersection(false);
       return true;
