@@ -591,7 +591,6 @@ TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
   QVector<QString> args = {"from=" + cubePath,
                            "to=" + outCubeFileName,
                            "csm=" + isdPath,
-                           "specialpixels=no",
                            "phase=yes",
                            "emission=yes",
                            "incidence=yes",
