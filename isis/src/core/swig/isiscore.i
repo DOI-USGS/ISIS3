@@ -1,7 +1,6 @@
 %module isiscore
 
 %{
-    #include <QString>
     #include <array>
     #include <vector> 
     #include <string>
@@ -11,14 +10,11 @@
 %include "std_vector.i"
 %include "std_string.i"
 %include "std_array.i"
-%include "std_map.i"
-%include "carrays.i"
 %include "std_pair.i"
 %include "exception.i"
 
-#include <nlohmann/json.hpp>
-#include <QVector>
-#include <QString>
+%include <QVector>
+%include <QString>
 
 %typemap(in) nlohmann::json {
   if (PyDict_Check($input) || PyList_Check($input)) {
@@ -78,12 +74,22 @@
 }
 
 
-%typemap(in) QString const & {
-  if (!PyUnicode_Check($input)) {
-    PyErr_SetString(PyExc_ValueError,"Expected a String");
-    SWIG_fail;
-  }
-  $1 = new QString(QString::fromUtf8(PyUnicode_AsUTF8($input))); 
+// Typemap for 'const QString &'
+%typemap(in) const QString & (QString temp) {
+    if (PyUnicode_Check($input)) {
+        // Convert Python Unicode (str) to UTF-8 C-string
+        const char *s = PyUnicode_AsUTF8($input);
+        temp = QString::fromUtf8(s);
+        $1 = &temp;
+    } else if (PyBytes_Check($input)) {
+        // Handle Python bytes as well
+        const char *s = PyBytes_AsString($input);
+        temp = QString::fromUtf8(s);
+        $1 = &temp;
+    } else {
+        PyErr_SetString(PyExc_TypeError, "Expected a string");
+        SWIG_fail;
+    }
 }
 
 
@@ -94,16 +100,14 @@
 
 %typemap(in) QString {
   if (!PyUnicode_Check($input)) {
-    std::cout << "TANGERINE" << std::endl;
     PyErr_SetString(PyExc_ValueError,"Expected a String");
     SWIG_fail;
   }
-  $1 = QString::fromUtf8(PyUnicode_AsUTF8($input)); 
+  $1 = QString::fromUtf8(PyUnicode_AsUTF8($input));
 }
 
-%typemap(typecheck,precedence=SWIG_TYPECHECK_STRING) QString {
-    $1 = !PyUnicode_Check($input);
-    std::cout << PyUnicode_AsUTF8($input) << std::endl;
+%typemap(typecheck, precedence=SWIG_TYPECHECK_STRING) QString {
+    $1 = PyUnicode_Check($input) ? 1 : 0;
 }
 
 %typemap(out) QString = QString const &;
@@ -153,11 +157,5 @@ namespace std {
   }
 }
 
-%include "pvlKeyword.i"
-%include "PvlContainer.h"
-%include "pvlGroup.i"
-%include "pvlObject.i"
-%nodefaultdtor Isis::PvlObject;
-// %include "UserInterface.i"
-%include "isisblob.i"
 %include "isispvl.i"
+%include "isisblob.i"

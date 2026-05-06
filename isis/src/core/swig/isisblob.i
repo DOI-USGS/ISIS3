@@ -1,7 +1,14 @@
 %module(package="isiscore") Blob
 %{
+    #include "PvlKeyword.h"
+    #include "PvlGroup.h"
+    #include "PvlObject.h"
     #include "Blob.h"
 %}
+
+%include "PvlKeyword.h"
+%include "PvlGroup.h"
+%include "PvlObject.h"
 
 %include "Blob.h"
 %nodefaultdtor Isis::Blob;
