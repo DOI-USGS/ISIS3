@@ -50,7 +50,16 @@ namespace Isis{
     catch (IException &e) {
       inputCubePath = cube->fileName();
     }
-    campt.SetCube(inputCubePath);
+
+    // Optional external CSM camera (ISD or model state JSON). Replaces the
+    // camera attached to the input cube; the cube does not need to be run
+    // through spiceinit in this mode.
+    if (ui.WasEntered("CSM")) {
+      campt.SetCube(inputCubePath, ui.GetFileName("CSM"));
+    }
+    else {
+      campt.SetCube(inputCubePath);
+    }
 
     // Grab the provided points (coordinates)
     QList< QPair<double, double> > points = getPoints(ui, ui.WasEntered("COORDLIST"));

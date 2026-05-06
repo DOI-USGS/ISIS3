@@ -81,6 +81,7 @@ namespace Isis {
       virtual ~CameraPointInfo();
 
       void SetCube(const QString &cubeFileName);
+      void SetCube(const QString &cubeFileName, const QString &csmFileName);
       void SetCSVOutput(bool csvOutput);
       PvlGroup *SetImage(const double sample, const double line,
                          const bool outside = false, const bool error = false);
