@@ -1,4 +1,5 @@
 #include "PvlObject.h"
+#include "Pvl.h"
 #include "IException.h"
 
 #include "TestUtilities.h"
@@ -227,5 +228,35 @@ TEST(PvlObject, PvlGroupEqualTest){
 
   copy.addKeyword(pvlTmplKwrdFour);
   EXPECT_FALSE(AssertPvlGroupEqual("Point_ErrorMagnitude", "Point_ErrorMagnitude", copy, pvlTmplGrp)); // should fail
+}
+
+// Parse a complex JSON string found in an LROC NAC GeoTIFF cube
+// (M181073012LE.ce.cub) after being processed with gdal_translate -of COG. GDAL
+// expanded the PVL keyword INS-85600_F/RATIO into a nested object that is
+// tricky to parse. Expected output PVL:
+//   Object = NaifKeywords
+//     BODY_FRAME_CODE   = 10020
+//     INS-85600_F/RATIO = 3.577
+//   End_Object
+TEST(PvlObject, ReadObjectGdalSlashKeyword) {
+  
+  // Complex json fragment that needs parsing to produce PVL
+  nlohmann::ordered_json j = {
+    {"NaifKeywords", {
+      {"_type", "object"},
+      {"BODY_FRAME_CODE", 10020},
+      {"INS-85600_F", {{"RATIO", 3.577}}}
+    }}
+  };
+
+  Pvl pvl;
+  Pvl::readObject(pvl, j);
+
+  ASSERT_TRUE(pvl.hasObject("NaifKeywords"));
+  PvlObject &nk = pvl.findObject("NaifKeywords");
+  ASSERT_TRUE(nk.hasKeyword("BODY_FRAME_CODE"));
+  EXPECT_EQ((int)nk.findKeyword("BODY_FRAME_CODE"), 10020);
+  ASSERT_TRUE(nk.hasKeyword("INS-85600_F/RATIO"));
+  EXPECT_DOUBLE_EQ((double)nk.findKeyword("INS-85600_F/RATIO"), 3.577);
 }
 

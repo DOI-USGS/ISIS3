@@ -77,6 +77,41 @@ namespace Isis {
     m_internalTemplate = false;
   }
 
+  // Treat a nested-object value as a single keyword if it has exactly the
+  // {value, unit} shape that GDAL's ISIS3 driver creates. 
+  // Example: "0.636 <ms>".
+  bool isJsonValueUnitObject(const nlohmann::ordered_json &v) {
+    if (!v.is_object()) return false;
+    if (!v.contains("value") || !v.contains("unit")) return false;
+    for (auto &[k, _] : v.items())
+      if (k != "value" && k != "unit") return false;
+    return true;
+  }
+
+  // Parse a JSON entry into one or more PVL keywords. Handles fragments like
+  //   "INS-85600_F": { "RATIO": 3.577 }
+  // produced by GDAL. This results in the intended PVL keyword
+  //   INS-85600_F/RATIO = 3.577
+  template <class Container>
+  void addJsonKeyword(Container &container, const std::string &name,
+                      const nlohmann::ordered_json &val) {
+    if (val.is_object() && !isJsonValueUnitObject(val)) {
+      for (auto &[subkey, subval] : val.items()) {
+        if (subkey == "_type" || subkey == "_container_name" ||
+            subkey == "_filename" || subkey == "_data") continue;
+        addJsonKeyword(container, name + "/" + subkey, subval);
+      }
+      return;
+    }
+    Isis::PvlKeyword keyword;
+    keyword.setName(QString::fromStdString(name));
+    if (val.is_array())
+      keyword.addJsonArrayValue(val);
+    else
+      keyword.setJsonValue(val);
+    container.addKeyword(keyword);
+  }
+
   // This function specifically reads from GDAL-style JSON metadata.  
   Isis::PvlObject &Pvl::readObject(Isis::PvlObject &pvlobj, nlohmann::ordered_json jdata) {
     for(auto &[key, value] : jdata.items()) {
@@ -97,13 +132,7 @@ namespace Isis {
           // parse keys 
           PvlGroup group(QString::fromStdString(name)); 
           for(auto &[pvlkeyword, pvlvalue] : value.items())  { 
-            PvlKeyword keyword;
-            keyword.setName(QString::fromStdString(pvlkeyword));
-            if (pvlvalue.is_array())
-                keyword.addJsonArrayValue(pvlvalue);
-            else 
-              keyword.setJsonValue(pvlvalue);
-            group.addKeyword(keyword);
+            addJsonKeyword(group, pvlkeyword, pvlvalue);
           }
           pvlobj.addGroup(group);
         } // end of group
@@ -111,14 +140,7 @@ namespace Isis {
 
       // not a group or object, must be a keyword
       else if (key != "_type" && key != "_filename" && key != "_data") { 
-        PvlKeyword keyword;
-        keyword.setName(QString::fromStdString(key));
-        if (value.is_array()) 
-          keyword.setJsonArrayValue(value);
-        else 
-          keyword.setJsonValue(value);
-
-        pvlobj.addKeyword(keyword);
+        addJsonKeyword(pvlobj, key, value);
       }
     }
     return pvlobj;
