@@ -73,28 +73,20 @@
   }
 }
 
-
-// Typemap for 'const QString &'
-%typemap(in) const QString & (QString temp) {
-    if (PyUnicode_Check($input)) {
-        // Convert Python Unicode (str) to UTF-8 C-string
-        const char *s = PyUnicode_AsUTF8($input);
-        temp = QString::fromUtf8(s);
-        $1 = &temp;
-    } else if (PyBytes_Check($input)) {
-        // Handle Python bytes as well
-        const char *s = PyBytes_AsString($input);
-        temp = QString::fromUtf8(s);
-        $1 = &temp;
-    } else {
-        PyErr_SetString(PyExc_TypeError, "Expected a string");
-        SWIG_fail;
-    }
+%typemap(in) QString const & {
+  if (!PyUnicode_Check($input)) {
+    PyErr_SetString(PyExc_ValueError,"Expected a String");
+    SWIG_fail;
+  }
+  $1 = new QString(QString::fromUtf8(PyUnicode_AsUTF8($input))); 
 }
-
 
 %typemap(out) QString const & {
   $result = Py_BuildValue("s#", $1.toStdString().c_str(), $1.size());
+}
+
+%typemap(typecheck, precedence=SWIG_TYPECHECK_STRING) QString const & {
+  $1 = PyUnicode_Check($input) ? 1 : 0;
 }
 
 
