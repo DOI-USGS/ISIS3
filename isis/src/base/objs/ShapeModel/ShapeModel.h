@@ -138,8 +138,6 @@ namespace Isis {
       // Get shape name
       QString name() const;
 
-      // Set m_hasIntersection
-      void setHasIntersection(bool b);
 
       // Set current surface point
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
@@ -177,6 +175,9 @@ namespace Isis {
       void setHasNormal(bool status);
       void setHasLocalNormal(bool status);
       double resolution();
+
+      // Set m_hasIntersection
+      void setHasIntersection(bool b);
 
     private:
       bool m_hasEllipsoidIntersection; //!< Indicates the ellipsoid was successfully intersected

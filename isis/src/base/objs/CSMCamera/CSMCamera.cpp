@@ -218,7 +218,6 @@ void sanitize(std::string &input);
     }
     *m_et = m_refTime + m_model->getImageTime(imagePt);
     if (target()->isSky()) {
-      target()->shape()->setHasIntersection(false);
       return true;
     }
 
@@ -359,7 +358,6 @@ void sanitize(std::string &input);
 
     // Don't try to intersect the sky
     if (target()->isSky()) {
-      target()->shape()->setHasIntersection(false);
       return false;
     }
 
@@ -459,7 +457,6 @@ void sanitize(std::string &input);
       p_childSample = p_alphaCube->BetaSample(sample);
       p_childLine = p_alphaCube->BetaLine(line);
       p_pointComputed = true;
-      shape->setHasIntersection(true);
       if (!m_et) {
         m_et = new iTime();
       }

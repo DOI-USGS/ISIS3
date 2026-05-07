@@ -598,9 +598,11 @@ namespace Isis {
       }
 
       p_camera->Sensor::setTime(root[j]);
+      if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+        return Failure;
+      }
     }
 
-    // No need to make sure the point isn't behind the planet, it was done above
     p_camera->Sensor::LookDirection(lookC);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];

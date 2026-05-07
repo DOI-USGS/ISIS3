@@ -304,7 +304,6 @@ namespace Isis {
         lon = Longitude(tproj->UniversalLongitude(), Angle::Degrees);
         rad = Distance(LocalRadius(lat, lon));
         if (!rad.isValid()) {
-          shape->setHasIntersection(false);
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
@@ -312,7 +311,6 @@ namespace Isis {
           p_childSample = sample;
           p_childLine = line;
 
-          shape->setHasIntersection(true);
           return true;
         }
       }
@@ -325,7 +323,6 @@ namespace Isis {
         rad = Distance(rproj->UniversalRingRadius(),Distance::Meters);
 
         if (!rad.isValid()) {
-          shape->setHasIntersection(false);
           return false;
         }
         SurfacePoint surfPt(lat, lon, rad);
@@ -333,7 +330,6 @@ namespace Isis {
           p_childSample = sample;
           p_childLine = line;
 
-          shape->setHasIntersection(true);
           return true;
         }
       }
@@ -481,7 +477,6 @@ namespace Isis {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
             p_pointComputed = true;
-            shape->setHasIntersection(true);
             return true;
           }
           else if (p_projection->IsSky()) {
@@ -489,7 +484,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -498,7 +492,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -511,7 +504,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
