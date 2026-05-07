@@ -1,18 +1,13 @@
-# Include python
-include(FindPythonAnaconda.cmake)
-include_directories(${PYTHON_INCLUDE_DIR})
+set(Python_FIND_VIRTUALENV FIRST)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+
+set(ISIS_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+include_directories(${ISIS_INCLUDE_DIR})
 
 set(CMAKE_SWIG_FLAGS "")
 set(CMAKE_SWIG_OUTDIR isiscore)
 set_source_files_properties(../isiscore.i
                             PROPERTIES CPLUSPLUS ON SWIG_FLAGS "-py3")
-
-#Find dependencies
-find_path(INCLUDE_DIR NAMES Pvl.h
-                      PATH_SUFFIXES include
-                      PATHS ${PROJECT_SOURCE_DIR}/)
-message("-- Found Include: ${INCLUDE_DIR}")
-include_directories(${INCLUDE_DIR})
 
 # Add and link
 swig_add_library(isiscore
@@ -21,14 +16,12 @@ swig_add_library(isiscore
 
 set_target_properties(_isiscore PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SWIG_OUTDIR})
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-
 if (APPLE)
      set_target_properties(_isiscore PROPERTIES LINK_FLAGS "-undefined dynamic_lookup")
      # On OSX, do not link python - this causes segfaults
      swig_link_libraries(isiscore core)
 else()
-     swig_link_libraries(isiscore core ${PYTHON_LIBRARY})
+     swig_link_libraries(isiscore core Python3::Module)
 endif()
 
 # Build out a standard directory structure
@@ -45,5 +38,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/__init__.py
 #file(COPY ${CMAKE_SOURCE_DIR}/python/tests
 #     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-install(CODE "execute_process(COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/setup.py install --single-version-externally-managed --record=record.txt
+install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m pip install . --prefix=${CMAKE_INSTALL_PREFIX} --no-deps --no-build-isolation
                               WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})")
+                              
