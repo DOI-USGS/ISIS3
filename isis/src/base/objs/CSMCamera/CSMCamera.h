@@ -28,9 +28,10 @@ namespace Isis {
       // constructors
       CSMCamera(Cube &cube);
       CSMCamera(Cube &cube, QString pluginName, QString modelName, QString stateString);
+      CSMCamera(Cube &cube, csm::RasterGM *model);
 
-      //! Destroys the CSMCamera object.
       ~CSMCamera() {};
+
 
       /**
        * The CSM camera needs a bogus type for now.
@@ -144,8 +145,12 @@ namespace Isis {
 
     private:
       void init(Cube &cube, QString pluginName, QString modelName, QString stateString);
+      void initFromModel(Cube &cube);
 
-      csm::RasterGM *m_model; //! CSM sensor model
+      // Not owned. Cannot be freed because test mocks pass stack-allocated
+      // objects via constructModelFromState(). A proper fix would require
+      // heap-allocating the mock model in the test fixtures.
+      csm::RasterGM *m_model = nullptr;
       iTime m_refTime; //! The reference time that all model image times are relative to
 
       void isisToCsmPixel(double line, double sample, csm::ImageCoord &csmPixel) const;

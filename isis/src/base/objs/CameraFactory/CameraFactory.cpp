@@ -225,13 +225,157 @@ namespace Isis {
   }
 
   /**
+   * Create a CSMCamera from an external ISD file and attach it to a cube.
+   *
+   * @param isdFile Path to the external ISD file.
+   * @param cube The cube to attach the camera to.
+   *
+   * @return Camera* The CSMCamera object created.
+   */
+  Camera *CameraFactory::CreateFromIsd(const QString &isdFile, Cube &cube) {
+    // This raw pointer is not managed. Pre-existing issue.
+    csm::Model *model = constructModelFromIsdOrState(isdFile);
+
+    updateLabelForCsm(cube, model);
+
+    // Cast to RasterGM
+    csm::RasterGM *rasterModel = dynamic_cast<csm::RasterGM*>(model);
+    if (!rasterModel) {
+      delete model;
+      QString msg = "CSM model from [" + isdFile + "] is not a RasterGM.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+    return new CSMCamera(cube, rasterModel);
+  }
+
+
+  /**
+   * Update the cube label in memory to support CSM cameras.
+   * Follows the same logic as csminit: sets ShapeModel=Null in the
+   * Kernels group and injects a CsmInfo group with platform/instrument
+   * identifiers derived from the CSM model. This allows serial number
+   * derivation and camera creation to work as if csminit had been run,
+   * but without modifying the cube on disk.
+   *
+   * @param cube  The cube whose label will be modified.
+   * @param model The CSM sensor model.
+   */
+  void CameraFactory::updateLabelForCsm(Cube &cube, csm::Model *model) {
+    if (!model) return;
+    PvlObject &cubeObj = cube.label()->findObject("IsisCube");
+
+    // Ensure Kernels group exists and has ShapeModel=Null.
+    // This matches csminit behavior.
+    if (!cubeObj.hasGroup("Kernels")) {
+      cubeObj.addGroup(PvlGroup("Kernels"));
+    }
+    PvlGroup &kernels = cubeObj.findGroup("Kernels");
+    kernels.addKeyword(PvlKeyword("ShapeModel", "Null"), Pvl::Replace);
+
+    // Add Target group if it doesn't exist. Needed for Target resolution.
+    // Get TargetName from the Instrument group (same approach as csminit).
+    if (!cubeObj.hasGroup("Target")) {
+      QString targetName = "Unknown";
+      if (cubeObj.hasGroup("Instrument") &&
+          cubeObj.findGroup("Instrument").hasKeyword("TargetName"))
+        targetName = cubeObj.findGroup("Instrument")["TargetName"][0];
+      PvlGroup target("Target");
+      target += PvlKeyword("TargetName", targetName);
+      cubeObj.addGroup(target);
+    }
+
+    // Add CsmInfo group
+    if (cubeObj.hasGroup("CsmInfo"))
+      cubeObj.deleteGroup("CsmInfo");
+
+    PvlGroup infoGroup("CsmInfo");
+    infoGroup += PvlKeyword("TargetName", cubeObj.findGroup("Target")["TargetName"][0]);
+    infoGroup += PvlKeyword("CSMPlatformID", QString::fromStdString(model->getPlatformIdentifier()));
+    infoGroup += PvlKeyword("CSMInstrumentId", QString::fromStdString(model->getSensorIdentifier()));
+    infoGroup += PvlKeyword("ReferenceTime", QString::fromStdString(model->getReferenceDateAndTime()));
+    cubeObj.addGroup(infoGroup);
+  }
+
+
+  /**
+   * Write adjusted CSM model state to a JSON file. The output file is
+   * named <prefix><cube_basename>.adjusted_state.json, following the
+   * same convention as ASP bundle_adjust.
+   *
+   * @param cubeFile Path to the input cube (basename used for output name).
+   * @param state    The adjusted CSM model state string.
+   * @param prefix   Optional file prefix (e.g., "run/run_").
+   */
+  void CameraFactory::writeAdjustedCsmState(const QString &cubeFile,
+                                            const QString &state,
+                                            const QString &prefix) {
+    QFileInfo fi(cubeFile);
+    QString outPath = prefix + fi.completeBaseName() + ".adjusted_state.json";
+
+    std::ofstream outFile(outPath.toStdString().c_str());
+    if (!outFile.is_open()) {
+      QString msg = "Error creating adjusted CSM state file [" + outPath + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    outFile << state.toStdString() << "\n";
+    outFile.close();
+  }
+
+
+  /**
+   * Construct a CSM model from either an ISD or a model state file.
+   * Tries the ISD path first (canModelBeConstructedFromISD), then
+   * falls back to the state path (canModelBeConstructedFromState).
+   * Follows the same plugin iteration logic as csminit.
+   *
+   * @param filePath Path to the ISD or model state file.
+   *
+   * @return csm::Model* The constructed CSM model (caller owns).
+   */
+  csm::Model *CameraFactory::constructModelFromIsdOrState(
+      const QString &filePath) {
+    initPlugin();
+
+    // Try ISD path first
+    csm::Isd isd(filePath.toStdString());
+    for (const csm::Plugin *plugin : csm::Plugin::getList())
+      for (size_t j = 0; j < plugin->getNumModels(); j++) {
+        std::string modelName = plugin->getModelName(j);
+        if (plugin->canModelBeConstructedFromISD(isd, modelName))
+          return plugin->constructModelFromISD(isd, modelName);
+      }
+
+    // ISD path failed. Try interpreting the file as a model state string.
+    std::ifstream stateFile(filePath.toStdString());
+    if (!stateFile.is_open()) {
+      QString msg = "Unable to open CSM file [" + filePath + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+    std::stringstream buffer;
+    buffer << stateFile.rdbuf();
+    std::string content = buffer.str();
+
+    for (const csm::Plugin *plugin : csm::Plugin::getList())
+      for (size_t j = 0; j < plugin->getNumModels(); j++) {
+        std::string modelName = plugin->getModelName(j);
+        if (plugin->canModelBeConstructedFromState(modelName, content))
+          return plugin->constructModelFromState(content);
+      }
+
+    QString msg = "No loaded CSM plugin could construct a model from [" +
+      filePath + "].";
+    throw IException(IException::User, msg, _FILEINFO_);
+  }
+
+
+   /**
    * Constructs CSM Model from ISD.
-   * 
+   *
    * @param isdFilePath Path to ISD file
    * @param pluginName Plugin name
    * @param modelName Model name
    * @param isdFormat ISD format type (e.g., NITF)
-   * 
+   *
    */
   csm::Model *CameraFactory::constructModelFromIsd(QString isdFilePath, QString pluginName, QString modelName, QString isdFormat) {
 

@@ -120,6 +120,26 @@ namespace Isis {
    */
   void SerialNumberList::add(const QString &filename, bool def2filename) {
     Pvl p(Isis::FileName(filename).expanded());
+    add(p, filename, def2filename);
+  }
+
+
+  /**
+   * Adds a new filename / serial number pair to the SerialNumberList using an
+   * existing Pvl label.
+   *
+   * @param p The Pvl label to be used
+   * @param filename The filename to be added
+   * @param def2filename If a serial number could not be found, try to return the filename
+   *
+   * @throws IException::User "Unable to find Instrument or Mapping group for comparing target."
+   * @throws IException::User "Unable to find Instrument group for comparing target."
+   * @throws IException::User "Target name from file does not match."
+   * @throws IException::User "Invalid serial number [Unknown] from file."
+   * @throws IException::User "Duplicate serial number from files [file1] and [file2]."
+   * @throws IException::User "FileName cannot be added to serial number list."
+   */
+  void SerialNumberList::add(Pvl &p, const QString &filename, bool def2filename) {
     PvlObject cubeObj = p.findObject("IsisCube");
 
     try {

@@ -1,45 +1,54 @@
 %module(package="isiscore") Blob
 %{
+    #include "PvlKeyword.h"
+    #include "PvlGroup.h"
+    #include "PvlObject.h"
     #include "Blob.h"
+    #include "TableField.h"
+    #include "TableRecord.h"
+    #include "Table.h"
 %}
 
+%include <QVector>
+%include <QString>
+
+%include "PvlKeyword.h"
+%include "PvlGroup.h"
+%include "PvlObject.h"
+
 %include "Blob.h"
-%nodefaultdtor Isis::Blob;
 
-// %extend Isis::Blob {
+%include "TableField.h"
+%extend Isis::TableField {
+    double __float__() {
+        return (double)*$self;
+    }
 
-//   Blob(const char* name, const char* type) {
-//     QString qname(name);
-//     QString qtype(type);
-//     Isis::Blob *blob = new Isis::Blob(qname, qtype);
-//     return blob;
-//   }
+    int __int__() {
+        return (int)*$self;
+    }
 
-//   Blob(const char* name, const char* type, const char* file) {
-//     QString qname(name);
-//     QString qtype(type);
-//     QString qfile(file);
-//     Isis::Blob *blob = new Isis::Blob(qname, qtype, file);
-//     return blob;
-//   }
+    std::string __str__() {
+        return ((QString)*$self).toStdString();
+    }
+}
 
-//   void Write(const char *file) {
-//     QString qfile(file);
+%include "TableRecord.h"
+%extend Isis::TableRecord {
+    TableField __getitem__(int i) {
+        return (*$self)[i];
+    }
+    void __setitem__(int i, TableField val) {
+        (*$self)[i] = val;
+    }
+}
 
-//     $self->Write(file);
-//   }
-
-//   char * getStringBuffer() {
-//     int bufferSize = $self->Size();
-//     char * buffer = $self->getBuffer();
-//     std::ostringstream os;
-//     for (int i = 0; i < bufferSize; i++) os << buffer[i];
-//     os << '\0';
-
-//     std::string str = os.str();
-//     char * cstr = new char [str.length()+1];
-//     std::strcpy (cstr, str.c_str());
-//     return cstr;
-//   }
-
-// }
+%include "Table.h"
+%extend Isis::Table {
+    TableRecord __getitem__(int i) {
+        return (*$self)[i];
+    }
+    void __setitem__(int i, TableRecord val) {
+        (*$self)[i] = val;
+    }
+}

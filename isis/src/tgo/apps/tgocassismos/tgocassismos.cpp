@@ -239,6 +239,9 @@ namespace Isis {
         parameters += " MINLON=" + ui.GetAsString("MINLON");
         parameters += " MAXLON=" + ui.GetAsString("MAXLON");
       }
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
 
       ProgramLauncher::RunIsisProgram("automos", parameters);
 

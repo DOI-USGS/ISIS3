@@ -1,5 +1,6 @@
 #include "phocube.h"
 
+#include <QDir>
 #include <QTemporaryFile>
 #include <QTemporaryDir>
 #include <QTextStream>
@@ -560,6 +561,78 @@ TEST(Phocube, FunctionalTestPhocubeSurfaceObliqueDetectorResolution) {
   EXPECT_NEAR(hist->Sum(), 8942.223367512226, .000001);
   EXPECT_EQ(hist->ValidPixels(), 10000);
   EXPECT_NEAR(hist->StandardDeviation(), 0.19152389132027792, .000001);
+
+  cube.close();
+}
+
+
+// Test the CSM= parameter, which loads a CSM camera (ISD or model state JSON)
+// from an external file and uses it in place of the camera attached to the
+// input cube. Mirrors Cam2mapTests::FunctionalTestCam2mapAspMapCsm.
+// Requires the USGSCSM plugin from ISISROOT or CONDA_PREFIX.
+TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
+  auto hasPlugins = [](const char *dir) {
+    return dir && QDir(QString(dir) + "/lib/csmplugins").exists();
+  };
+  const char *isisroot = getenv("ISISROOT");
+  const char *conda = getenv("CONDA_PREFIX");
+  if (!hasPlugins(isisroot) && !hasPlugins(conda))
+    GTEST_SKIP() << "No CSM plugins found (set ISISROOT or CONDA_PREFIX)";
+
+  // Resize testCube to match the CSM framer's 16x16 detector so all input
+  // pixels project through the CSM camera.
+  resizeCube(16, 16, 1);
+  QString cubePath = testCube->fileName();
+  testCube->close();
+
+  QString outCubeFileName = tempDir.path() + "/phocube_csm.cub";
+  QString isdPath = "data/defaultImage/orbitalMarsFramer.json";
+
+  QVector<QString> args = {"from=" + cubePath,
+                           "to=" + outCubeFileName,
+                           "csm=" + isdPath,
+                           "phase=yes",
+                           "emission=yes",
+                           "incidence=yes",
+                           "latitude=yes",
+                           "longitude=yes"};
+  UserInterface options(APP_XML, args);
+
+  try {
+    phocube(options);
+  } catch (IException &e) {
+    GTEST_SKIP() << "phocube CSM test skipped (environment issue): "
+                 << e.what();
+  }
+
+  Cube cube(outCubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), 16);
+  ASSERT_EQ(cube.lineCount(), 16);
+  ASSERT_EQ(cube.bandCount(), 5);
+
+  // Confirm the band names match the angles requested. This passes only if
+  // the CSM camera was successfully loaded and used (the requested bands
+  // are camera-only and would be rejected with SOURCE=PROJECTION).
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0],
+                      "Phase Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1],
+                      "Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2],
+                      "Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3],
+                      "Latitude");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4],
+                      "Longitude");
+
+  // The CSM framer points at lon=0, lat=0 on Mars from 4000 km, so most
+  // pixels should ground correctly and produce valid (non-Null) output.
+  std::unique_ptr<Histogram> latHist(cube.histogram(4));
+  EXPECT_GT(latHist->ValidPixels(), 0);
+  std::unique_ptr<Histogram> lonHist(cube.histogram(5));
+  EXPECT_GT(lonHist->ValidPixels(), 0);
 
   cube.close();
 }

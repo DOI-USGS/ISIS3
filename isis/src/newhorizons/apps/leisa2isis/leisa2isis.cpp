@@ -246,6 +246,9 @@ namespace Isis {
       parameters += " F2= " + qualityFile.toString();
       parameters += " TO= " + ui.GetCubeName("TO");
       parameters += " EQUATION=" + QString("\"f1+f2\"");
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("fx", parameters);
 
       // Cleanup by removing temporary cubes

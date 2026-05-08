@@ -6,7 +6,7 @@
 
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-[![Badge for DOI 10.5066/P13TADS5](https://img.shields.io/badge/DOI-10.5066%2FP13TADS5-blue)](https://doi.org/10.5066/P13TADS5)
+
 
 ## Quick Reference
 
@@ -46,10 +46,43 @@ See this repo's [discussion page](https://github.com/DOI-USGS/ISIS3/discussions?
 
 ## Citing ISIS
 
-The badge at the top of this README lists the DOI of the most recent ISIS version.  ISIS 8.3.0 was released on 10/01/2024 and its DOI is [`10.5066/P13TADS5`](https://doi.org/10.5066/P13TADS5).  (This section last updated on 04/01/2025, 8.3.0 is the latest ISIS version.)
+If you use ISIS in your research, please cite the specific version you used:
 
-The [Releases Page on GitHub](https://github.com/DOI-USGS/ISIS3/releases) lists the DOI for each version of ISIS.  Older versions may be listed on [Zenodo](https://doi.org/10.5281/zenodo.2563341).  It is good practice to cite the version of the software being used by the citing work, so others can reproduce your exact results.
+### Latest Release 
 
+**APA Format:**
+```
+USGS Astrogeology Science Center. (2026). Integrated Software for Imagers and Spectrometers (ISIS) (Version 9.0) [Computer software]. U.S. Geological Survey. https://doi.org/10.5066/P14RZST9
+```
+
+**BibTeX Format:**
+```bibtex
+@software{ISIS9.0.0,
+  author = {{USGS Astrogeology Science Center}},
+  title = {{Integrated Software for Imagers and Spectrometers (ISIS) version 9.0.0}},
+  year = {2026},
+  publisher = {{U.S. Geological Survey}},
+  version = {9.0},
+  doi = {DOI-10.5066/P14RZST9},
+  url = {{https://doi.org/10.5066/P14RZST9}}
+}
+```
+
+Use "Cite this repository" button on dev branch for citation information for dev builds. 
+
+### Citing Previous Versions
+
+To cite a specific earlier version, visit our [GitHub Releases](https://github.com/DOI-USGS/ISIS3/releases) page and click on the version you used. Each release starting with 10.0.0 has a "Cite this repository" button with version-specific citation formats.
+
+Pre-10.0.0 have DOIs in their release page which can be used to generate a citation.
+
+### Machine-Readable Citation
+
+For automated citation tools, see our [CITATION.cff](CITATION.cff) file. This file is automatically recognized by GitHub, Zotero, and other citation managers.
+
+### Questions?
+
+If you have questions about citing ISIS, please [open an issue](https://github.com/DOI-USGS/ISIS3/issues/new).
 ## System Requirements
 
 ISIS is supported on these UNIX variants (and may work on others, though unsupported):

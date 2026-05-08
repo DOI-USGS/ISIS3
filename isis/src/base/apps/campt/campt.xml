@@ -63,57 +63,64 @@ xsi:noNamespaceSchemaLocation=
     </p>
 
     <pre>
-Group = GroundPoint
-  Filename                   = $ISISDATA/base/examples/ab102401.cub
-  <def>Sample</def>                     = 1.0
-  <def>Line</def>                       = 1.0
-  <def link="Digital Number">PixelValue</def>                 = 0.0607816
-  <def link="Right Ascension">RightAscension</def>             = 65.749350916052 &lt;DEGREE&gt;
-  <def>Declination</def>                = -18.390093214966 &lt;DEGREE&gt;
-  <def link="Planetocentric Latitude">PlanetocentricLatitude</def>     = 34.444196777763 &lt;DEGREE&gt;
-  <def link="Planetographic Latitude">PlanetographicLatitude</def>     = 34.760399604837 &lt;DEGREE&gt;
-  <def link="Positive East Longitude">PositiveEastLongitude</def>      = 223.84999971299 &lt;DEGREE&gt;
-  <def link="Positive West Longitude">PositiveWestLongitude</def>      = 136.15000028701 &lt;DEGREE&gt;
-  <def link="Body Fixed Coordinate">BodyFixedCoordinate</def>        = (-2015.9595225544, -1936.6155808127, 1917.2574858384) &lt;km&gt;
-  <def link="Local Radius">LocalRadius</def>                = 3389756.4767145 &lt;m&gt;
-  <def link="Sample Resolution">SampleResolution</def>           = 536.05556350077 &lt;m/pixel&gt;
-  <def link="Line Resolution">LineResolution</def>             = 536.05556350077 &lt;m/pixel&gt;
-  <def link="Oblique Detector Resolution">ObliqueDetectorResolution</def>  = 151.26661909292 &lt;m/pixel&gt;
-  <def link="Oblique Pixel Resolution">ObliquePixelResolution</def>     = 605.06647637166 &lt;m/pixel&gt;
-  <def link="Oblique Line Resolution">ObliqueLineResolution</def>      = 605.06647637166 &lt;m/pixel&gt;
-  <def link="Oblique Sample Resolution">ObliqueSampleResolution</def>    = 605.06647637166 &lt;m/pixel&gt;
-  # Spacecraft Information
-  SpacecraftPosition         = (-2025.6211429076, -2130.1417975758, 2009.318879871) &lt;km&gt;
-  <def link="Spacecraft Azimuth">SpacecraftAzimuth</def>          = 0.006855593033889 &lt;DEGREE&gt;
-  <def link="Slant Distance">SlantDistance</def>              = 214.52515878961 &lt;km&gt;
-  <def link="Target Center Distance">TargetCenterDistance</def>       = 3560.6189705415 &lt;km&gt;
-  <def link="SubSpacecraft Latitude">SubSpacecraftLatitude</def>      = 34.354896748841 &lt;DEGREE&gt;
-  <def link="SubSpacecraft Longitude">SubSpacecraftLongitude</def>     = 226.44072947174 &lt;DEGREE&gt;
-  SpacecraftAltitude         = 170.83335389965 &lt;km&gt;
-  <def link="Off Nadir Angle">OffNadirAngle</def>              = 36.149255932304 &lt;DEGREE&gt;
-  <def link="SubSpacecraft Ground Azimuth">SubSpacecraftGroundAzimuth</def> = 91.64525294858 &lt;DEGREE&gt;
+    Group = GroundPoint
+      Filename = $ISISDATA/base/examples/ab102401.cub
+      <def link="Sample">Sample</def> = 1.0
+      <def link="Line">Line</def> = 1.0
+      <def link="Digital Number">PixelValue</def> = 0.060781602
+      <def link="Right Ascension">RightAscension</def> = 65.749350916052 &lt;DEGREE&gt;
+      <def link="Declination">Declination</def> = -18.390093214966 &lt;DEGREE&gt;
+      <def link="Planetocentric Latitude">PlanetocentricLatitude</def> = 34.444810271419 &lt;DEGREE&gt;
+      <def link="Planetographic Latitude">PlanetographicLatitude</def> = 34.761015675467 &lt;DEGREE&gt;
+      <def link="Positive East 360 Longitude">PositiveEast360Longitude</def> = 223.82417212882 &lt;DEGREE&gt;
+      <def link="Positive East 180 Longitude">PositiveEast180Longitude</def> = -136.17582787118 &lt;DEGREE&gt;
+      <def link="Positive West 360 Longitude">PositiveWest360Longitude</def> = 136.17582787118 &lt;DEGREE&gt;
+      <def link="Positive West 180 Longitude">PositiveWest180Longitude</def> = 136.17582787118 &lt;DEGREE&gt;
+      <def link="Body Fixed Coordinate">BodyFixedCoordinate</def> = (-2015.8679290774, -1934.7810590267, 1916.3847207237) &lt;km&gt;
+      <def link="Local Radius">LocalRadius</def> = 3388160.511498 &lt;meters&gt;
+      <def link="Sample Resolution">SampleResolution</def> = 541.13773952742 &lt;meters/pixel&gt;
+      <def link="Line Resolution">LineResolution</def> = 541.13773952742 &lt;meters/pixel&gt;
+      <def link="Oblique Detector Resolution">ObliqueDetectorResolution</def> = 172.33974835367 &lt;meters&gt;
+      <def link="Oblique Pixel Resolution">ObliquePixelResolution</def> = 689.35899341468 &lt;meters/pixel&gt;
+      <def link="Oblique Line Resolution">ObliqueLineResolution</def> = 689.35899341468 &lt;meters&gt;
+      <def link="Oblique Sample Resolution">ObliqueSampleResolution</def> = 689.35899341468 &lt;meters&gt;
 
-  # Sun Information
-  SunPosition                = (-177337948.13839, 112957442.69098, -33704752.205292) &lt;km&gt;
-  <def link="Sun Azimuth">SubSolarAzimuth</def>            = 172.30460990873 &lt;DEGREE&gt;
-  SolarDistance             = 1.4234246174889 &lt;AU&gt;
-  <def link="SubSolar Latitude">SubSolarLatitude</def>           = -9.1071705738361 &lt;DEGREE&gt;
-  <def link="SubSolar Longitude">SubSolarLongitude</def>          = 147.50443340123 &lt;DEGREE&gt;
-  <def link="Subsolar Ground Azimuth">SubSolarGroundAzimuth</def>      = 254.69139701227 &lt;DEGREE&gt;
+      # Spacecraft Information
+      <def link="Spacecraft Position">SpacecraftPosition</def> = (-2025.6211482473, -2130.1420376434, 2009.3189201922) &lt;km&gt;
+      <def link="Spacecraft Azimuth">SpacecraftAzimuth</def> = 359.99557293251 &lt;DEGREE&gt;
+      <def link="Slant Distance">SlantDistance</def> = 216.55900507971 &lt;km&gt;
+      <def link="Target Center Distance">TargetCenterDistance</def> = 3560.6191399537 &lt;km&gt;
+      <def link="SubSpacecraft Latitude">SubSpacecraftLatitude</def> = 34.35489567132 &lt;DEGREE&gt;
+      <def link="SubSpacecraft Longitude">SubSpacecraftLongitude</def> = 226.44073262086 &lt;DEGREE&gt;
+      SpacecraftAltitude = 171.90868675387 &lt;km&gt;
+      <def link="Off Nadir Angle">OffNadirAngle</def> = 36.15943479344 &lt;DEGREE&gt;
+      <def link="SubSpacecraft Ground Azimuth">Sub Spacecraft Ground Azimuth</def> = 91.645191732289 &lt;DEGREE&gt;
 
-  # Illumination and Other
-  <def link="Phase Angle">Phase</def>                      = 120.59515694473 &lt;DEGREE&gt;
-  <def link="Incidence Angle">Incidence</def>                  = 84.106289446623 &lt;DEGREE&gt;
-  <def link="Emission Angle">Emission</def>                   = 38.288719431206 &lt;DEGREE&gt;
-  <def link="North Azimuth">NorthAzimuth</def>               = 261.46910874636 &lt;DEGREE&gt;
+      # Sun Information
+      SunPosition = (-177337948.26395, 112957442.92463, -33704750.807723) &lt;km&gt;
+      <def link="Sun Azimuth">SubSolarAzimuth</def> = 172.26878294333 &lt;DEGREE&gt;
+      <def>SolarDistance</def> = 1.4234246106188 &lt;AU&gt;
+      <def link="SubSolar Latitude">SubSolar Latitude</def> = -9.1071701926796 &lt;DEGREE&gt;
+      <def link="SubSolar Longitude">SubSolarLongitude</def> = 147.50443336591 &lt;DEGREE&gt;
+      <def link="Subsolar Ground Azimuth">SubSolarGroundAzimuth</def> = 254.69133482343 &lt;DEGREE&gt;
 
-  # Time
-  <def link="Ephemeris Time">EphemerisTime</def>              = -69382819.160519 &lt;seconds&gt;
-  <def>UTC</def>                        = 1997-10-20T10:58:37.6570806
-  LocalSolarTime             = 17.089704420784 &lt;hour&gt;
-  <def link="Solar Longitude">SolarLongitude</def>             = 201.83159041209 &lt;DEGREE&gt;
-  Error                      = NULL
-End_Group
+      # Illumination and Other
+      <def link="Phase Angle">Phase</def> = 120.59515634921 &lt;DEGREE&gt;
+      <def link="Incidence Angle">Incidence</def> = 84.169474229445 &lt;DEGREE&gt;
+      <def link="Emission Angle">Emission</def> = 38.320209128441 &lt;DEGREE&gt;
+      <def link="North Azimuth">NorthAzimuth</def> = 260.69077053256 &lt;DEGREE&gt;
+
+      # Time
+      <def link="Epemeris Time">EphemerisTime</def> = -69382819.160519 &lt;seconds&gt;
+      UT = 1997-10-20T10:58:37.6570806
+      LocalSolarTime = 17.087982584194 &lt;hour&gt;
+      <def link="Solar Longitue">SolarLongitude</def> = 201.83052788083 &lt;DEGREE&gt;
+
+      # Look Direction Unit Vectors in Body Fixed, J2000, and Camera Coordinate Systems.
+      LookDirectionBodyFixed = (0.045037236693683, 0.90211431542542, -0.42914031413458)
+      LookDirectionJ2000 = (0.3897534785179, 0.86519446501987, -0.3154849658576)
+      LookDirectionCamera = (0.0040974504391656, 0.60456812815986,0.79654289860194)
+    End_Group
     </pre>
   </description>
 
@@ -216,6 +223,9 @@ End_Group
     <change name="Kristin Berry, Jesse Mapel, and Stuart Sides" date="2021-02-10">
       Modified to output Nulls when using a CSM Camera model and some values are not available.
     </change>
+    <change name="Jacob Cain" date="2026-04-21">
+      Updated output table.
+    </change>
   </history>
 
   <oldName>
@@ -230,6 +240,26 @@ End_Group
       <item>mappt</item>
       <item>getkey</item>
     </applications>
+    <documents>
+      <document>
+        <title>Multi-Instrument Registration</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/control-networks/multi-instrument-registration/</path>
+        </source>
+      </document>
+      <document>
+        <title>Camera Geometry</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/camera-geometry-and-projections/camera-geometry/#campt</path>
+        </source>
+      </document>
+      <document>
+        <title>HiRISE Anaglyphs</title>
+        <source>
+          <path>https://astrogeology.usgs.gov/docs/concepts/missions/mro/hirise-anaglyphs/</path>
+        </source>
+      </document>
+    </documents>
   </seeAlso>
 
   <groups>
@@ -540,4 +570,53 @@ End_Group
       </parameter>
     </group>
   </groups>
+  <examples>
+
+    <example>
+      <brief>Sample/Line</brief>
+      <description>
+        Get photometric information at pixel (1, 1).  TO (optional) specifies a label filename to save output to.  FORMAT and APPEND are also used to specify output.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=ab102401.cub sample=1 line=1 to=campt_out.pvl
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Latitude/Longitude</brief>
+      <description>
+        Get photometric information at lat 0, lon 270.  To use latitude and longitude, TYPE=GROUND must be specified.
+      </description>
+      <terminalInterface>
+        <commandLine>
+          from=ctx.cub lat=0.0 lon=270.0 type=ground
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+    <example>
+      <brief>Coordinate List</brief>
+      <description>
+        Get photometric information for a series of points.  The points should be in sample, line format for COORDTYPE=IMAGE (or lat, lon for COORDTYPE=GROUND).  COORDTYPE is required when COORDLIST is used.
+      </description>
+      <inputText>
+        <commandLine>2, 3
+2, 13
+12, 13
+12, 3   </commandLine>
+        <description>
+          campt_coords.lis
+        </description>
+      </inputText>
+      <terminalInterface>
+        <commandLine>
+          from=ab102401.cub coordlist=campt_coords.lis coordtype=image to=campt_out.pvl
+        </commandLine>
+      </terminalInterface>
+    </example>
+
+
+  </examples>
 </application>

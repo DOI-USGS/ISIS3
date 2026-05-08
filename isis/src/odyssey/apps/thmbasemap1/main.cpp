@@ -218,11 +218,17 @@ void IsisMain(){
     // Run thm2isis
     QString output = (infile.baseName()) + ".cub";
     QString parameters = "FROM=" + cubes[i].toString() + " TO=" + output;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("thm2isis", parameters);
 
     //Run spiceinit
     QString input = output;
     parameters = "FROM=" + input + " CKRECON=yes CKPREDICTED=yes CKNADIR=yes";
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("spiceinit", parameters);
     if (reportNadirSpc) {
       Pvl spclab(input);
@@ -245,6 +251,9 @@ void IsisMain(){
     QString tempstat1 = tstat1.expanded();
 
     parameters = "FROM=" + input + " TO=" + tempstat1 + " linc = 100 sinc = 100";
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("camstats", parameters);
     Pvl p1;
     p1.read(tempstat1);
@@ -297,12 +306,18 @@ void IsisMain(){
       output = (infile.baseName()) + "_driftcorr.cub";
       parameters = "FROM=" + input + "+" + toString(procBand) +
                    " ATM=" + input + "+" + toString(atmosBand) + " TO=" + output;
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("thmdriftcor", parameters);
       remove (input.toLatin1().data());
     }
     else {
       output = (infile.baseName()) + "_no_driftcorr.cub";
       parameters = "FROM=" + input + "+" + toString(procBand) + " TO=" + output;
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("stretch", parameters);
       remove (input.toLatin1().data());
     }
@@ -313,6 +328,9 @@ void IsisMain(){
       input = output;
       output = (infile.baseName()) + "_cosi.cub";
       parameters = "FROM=" + input + " TO=" + output;
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("cosi", parameters);
       remove (input.toLatin1().data());
     }
@@ -321,6 +339,9 @@ void IsisMain(){
     input = output;
     output = (infile.baseName()) + "cubenorm.cub";
     parameters = "FROM=" + input + " TO=" + output;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("cubenorm", parameters);
     remove (input.toLatin1().data());
 
@@ -328,6 +349,9 @@ void IsisMain(){
     input=output;
     outFile = pathName + infile.baseName() + ".lev1.cub";
     parameters ="FROM=" + input + " TO=" + outFile;
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("lineeq", parameters);
     remove (input.toLatin1().data());
 
@@ -347,6 +371,9 @@ void IsisMain(){
     //ProgramLauncher::RunIsisProgram("findgaps", parameters);
     parameters = "FROM=" + outFile +
                  " TO=" + tempgaps + " APPEND=no";
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("stats", parameters);
     Pvl tg;
     tg.read(tempgaps);
@@ -370,6 +397,9 @@ void IsisMain(){
 
     parameters = "FROM=" + outFile +
                  " TO=" + tempstat2 + " linc = 100 sinc = 100";
+    if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
     ProgramLauncher::RunIsisProgram("camstats", parameters);
 
     Pvl p2;
@@ -400,6 +430,9 @@ void IsisMain(){
       parameters = "FROM=" + outFile +
                    " TO=" + (QString)(infile.baseName()) + ".gml" +
                    " LABEL=" + (QString)(infile.baseName());
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("isis2gml", parameters);
     }
 

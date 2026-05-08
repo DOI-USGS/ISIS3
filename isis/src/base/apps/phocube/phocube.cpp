@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Angle.h"
 #include "Camera.h"
+#include "CameraFactory.h"
 #include "Cube.h"
 #include "FileName.h"
 #include "IException.h"
@@ -51,6 +52,15 @@ namespace Isis {
   void phocube(UserInterface &ui) {
     Cube icube;
     icube.open(ui.GetCubeName("FROM"));
+
+    // Optional external CSM camera (ISD or model state JSON). Replaces the
+    // camera attached to the input cube; the cube does not need to be run
+    // through spiceinit in this mode.
+    if (ui.WasEntered("CSM")) {
+      Camera *cam = CameraFactory::CreateFromIsd(ui.GetFileName("CSM"), icube);
+      icube.setCamera(cam);
+    }
+
     phocube(&icube, ui);
   }
 

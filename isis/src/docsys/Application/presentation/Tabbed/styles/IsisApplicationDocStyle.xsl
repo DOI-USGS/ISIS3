@@ -753,6 +753,23 @@
                       <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
                     </div>
 
+                    <xsl:if test="inputText">
+                      <hr></hr>
+                      <div>
+                        <xsl:for-each select="inputText">
+                          <div class="cmd-line-caption">
+                            <xsl:apply-templates select="description/* | description/text()" mode="copyContents"/>
+                          </div>
+                          <div>
+                            <code class="cmd-multiline">
+                                <xsl:apply-templates select="commandLine/* | commandLine/text()" mode="copyContents"/>
+                            </code>
+                          </div>
+                        </xsl:for-each>
+                      </div>
+
+                    </xsl:if>
+
                     <xsl:if test="terminalInterface">
                       <h3>
                       Command Line

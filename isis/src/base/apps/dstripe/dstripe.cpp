@@ -83,6 +83,9 @@ namespace Isis {
         lowParams += " samples= " + toString(lowSamples);
         lowParams += " lines= " + toString(lowLines);
 
+        if (ui.GetParamPreference() != "") { 
+            lowParams += " -PREFERENCE=" + ui.GetParamPreference();
+        }
         ProgramLauncher::RunIsisProgram("lowpass", lowParams);
 
         // Make a copy of the lowpass filter results if the user wants it
@@ -92,6 +95,9 @@ namespace Isis {
             lowParams += " to= " + ui.GetCubeName("LPFNOISE");
             lowParams += " samples= " + toString(lowSamples);
             lowParams += " lines= " + toString(lowLines);
+            if (ui.GetParamPreference() != "") { 
+                lowParams += " -PREFERENCE=" + ui.GetParamPreference();
+            }
             ProgramLauncher::RunIsisProgram("lowpass", lowParams);
         }
 
@@ -104,7 +110,9 @@ namespace Isis {
         highParams += " to= " + tempNoiseFileName + " ";
         highParams += " samples= " + toString(highSamples);
         highParams += " lines= " + toString(highLines);
-
+        if (ui.GetParamPreference() != "") { 
+            highParams += " -PREFERENCE=" + ui.GetParamPreference();
+        }
         ProgramLauncher::RunIsisProgram("highpass", highParams);
         QFile::remove(tempFileName);
 

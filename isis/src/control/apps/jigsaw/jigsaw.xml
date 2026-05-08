@@ -721,6 +721,27 @@
         </filter>
       </parameter>
 
+      <parameter name="CSMLIST">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <internalDefault>None</internalDefault>
+        <brief>
+          List of external CSM camera files (one per cube in FROMLIST)
+        </brief>
+        <description>
+          Optional list of external CSM camera files, parallel to FROMLIST.
+          Each line corresponds to one cube. Each file can be a CSM ISD or
+          model state. When provided, jigsaw loads the CSM camera from the
+          file instead of from the cube blob, and writes adjusted state to
+          an external file instead of modifying the cube. The output files
+          use the same naming convention as OUTPUT_ADJUSTED_CSMSTATE. Cannot
+          be used together with OUTPUT_ADJUSTED_CSMSTATE.
+        </description>
+        <filter>
+          *.txt *.lis
+        </filter>
+      </parameter>
+
       <parameter name="CNET">
         <type>filename</type>
         <fileMode>input</fileMode>
@@ -1869,11 +1890,13 @@
         </parameter>
 
         <parameter name="OUTPUT_ADJUSTED_CSMSTATE">
-          <brief> Outputs CSMState string to file after adjustment</brief>
+          <brief> Outputs adjusted CSM state to file after adjustment</brief>
           <description>
-            Selection of this parameter flags output of CSMState string
-            to a JSON file. A CSMState string is generated for each cube 
-            in the cube list and outputted to where the cubes are located.
+            If set, save the adjusted CSM states to JSON files in addition to
+            updating the cube files. The output files are named
+            &lt;cube_basename&gt;.adjusted_state.json, written to the current
+            directory or prepended with FILE_PREFIX if set. Cannot be used
+            together with CSMLIST.
           </description>
           <type>boolean</type>
           <default>
@@ -2263,6 +2286,36 @@
           </description>
         </dataFile>
       </dataFiles>
+    </example>
+
+    <example>
+      <brief>Solve with external CSM cameras (CSMLIST)</brief>
+      <description>
+      <p>
+        This example uses external CSM camera files instead of
+        embedded cube blobs. The CSMLIST file has one entry per
+        cube in FROMLIST. Each entry can be a CSM ISD or model
+        state file. Cubes are not modified. Adjusted camera state
+        is written to .adjusted_state.json files using the
+        FILE_PREFIX naming convention, regardless of the UPDATE
+        flag (which only controls cube modification).
+      </p>
+      </description>
+      <terminalInterface>
+        <commandLine>fromlist=cubes.lis csmlist=isds.lis
+          cnet=input.net onet=output.net
+          csmsolveset=adjustable file_prefix=run/out
+          point_latitude_sigma=500 point_longitude_sigma=500
+          point_radius_sigma=500 camera_angles_sigma=2
+          spacecraft_position_sigma=1000
+        </commandLine>
+        <description>
+         jigsaw with external CSM cameras. Consider carefully
+         which sigma values to set and their magnitudes.
+         The units are in meters, except for
+         camera_angles_sigma which is in radians.
+        </description>
+      </terminalInterface>
     </example>
 
   </examples>

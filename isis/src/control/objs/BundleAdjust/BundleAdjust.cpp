@@ -19,6 +19,9 @@ find files of those names at the top level of this repository. **/
 #include <QFile>
 #include <QMutex>
 
+// csm lib
+#include <csm/Model.h>
+
 // boost lib
 #include <boost/lexical_cast.hpp>
 #include <boost/numeric/ublas/io.hpp>
@@ -28,6 +31,10 @@ find files of those names at the top level of this repository. **/
 
 // Isis lib
 #include "Application.h"
+#include "CameraFactory.h"
+#include "Cube.h"
+#include "FileList.h"
+#include "PvlKeyword.h"
 #include "BundleLidarControlPoint.h"
 #include "BundleMeasure.h"
 #include "BundleObservation.h"
@@ -107,7 +114,8 @@ namespace Isis {
   BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              const QString &cnetFile,
                              const QString &cubeList,
-                             bool printSummary) {
+                             bool printSummary,
+                             const QString &isdList) {
     m_abort = false;
     Progress progress;
     // initialize constructor dependent settings...
@@ -125,6 +133,8 @@ namespace Isis {
     }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = new SerialNumberList(cubeList);
+    if (!isdList.isEmpty())
+      readIsdList(isdList, cubeList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -146,7 +156,8 @@ namespace Isis {
                              const QString &cnetFile,
                              const QString &cubeList,
                              const QString &lidarDataFile,
-                             bool printSummary) {
+                             bool printSummary,
+                             const QString &isdList) {
     m_abort = false;
     Progress progress;
     // initialize constructor dependent settings...
@@ -175,6 +186,8 @@ namespace Isis {
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_bundleResults.setOutputLidarData(m_lidarDataSet);
     m_serialNumberList = new SerialNumberList(cubeList);
+    if (!isdList.isEmpty())
+      readIsdList(isdList, cubeList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -303,7 +316,8 @@ namespace Isis {
   BundleAdjust::BundleAdjust(BundleSettingsQsp bundleSettings,
                              ControlNetQsp cnet,
                              const QString &cubeList,
-                             bool printSummary) {
+                             bool printSummary,
+                             const QString &isdList) {
     m_abort = false;
     m_printSummary = printSummary;
     m_cleanUp = false;
@@ -316,6 +330,8 @@ namespace Isis {
     }
     m_bundleResults.setOutputControlNet(m_controlNet);
     m_serialNumberList = new SerialNumberList(cubeList);
+    if (!isdList.isEmpty())
+      readIsdList(isdList, cubeList);
     m_bundleSettings = bundleSettings;
     m_bundleTargetBody = bundleSettings->bundleTargetBody();
 
@@ -391,6 +407,54 @@ namespace Isis {
   }
 
 
+  // Parse the ISD list file into m_isdFiles. Rebuild m_serialNumberList
+  // so that images with ISDs get CSM-derived serial numbers (matching
+  // cnets built with csminit'd cubes), while images without ISDs keep
+  // their original serial numbers. This rebuild is necessary because
+  // deriving serial numbers requires reading cube labels from disk,
+  // and the in-memory CsmInfo patches from here do not persist to
+  // later pipeline stages. Uses the same CsmInfo PVL group approach
+  // as csminit, but in memory only. Cubes on disk are not modified.
+  void BundleAdjust::readIsdList(const QString &isdList,
+                                 const QString &cubeList) {
+    // Parse the ISD list file (use FileList, same as cube list parsing)
+    FileList isdFileList(isdList);
+    for (int i = 0; i < (int)isdFileList.size(); i++)
+      m_isdFiles.append(isdFileList[i].toString());
+
+    // Parse the cube list file
+    FileList cubeFiles(cubeList);
+    if (m_isdFiles.size() != (int)cubeFiles.size()) {
+      QString msg = "ISD list has " + toString((int)m_isdFiles.size()) +
+        " entries but cube list has " + toString((int)cubeFiles.size()) + ".";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // Rebuild serial number list. For cubes with ISDs, inject a CsmInfo
+    // group into the in-memory label before deriving the serial number.
+    CameraFactory::initPlugin();
+    delete m_serialNumberList;
+    m_serialNumberList = new SerialNumberList(false);
+    for (int i = 0; i < (int)cubeFiles.size(); i++) {
+      QString filename = cubeFiles[i].toString();
+      Cube cube(filename, "r");
+
+      if (!m_isdFiles[i].isEmpty()) {
+        // Prepare cube label for CSM (strips SPICE, injects CsmInfo)
+        csm::Model *model =
+          CameraFactory::constructModelFromIsdOrState(m_isdFiles[i]);
+        CameraFactory::updateLabelForCsm(cube, model);
+        if (model) delete model;
+      }
+
+      // Derive serial number and metadata from (possibly modified) label.
+      // This ensures observation numbers and solve settings are correctly
+      // handled for both CSM and ISIS cameras.
+      m_serialNumberList->add(*cube.label(), filename);
+    }
+  }
+
+
   /**
    * Initialize all solution parameters. This method is called
    * by constructors to
@@ -438,7 +502,7 @@ namespace Isis {
     // NOTE - THIS IS NOT THE SAME AS "setImage" as called in BundleAdjust::computePartials
     // this call only does initializations; sets measure's camera pointer, etc
     // RENAME????????????
-    m_controlNet->SetImages(*m_serialNumberList, progress);
+    m_controlNet->SetImages(*m_serialNumberList, progress, m_isdFiles);
 
     if (m_lidarDataSet) {
       // TODO: (KLE) document why we're (at the moment) required to use an existing control net to
@@ -2920,6 +2984,20 @@ namespace Isis {
    */
   QString BundleAdjust::fileName(int i) {
     return m_serialNumberList->fileName(i);
+  }
+
+
+  /**
+   * Return the isd file path for the image with index i.
+   *
+   * @param i The image index.
+   *
+   * @return @b QString The isd file path.
+   */
+  QString BundleAdjust::isdFile(int i) {
+    if (i < 0 || i >= (int)m_isdFiles.size())
+      return "";
+    return m_isdFiles[i];
   }
 
 

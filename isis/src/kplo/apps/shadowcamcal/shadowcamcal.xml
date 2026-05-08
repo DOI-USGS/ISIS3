@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application name="shadowcamcal" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://isis.astrogeology.usgs.gov/Schemas/Application/application.xsd">
+  <brief>
+    Calibrates ShadowCam Images
+  </brief>
+
+  <description>
+    <p>
+      shadowcamcal performs radiometric corrections to images acquired by the 
+      Camera aboard the Korea Pathfinder Lunar Orbiter spacecraft.
+    </p>
+
+    <p>
+      The ShadowCam detector has a total of 3144 pixels, divided amongst 6 channels, each containing 524 pixels.
+
+    </p>
+      The ShadowCam camera has the ability to acquire images of differing sizes in line. The starting hardware detector pixel for the acquired image is specified by the ISIS label keyword, SampleFirstPixel.
+      The first pixel in this detector is indicated by a value of ??(0 for LROC).
+    <p>
+      Bias Subtraction
+    </p>
+
+    <p>
+      Gain Correction/Normalization
+    </p>
+
+    <p>
+      Dark Subtraction
+    </p>
+
+    <p>
+      Flat Field
+    </p>
+
+    <p>
+      Flat Field
+    </p>
+
+    <p>
+      Radiance
+    </p>
+
+    <p>
+      IOF
+    </p>
+
+    <p>
+      Special Pixels
+    </p>
+
+    <p>
+      The calibration equation is: (update for SC)
+      <pre>
+        reportedDN = 
+      </pre>
+        Where:
+      <pre>
+        ObservedDN = 
+      </pre>
+    </p>
+
+    <p>
+      
+    </p>
+  </description>
+
+  <category>
+    <categoryItem>Calibrate</categoryItem>
+  </category>
+
+  <history>
+    <change name="Victor Silva" date="2024-05-22">
+      Original version
+    </change>
+    <change name="Cordell Michaud" date="2025-03-31">
+      Refactored for better testability, simplified code where possible, and improved readability.
+      Changed INTRCPTCOEFF parameter to INTERCEPTCOEFF for clarity and consistency.
+    </change>
+  </history>
+
+  <groups>
+    <group name="Files">
+      <parameter name="FROM">
+        <type>cube</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Input cube
+        </brief>
+        <description>
+  	      This is the input cube that will be cropped.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="TO">
+        <type>cube</type>
+        <fileMode>output</fileMode>
+        <brief>
+          Output cropped cube
+        </brief>
+        <description>
+          The smaller output <def link="Cube">cube</def> containing the results of <i>shadowcamcal</i>.
+        </description>
+        <filter>
+          *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="WriteOutSteps">
+        <type>boolean</type>
+        <default><item>False</item></default>
+        <brief>
+          Write out steps 
+        </brief>
+        <description>
+          Write out calibration steps as cubes
+        </description>
+      </parameter>
+    </group>
+
+    
+
+    <group NAME="Remove Bias Pixel Columns (after calibration steps completed)">
+      <parameter name="BiasPixelRemoval">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Remove Bias Pixels(columns) in the image 
+        </brief>
+        <description>
+          Remove Bias Pixel columns in image 
+          
+          Keeping in image will keep width of 524 pixesl per channel (6 total channels)
+          
+          Removing from image will reduce width to 512 samples per channel(6 total channels) 
+
+          Bias pixels total 12 per line, 8 blank/dark, 4 overscan (2 on each side of sensor channels)
+          
+        </description>
+      </parameter>
+    </group>
+
+    <group name="Bias Average Subtraction">
+      <parameter name="BiasAvgSubtraction">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Subtract bias pixel average from DN.
+        </brief>
+        <description>
+          Mean or Median
+        </description>
+        <inclusions><item>BIASAVGTYPE</item></inclusions>
+      </parameter>
+
+      <parameter name="BIASAVGTYPE">
+        <type>string</type>
+        <default><item>MEAN</item></default>
+        <list>
+          <option value="MEDIAN">
+            <brief>Median</brief>
+            <description>
+              Use Median bias value for bias subtraction.
+            </description>
+          </option>
+          <option value="MEAN">
+            <brief>Mean</brief>
+            <description>
+              Use Mean bias value for bias subtraction.
+            </description>
+          </option>
+        </list>
+      </parameter>
+    </group>
+
+    <group name="Gain Correction">
+      <parameter name="GainCorrection">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using the Gain Correction.
+        </brief>
+        <description>
+          Calibrate using the Gain Correction.
+        </description>
+        <inclusions>
+          <item>GAINFACTORS</item>
+        </inclusions>
+      </parameter>
+      <parameter name="GAINFACTORS">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$kplo/calibration</defaultPath>
+        <default><item>$kplo/calibration/gain_factors.csv</item></default>
+        <brief>
+          CSV file containing gain factors for gain correction
+        </brief>
+        <description>
+        </description>
+        <filter>*.csv</filter>
+      </parameter>
+    </group>
+
+    <group name="Dark Subtraction">
+      <parameter name="DarkSubtraction">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using Dark Subtraction
+        </brief>
+        <description>
+          Calibrate using slope coefficients and intercept coefficients from respective csv files to compute dark level subtracted from image. 
+        </description>
+        <inclusions>
+          <item>SLOPECOEFF</item>
+          <item>INTERCEPTCOEFF</item>
+        </inclusions>
+      </parameter>
+      <parameter name="SLOPECOEFF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$kplo/calibration</defaultPath>
+        <default><item>$kplo/calibration/dark_subtract_slope.csv</item></default>
+        <brief>
+          CSV file containing slope coefficents for dark subtraction
+        </brief>
+        <description>
+        </description>
+        <filter>*.csv</filter>
+      </parameter>
+      <parameter name="INTERCEPTCOEFF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$kplo/calibration</defaultPath>
+        <default><item>$kplo/calibration/dark_subtract_intercept.csv</item></default>
+        <brief>
+          CSV file containing intercept coefficents for dark subtraction
+        </brief>
+        <description>
+        </description>
+        <filter>*.csv</filter>
+      </parameter>
+    </group>
+
+    <group name="Flatfield Correction">
+      <parameter name="FlatfieldCorrection">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using the flatfield.
+        </brief>
+        <description>
+        </description>
+        <inclusions>
+          <item>FLATCOEFF</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="FLATCOEFF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$kplo/calibration</defaultPath>
+        <default><item>$kplo/calibration/flat_field.csv</item></default>
+        <brief>
+          CSV file containing flatfield coefficents
+        </brief>
+        <description>
+        </description>
+        <filter>*.csv</filter>
+      </parameter>
+    </group>
+
+    <group name="Radiance Correction">
+      <parameter name="RadianceCorrection">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using radiance.
+        </brief>
+        <description>
+        </description>
+        <inclusions>
+          <item>RADCOEFF</item>
+        </inclusions>
+      </parameter>
+
+      <parameter name="RADCOEFF">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <defaultPath>$kplo/calibration</defaultPath>
+        <default><item>$kplo/calibration/radiance.csv</item></default>
+        <brief>
+          CSV file containing radiance coefficents
+        </brief>
+        <description>
+        </description>
+        <filter>*.csv</filter>
+      </parameter>
+    </group>
+  </groups>
+</application>

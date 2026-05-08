@@ -27,6 +27,7 @@ find files of those names at the top level of this repository. **/
 #include <boost/numeric/ublas/io.hpp>
 
 #include "Application.h"
+#include "Camera.h"
 #include "CameraFactory.h"
 #include "ControlMeasure.h"
 #include "ControlNetVersioner.h"
@@ -1592,7 +1593,8 @@ namespace Isis {
    *   @history 2016-10-13 Ian Humphrey - Added initial check to see if cameras have already been
    *                           set, and immediately return if yes. References #4293.
    */
-  void ControlNet::SetImages(SerialNumberList &list, Progress *progress) {
+  void ControlNet::SetImages(SerialNumberList &list, Progress *progress,
+                             const QStringList &isdFiles) {
     // First check if cameras have already been setup via another SetImages call
     if (p_cameraList.size() > 0) {
       return;
@@ -1610,7 +1612,11 @@ namespace Isis {
       Cube cube(filename, "r");
 
       try {
-        Isis::Camera *cam = CameraFactory::Create(cube);
+        Isis::Camera *cam = nullptr;
+        if (i < isdFiles.size() && !isdFiles[i].isEmpty())
+          cam = CameraFactory::CreateFromIsd(isdFiles[i], cube);
+        else
+          cam = CameraFactory::Create(cube);
         p_cameraMap[serialNumber] = cam;
         p_cameraValidMeasuresMap[serialNumber] = 0;
         p_cameraRejectedMeasuresMap[serialNumber] = 0;

@@ -253,6 +253,9 @@ namespace Isis {
                            " MOSAIC=" + toMosaic + 
                            " PRIORITY=" + MosaicPriority +
                            " MATCHBANDBIN=" + (matchBandBin ? "TRUE" : "FALSE");
+      if (ui.GetParamPreference() != "") { 
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
       ProgramLauncher::RunIsisProgram("automos", parameters);
 
       // write out new information to new group mosaic
