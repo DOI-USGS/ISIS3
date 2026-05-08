@@ -472,14 +472,13 @@ namespace Isis {
       if (!dataset) {
         if (xmlFileName.expanded().contains("/vsi")) {
           // Attempt to manually read the label via VSI buffer
-          // Needed for Cassini VIMS workflow
           VSILFILE *fp = VSIFOpenL(xmlFileName.expanded().toUtf8().constData(), "rb");
           if (fp) {
             char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
             size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
             buffer[nRead] = '\0'; // end sign
             VSIFCloseL(fp);
-            m_xmlLabel.setContent(QString::fromUtf8(buffer), &errmsg, &errline, &errcol);
+            m_xmlLabel.setContent(QString::fromUtf8(buffer), false, &errmsg, &errline, &errcol);
             CPLFree(buffer);
             return;
           }
@@ -496,14 +495,12 @@ namespace Isis {
         if (metadata.Count() > 0 && metadata[0] != nullptr) {
           const char *metadataXmlString = metadata[0];
           QString xmlString = QString::fromUtf8(metadataXmlString);
-          if (m_xmlLabel.setContent(xmlString, &errmsg, &errline, &errcol)) {
+          if (!m_xmlLabel.setContent(xmlString, false, &errmsg, &errline, &errcol)) {
             GDALClose(dataset); 
-            return; // CRITICAL: Stop here so we don't hit the QFile logic
-          } else {
-              // Handle the parse error here
-              std::cerr << "XML Parse Error: " << errmsg.toStdString() << std::endl;
-              QString msg = "Failed setting XML content from [" + xmlFileName.name() + "]";
-              throw IException(IException::Programmer, msg, _FILEINFO_);
+            QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+              + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+              + "], message: " + errmsg;
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
       } 

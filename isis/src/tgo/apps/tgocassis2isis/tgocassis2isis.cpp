@@ -69,15 +69,15 @@ namespace Isis {
       QString transRawFile = "TgoCassisInstrument.trn";
 
       OriginalXmlLabel xmlLabel;
-      xmlLabel.readFromXmlFile(xmlFileName);
-
+      xmlLabel.readFromXmlFile(xmlFileName, true);
+      QDomDocument xmlDoc = xmlLabel.ReturnLabels();
       // If any instances of "Optical_Filter" or "Mission_Area" exist, use PSA .trn file
       QString transExportFile;
-      if (!xmlLabel.CheckElementsByTagName("Optical_Filter") &&
-          !xmlLabel.CheckElementsByTagName("Cassis_Data")) {
+      if (!xmlDoc.elementsByTagName("Optical_Filter").isEmpty() &&
+          !xmlDoc.elementsByTagName("Cassis_Data").isEmpty()) {
         transExportFile = "TgoCassisExportedInstrument_PSA_Optical_Filter.trn";
       }
-      else if (!xmlLabel.CheckElementsByTagName("Cassis_Data")) {
+      else if (!xmlDoc.elementsByTagName("Cassis_Data").isEmpty()) {
         transExportFile = "TgoCassisExportedInstrument_PSA.trn";
       }
       else {
@@ -113,6 +113,7 @@ namespace Isis {
       }
 
       FileName outputCubeFileName(ui.GetCubeName("TO"));
+      xmlLabel.readFromXmlFile(xmlFileName);
       importer.StartProcess();
 
       // Write out original label before closing the cube
@@ -212,11 +213,12 @@ namespace Isis {
       QString missionDir = "$ISISROOT/appdata/translations/";
 
       OriginalXmlLabel xmlLabel;
-      xmlLabel.readFromXmlFile(xmlFileName);
+      xmlLabel.readFromXmlFile(xmlFileName, true);
+      QDomDocument xmlDoc = xmlLabel.ReturnLabels();
 
       // If any instances of "Observing_System_Component" exist, use PSA .trn file
       FileName mapTransFile;
-      if (xmlLabel.CheckElementsByTagName("cart:a_axis_radius")){
+      if (xmlDoc.elementsByTagName("cart:a_axis_radius").size()) {
         mapTransFile = FileName(missionDir + "TgoCassisMapping_PSA.trn");
       } else {
         mapTransFile = FileName(missionDir + "TgoCassisMapping.trn");

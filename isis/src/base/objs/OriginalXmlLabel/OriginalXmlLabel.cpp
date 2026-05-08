@@ -103,7 +103,9 @@ namespace Isis {
    * @throws IException::Io "Could not open label file."
    * @throws IException::Unknown "XML read/parse error in file."
    */
-  void OriginalXmlLabel::readFromXmlFile(const FileName &xmlFileName) {
+  void OriginalXmlLabel::readFromXmlFile(const FileName &xmlFileName, bool useNamespace) {
+    QString errmsg;
+    int errline, errcol;
 
     if (xmlFileName.expanded().contains("/vsi")) {
       GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(xmlFileName.expanded().toStdString().c_str(), GA_ReadOnly));
@@ -116,7 +118,7 @@ namespace Isis {
             size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
             buffer[nRead] = '\0'; // end sign
             VSIFCloseL(fp);
-            m_originalLabel.setContent(QString::fromUtf8(buffer), true);
+            m_originalLabel.setContent(QString::fromUtf8(buffer), useNamespace);
             CPLFree(buffer);
             return;
           }
@@ -134,26 +136,36 @@ namespace Isis {
         if (metadata.Count() > 0 && metadata[0] != nullptr) {
           const char *metadataXmlString = metadata[0];
           QString xmlString = QString::fromUtf8(metadataXmlString);
-          if (m_originalLabel.setContent(xmlString, true)) {
+          if (!m_originalLabel.setContent(xmlString, useNamespace, &errmsg, &errline, &errcol)) {
             GDALClose(dataset);
-            return;
-          } else {
-              QString msg = "Failed setting XML content from [" + xmlFileName.name() + "]";
-              throw IException(IException::Programmer, msg, _FILEINFO_);
+            QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+              + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+              + "], message: " + errmsg;
+            throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
       } 
       GDALClose(dataset);
     } else {
       QFile xmlFile(xmlFileName.expanded());
-      if ( !xmlFile.open(QIODevice::ReadOnly) ) {
-        QString msg = "Could not open label file [" + xmlFileName.expanded() + "].";
-        throw IException(IException::Io, msg, _FILEINFO_);
+      if (!xmlFile.open(QIODevice::ReadOnly)) {
+        throw IException(IException::Io, "Could not open file", _FILEINFO_);
       }
 
-      if ( !m_originalLabel.setContent(&xmlFile, true)) {
+      QString errmsg;
+      int errline, errcol;
+      if (!m_originalLabel.setContent(&xmlFile, useNamespace, &errmsg, &errline, &errcol)) {
+        if (useNamespace) {
+          xmlFile.seek(0);
+          if (m_originalLabel.setContent(&xmlFile, false)) {
+            xmlFile.close();
+            return;
+          }
+        }
         xmlFile.close();
-        QString msg = "XML read/parse error in file [" + xmlFileName.expanded() + "].";
+        QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+              + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+              + "], message: " + errmsg;
         throw IException(IException::Unknown, msg, _FILEINFO_);
       }
 
@@ -169,10 +181,5 @@ namespace Isis {
    */
   const QDomDocument &OriginalXmlLabel::ReturnLabels() const{
     return m_originalLabel;
-  }
-
-  bool OriginalXmlLabel::CheckElementsByTagName(QString tagName) {
-    auto nodes = m_originalLabel.elementsByTagName(tagName);
-    return nodes.isEmpty();
   }
 }
