@@ -131,7 +131,7 @@ namespace Isis {
       CPLStringList metadataDomains = CPLStringList(dataset->GetMetadataDomainList(), false);
       CPLStringList metadata;
       const char* domainPDS4 = "xml:PDS4";
-      if (CSLFindString(metadataDomains.List(), domainPDS4) != -1) {
+      if (CSLFindString(metadataDomains.List(), domainPDS4) != -1) { 
         metadata = CPLStringList(dataset->GetMetadata(domainPDS4), false);
         if (metadata.Count() > 0 && metadata[0] != nullptr) {
           const char *metadataXmlString = metadata[0];
@@ -144,6 +144,10 @@ namespace Isis {
             throw IException(IException::Programmer, msg, _FILEINFO_);
           }
         }
+      } else {
+        GDALClose(dataset);
+        QString msg = "Could not find " + QString(domainPDS4) + " in GDALDataset metadata domains list.";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
       } 
       GDALClose(dataset);
     } else {

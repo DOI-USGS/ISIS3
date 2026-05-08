@@ -363,7 +363,11 @@ namespace Isis {
     Pvl pvl;
 
     try {
-      pvl.read(pvlFile);
+      if (pvlFile.contains("/vsi")) {
+        pvl.readGdal(pvlFile);
+      } else {
+        pvl.read(pvlFile);
+      }
     }
     catch (IException &e){
       QString msg = QString("Failed to open file for PVL Input: [%1]").arg(pvlFile);

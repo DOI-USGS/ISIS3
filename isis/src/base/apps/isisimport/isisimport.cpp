@@ -347,22 +347,26 @@ namespace Isis {
 
 
     ProcessImport importer;
-    if (inputFileName.removeExtension().addExtension("dat").fileExists()){
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("dat").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("tif").fileExists()) {
-    QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
-                  "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
-      throw IException(IException::User, msg, _FILEINFO_);
-    }
-    else {
+    if (inputFileName.expanded().contains("/vsi")) {
       importer.SetInputFile(inputFileName.expanded());
+    } else {
+      if (inputFileName.removeExtension().addExtension("dat").fileExists()){
+        importer.SetInputFile(inputFileName.removeExtension().addExtension("dat").expanded());
+      }
+      else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
+        importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
+      }
+      else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
+        importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
+      }
+      else if (inputFileName.removeExtension().addExtension("tif").fileExists()) {
+      QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
+                    "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      else {
+        importer.SetInputFile(inputFileName.expanded());
+      }
     }
 
     // Use inja to get number of lines, samples, and bands from the input label
