@@ -60,6 +60,7 @@ namespace Isis {
       QString msg = "Could not create camera or projection for [" +
                         cube.fileName() + "]";
       IException realError(IException::Unknown, msg, _FILEINFO_);
+      throw realError;
     }
   }
 
