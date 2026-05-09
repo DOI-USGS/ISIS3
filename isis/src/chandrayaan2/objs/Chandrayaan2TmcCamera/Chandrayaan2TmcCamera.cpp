@@ -79,23 +79,15 @@ namespace Isis {
     new LineScanCameraGroundMap(this);
     new LineScanCameraSkyMap(this);
 
-    QString errorMsg = "Cube [" + cube.fileName() + "] has instrument [" + inst["InstrumentId"] + "]. "
-      "Support for AFT or FORE cubes is not available in the Chandrayaan2 TMC-2 ISIS camera model. Please use the CSM camera model by running csminit."
-      "For more information, see: "
-      "https://astrogeology.usgs.gov/docs/concepts/missions/chandrayaan2/";
-
-
     // Set proper end frame
     int tmcFrame(0);
     if (naifIkCode() == -152210) {
       tmcFrame = -152220;
     }
     else if (naifIkCode() == -152211) {
-      throw IException(IException::User, errorMsg, _FILEINFO_);
       tmcFrame = -152221;
     }
     else if (naifIkCode() == -152212) {
-      throw IException(IException::User, errorMsg, _FILEINFO_);
       tmcFrame = -152222;
     }
     else {
