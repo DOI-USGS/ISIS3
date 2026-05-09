@@ -1,5 +1,8 @@
 #include "NetworkFixtures.h"
 
+#include <SpiceUsr.h>
+
+#include "FileName.h"
 #include "ImagePolygon.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -8,6 +11,13 @@ namespace Isis {
 
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
+
+    // The fromIsd fixture cubes do not auto-furnsh kernels, but the new
+    // LineScanCameraGroundMap constructor (PR #5955) hits a SCLK->ET
+    // conversion path that requires the MGS spacecraft clock kernel to
+    // be loaded into the SPICE pool. Furnsh it explicitly here.
+    FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
+    furnsh_c(mgsSclk.expanded().toLatin1().data());
 
     FileName labelPath1("data/threeImageNetwork/cube1.pvl");
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
@@ -128,6 +138,11 @@ namespace Isis {
 
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
+
+    // Match the furnsh_c in SetUp so successive tests don't accumulate
+    // SPICE kernel state.
+    FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
+    unload_c(mgsSclk.expanded().toLatin1().data());
   }
 
 
