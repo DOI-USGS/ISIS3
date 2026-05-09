@@ -654,12 +654,14 @@ namespace Isis {
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
     // Use the line given as a start point for the secant method root search.
-    // approxLine is in cube coordinates; route through Camera::SetImage so
-    // the AlphaCube translation to parent coordinates is applied. For non-
-    // subsetted cubes this is the identity; for subsetted cubes (e.g. the
-    // CTX bottom-strip test cube with cube Lines=50 vs ParentLines=52224)
-    // it matters.
+    // approxLine is in cube coordinates. Route through Camera::SetImage with
+    // IgnoreProjection set so the AlphaCube translation to parent coords
+    // runs but the map-projection path (which would re-enter SetGround and
+    // recurse on map-projected cubes) is bypassed.
+    bool savedIgnoreProj = p_camera->isProjectionIgnored();
+    p_camera->IgnoreProjection(true);
     p_camera->SetImage(p_camera->Samples() / 2.0, approxLine);
+    p_camera->IgnoreProjection(savedIgnoreProj);
     approxTime = p_camera->time().Et();
     approxOffset = offsetFunc(approxTime);
 
