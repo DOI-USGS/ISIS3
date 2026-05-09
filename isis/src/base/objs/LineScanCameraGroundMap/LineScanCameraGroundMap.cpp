@@ -215,11 +215,15 @@ namespace Isis {
       }
 
       cam->IgnoreProjection(true);
-      cam->SetImage(cam->ParentSamples()/2.0, cam->ParentLines()/2.0);
+      // Use cube samples/lines, not parent. Camera::SetImage does its
+      // own AlphaCube translation; passing parent coords double-
+      // translates and breaks subsetted cubes (e.g. the CTX test cube
+      // with cube Lines=50 vs ParentLines=52224).
+      cam->SetImage(cam->Samples()/2.0, cam->Lines()/2.0);
       SurfacePoint refPt = cam->GetSurfacePoint();
 
-      double numImageRows = cam->ParentLines();
-      double numImageCols = cam->ParentSamples();
+      double numImageRows = cam->Lines();
+      double numImageCols = cam->Samples();
 
       std::vector<std::vector<double>> ip(2 * numPts, std::vector<double>(2, 0.0));
       std::vector<std::vector<double>> gp(2 * numPts, std::vector<double>(3, 0.0));
@@ -317,7 +321,7 @@ namespace Isis {
       double z = surfacePoint.GetZ().meters();
       double line_den = 1 + u[4]  * x + u[5]  * y + u[6]  * z;
       double approxLine = 0;
-      double numRows = p_camera->ParentLines();
+      double numRows = p_camera->Lines();
 
       // Sanity checks. Ensure we don't divide by 0 and that the numbers are valid.
       if (line_den == 0.0 || std::isnan(line_den) || std::isinf(line_den)) {
@@ -336,7 +340,7 @@ namespace Isis {
     }
     else {
       // Projective fit failed; fall back to the middle of the image.
-      double approxLine = p_camera->ParentLines() / 2.0;
+      double approxLine = p_camera->Lines() / 2.0;
       status = FindFocalPlane(surfacePoint, approxLine);
     }
 
@@ -650,7 +654,12 @@ namespace Isis {
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
     // Use the line given as a start point for the secant method root search.
-    p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
+    // approxLine is in cube coordinates; route through Camera::SetImage so
+    // the AlphaCube translation to parent coordinates is applied. For non-
+    // subsetted cubes this is the identity; for subsetted cubes (e.g. the
+    // CTX bottom-strip test cube with cube Lines=50 vs ParentLines=52224)
+    // it matters.
+    p_camera->SetImage(p_camera->Samples() / 2.0, approxLine);
     approxTime = p_camera->time().Et();
     approxOffset = offsetFunc(approxTime);
 
