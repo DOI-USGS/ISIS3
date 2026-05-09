@@ -8,8 +8,10 @@ find files of those names at the top level of this repository. **/
 #include "LineScanCameraGroundMap.h"
 #include "EigenUtilities.h"
 
+#include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <limits>
 
 #include <QTime>
 #include <QList>
@@ -180,12 +182,21 @@ namespace Isis {
   LineScanCameraGroundMap::LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {
     bool originalIgnoreProj = cam->isProjectionIgnored();
     try {
-      // Approximate the ground-to-image function with a projective transform
-      // Use 9 points (9*4 eventual matrix rows) as we need to fit 14 variables.
-      const int numPts = 9;
-      double u_factors[numPts] = {0.0, 0.0, 0.0, 0.5, 0.5, 0.5, 1.0, 1.0, 1.0};
-      double v_factors[numPts] = {0.0, 0.5, 1.0, 0.0, 0.5, 1.0, 0.0, 0.5, 1.0};
-      
+      // Sample a 5x5 image grid at two ground heights to fit the
+      // projective transform robustly: 5x5 covers wide-FOV corner
+      // distortion, two layers break the rank-deficiency that single-
+      // layer sampling has on narrow-FOV/narrow-swath sensors (HiRISE).
+      const int gridDim = 5;
+      const int numPts = gridDim * gridDim;
+      double u_factors[numPts];
+      double v_factors[numPts];
+      for (int gi = 0; gi < gridDim; gi++) {
+        for (int gj = 0; gj < gridDim; gj++) {
+          u_factors[gi * gridDim + gj] = static_cast<double>(gi) / (gridDim - 1);
+          v_factors[gi * gridDim + gj] = static_cast<double>(gj) / (gridDim - 1);
+        }
+      }
+
       cam->IgnoreProjection(true);
       cam->SetImage(cam->ParentSamples()/2.0, cam->ParentLines()/2.0);
       SurfacePoint refPt = cam->GetSurfacePoint();
@@ -193,8 +204,8 @@ namespace Isis {
       double numImageRows = cam->ParentLines();
       double numImageCols = cam->ParentSamples();
 
-      std::vector<std::vector<double>> ip(numPts, std::vector<double>(2, 0.0));
-      std::vector<std::vector<double>> gp(numPts, std::vector<double>(3, 0.0));
+      std::vector<std::vector<double>> ip(2 * numPts, std::vector<double>(2, 0.0));
+      std::vector<std::vector<double>> gp(2 * numPts, std::vector<double>(3, 0.0));
       m_useApproxInitTrans = true;
 
       for (int i = 0; i < numPts; i++) {
@@ -209,12 +220,28 @@ namespace Isis {
         gp[i][0] = surfacePt.GetX().meters();
         gp[i][1] = surfacePt.GetY().meters();
         gp[i][2] = surfacePt.GetZ().meters();
+
+        // Second layer: shift the ground point radially outward to
+        // give the projective system non-degenerate depth coverage.
+        ip[i + numPts][0] = ip[i][0];
+        ip[i + numPts][1] = ip[i][1];
+        const double delta_z = 10000.0;
+        double r = std::sqrt(gp[i][0]*gp[i][0] + gp[i][1]*gp[i][1] + gp[i][2]*gp[i][2]);
+        if (r > 0.0) {
+          double scale = (r + delta_z) / r;
+          gp[i + numPts][0] = gp[i][0] * scale;
+          gp[i + numPts][1] = gp[i][1] * scale;
+          gp[i + numPts][2] = gp[i][2] * scale;
+        }
+        else {
+          m_useApproxInitTrans = false;
+        }
       }
 
       if (m_useApproxInitTrans) {
         computeBestFitProjectiveTransform(ip, gp, m_projTransCoeffs);
       }
-    } 
+    }
     catch (...) {
       m_useApproxInitTrans = false;
     }
