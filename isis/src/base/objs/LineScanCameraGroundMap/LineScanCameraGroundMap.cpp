@@ -180,6 +180,23 @@ namespace Isis {
    * @param cam pointer to camera model
    */
   LineScanCameraGroundMap::LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {
+    // Defer projective-fit construction (which ray-traces) until first
+    // SetGround call. This lets cubes whose SPICE chain is not fully
+    // loaded at camera construction succeed.
+    m_projectiveFitAttempted = false;
+    m_useApproxInitTrans = false;
+  }
+
+
+  /** Sample the image, ray-trace, and fit the projective transform that
+   * gives an initial guess for the secant in SetGround. Runs once per
+   * instance, on the first SetGround call.
+   */
+  void LineScanCameraGroundMap::ensureProjectiveFit() {
+    if (m_projectiveFitAttempted) return;
+    m_projectiveFitAttempted = true;
+
+    Camera *cam = p_camera;
     bool originalIgnoreProj = cam->isProjectionIgnored();
     try {
       // Sample a 5x5 image grid at two ground heights to fit the
@@ -290,6 +307,7 @@ namespace Isis {
    * @return conversion was successful
    */
   bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
+    ensureProjectiveFit();
     FindFocalPlaneStatus status = FindFocalPlaneStatus::Failure;
     if (m_useApproxInitTrans) {
       std::vector<double> const& u = m_projTransCoeffs; // alias, to save on typing

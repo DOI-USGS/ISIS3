@@ -72,6 +72,10 @@ namespace Isis {
       // Store here the projective approximation of the sensor model
       std::vector<double> m_projTransCoeffs;
       bool m_useApproxInitTrans;
+      bool m_projectiveFitAttempted;
+
+    private:
+      void ensureProjectiveFit();
   };
 };
 #endif
