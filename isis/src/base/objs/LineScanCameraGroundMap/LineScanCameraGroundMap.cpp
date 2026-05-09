@@ -208,85 +208,47 @@ namespace Isis {
       std::vector<std::vector<double>> gp(2 * numPts, std::vector<double>(3, 0.0));
       m_useApproxInitTrans = true;
 
+      // Two layers along the camera ray. Layer 0 is the shape-model
+      // ground point itself (delta = 0); layer 1 walks 100 m along the
+      // ray toward the spacecraft. Two distinct (X,Y,Z) sharing the
+      // same (line, sample) gives the projective fit non-degenerate
+      // depth coverage. CSM uses the same idea, intersecting the ray
+      // against an ellipsoid 100 m higher.
+      const double deltas[] = {0.0, 100.0};
+      const int numLayers = sizeof(deltas) / sizeof(deltas[0]);
       for (int i = 0; i < numPts; i++) {
-        // Store as Line, Sample
-        ip[i][0] = u_factors[i] * numImageRows;
-        ip[i][1] = v_factors[i] * numImageCols;
-        // Run set image as Sample, Line
-        if (!cam->SetImage(ip[i][1], ip[i][0])) {
+        double line = u_factors[i] * numImageRows;
+        double samp = v_factors[i] * numImageCols;
+        if (!cam->SetImage(samp, line)) {
           m_useApproxInitTrans = false;
         }
-        SurfacePoint surfacePt = cam->GetSurfacePoint();
-        gp[i][0] = surfacePt.GetX().meters();
-        gp[i][1] = surfacePt.GetY().meters();
-        gp[i][2] = surfacePt.GetZ().meters();
-
-        // Second layer: a second 3D point on the same camera ray.
-        // CSM does this by re-intersecting the ray against an
-        // ellipsoid 100 m higher; here we just walk 100 m along the
-        // ray toward the spacecraft. Same effect: a second point with
-        // identical image coords but different (X,Y,Z), giving the
-        // projective fit non-degenerate depth coverage. A radial shift
-        // would be wrong off-nadir because radial != ray direction.
-        ip[i + numPts][0] = ip[i][0];
-        ip[i + numPts][1] = ip[i][1];
+        SurfacePoint base = cam->GetSurfacePoint();
+        double Px = base.GetX().meters();
+        double Py = base.GetY().meters();
+        double Pz = base.GetZ().meters();
         double scPos[3];
         cam->instrumentPosition(scPos);  // body-fixed, in km
-        double dx = gp[i][0] - scPos[0] * 1000.0;
-        double dy = gp[i][1] - scPos[1] * 1000.0;
-        double dz = gp[i][2] - scPos[2] * 1000.0;
+        double dx = Px - scPos[0] * 1000.0;
+        double dy = Py - scPos[1] * 1000.0;
+        double dz = Pz - scPos[2] * 1000.0;
         double dnorm = std::sqrt(dx*dx + dy*dy + dz*dz);
-        const double delta_along_ray = 100.0;  // meters
-        if (dnorm > 0.0) {
-          double scale = delta_along_ray / dnorm;
-          gp[i + numPts][0] = gp[i][0] - scale * dx;
-          gp[i + numPts][1] = gp[i][1] - scale * dy;
-          gp[i + numPts][2] = gp[i][2] - scale * dz;
-        }
-        else {
+        if (dnorm <= 0.0) {
           m_useApproxInitTrans = false;
+          continue;
+        }
+        for (int k = 0; k < numLayers; k++) {
+          int idx = i + k * numPts;
+          double scale = deltas[k] / dnorm;
+          ip[idx][0] = line;
+          ip[idx][1] = samp;
+          gp[idx][0] = Px - scale * dx;
+          gp[idx][1] = Py - scale * dy;
+          gp[idx][2] = Pz - scale * dz;
         }
       }
 
       if (m_useApproxInitTrans) {
         computeBestFitProjectiveTransform(ip, gp, m_projTransCoeffs);
-
-        // Sanity check the fit: evaluate the line projective at each
-        // training ground point and compare to the known training line.
-        // For narrow-FOV/narrow-swath sensors (e.g. HiRISE single CCD)
-        // the 14-parameter projective fit can be ill-conditioned and
-        // produce a transform whose initial guess sends the secant
-        // search to a wrong local zero of the line-offset functor.
-        // Detect that here: if the residual at any training point
-        // exceeds a few percent of the image height, the fit is not
-        // useful and we should fall back to the legacy no-init-guess
-        // secant path (which works for these sensors).
-        std::vector<double> const& u = m_projTransCoeffs;
-        double maxLineResid = 0.0;
-        for (int i = 0; i < (int)ip.size(); i++) {
-          double x = gp[i][0], y = gp[i][1], z = gp[i][2];
-          double den = 1.0 + u[4] * x + u[5] * y + u[6] * z;
-          if (den == 0.0 || std::isnan(den) || std::isinf(den)) {
-            maxLineResid = std::numeric_limits<double>::infinity();
-            break;
-          }
-          double predLine = (u[0] + u[1] * x + u[2] * y + u[3] * z) / den;
-          double resid = std::abs(predLine - ip[i][0]);
-          if (!std::isfinite(resid)) {
-            maxLineResid = std::numeric_limits<double>::infinity();
-            break;
-          }
-          if (resid > maxLineResid) maxLineResid = resid;
-        }
-        // Tolerance: 5% of the image height. The projective only needs
-        // to put the secant in the right basin; tighter than 5% would
-        // start tripping for healthy wide-FOV cameras with curvature
-        // that the linear-fractional projective can't represent
-        // exactly.
-        double residTol = std::max(50.0, 0.05 * cam->ParentLines());
-        if (!std::isfinite(maxLineResid) || maxLineResid > residTol) {
-          m_useApproxInitTrans = false;
-        }
       }
     }
     catch (...) {
@@ -355,14 +317,7 @@ namespace Isis {
       status = FindFocalPlane(surfacePoint, approxLine);
     }
     else {
-      // Projective approximation either failed to fit (e.g. corner
-      // pixels off the body) or its training-point residuals were too
-      // large to trust (e.g. narrow-FOV/narrow-swath sensors where
-      // the 14-parameter linear-fractional fit is ill-conditioned).
-      // Use the middle line as a uniformly-OK initial guess: the
-      // secant generally converges from there for most pixels in a
-      // line-scanner image, even off-nadir, much better than the old
-      // quadratic-fit fallback in FindFocalPlane(surfacePoint).
+      // Projective fit failed; fall back to the middle of the image.
       double approxLine = p_camera->ParentLines() / 2.0;
       status = FindFocalPlane(surfacePoint, approxLine);
     }
