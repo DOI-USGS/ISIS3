@@ -12,10 +12,9 @@ namespace Isis {
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
 
-    // The fromIsd fixture cubes do not auto-furnsh kernels, but the new
-    // LineScanCameraGroundMap constructor (PR #5955) hits a SCLK->ET
-    // conversion path that requires the MGS spacecraft clock kernel to
-    // be loaded into the SPICE pool. Furnsh it explicitly here.
+    // Load the MGS spacecraft clock kernel so SCLK<->ET conversions
+    // work for the fromIsd cubes set up below. fromIsd does not
+    // auto-furnsh, and some camera code paths need an SCLK in the pool.
     FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
     furnsh_c(mgsSclk.expanded().toLatin1().data());
 
