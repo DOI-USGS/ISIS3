@@ -223,9 +223,10 @@ namespace Isis {
 
         // Second layer: shift the ground point radially outward to
         // give the projective system non-degenerate depth coverage.
+        // Match CSM's createProjectiveApproximation choice of 100 m.
         ip[i + numPts][0] = ip[i][0];
         ip[i + numPts][1] = ip[i][1];
-        const double delta_z = 10000.0;
+        const double delta_z = 100.0;
         double r = std::sqrt(gp[i][0]*gp[i][0] + gp[i][1]*gp[i][1] + gp[i][2]*gp[i][2]);
         if (r > 0.0) {
           double scale = (r + delta_z) / r;
@@ -240,6 +241,43 @@ namespace Isis {
 
       if (m_useApproxInitTrans) {
         computeBestFitProjectiveTransform(ip, gp, m_projTransCoeffs);
+
+        // Sanity check the fit: evaluate the line projective at each
+        // training ground point and compare to the known training line.
+        // For narrow-FOV/narrow-swath sensors (e.g. HiRISE single CCD)
+        // the 14-parameter projective fit can be ill-conditioned and
+        // produce a transform whose initial guess sends the secant
+        // search to a wrong local zero of the line-offset functor.
+        // Detect that here: if the residual at any training point
+        // exceeds a few percent of the image height, the fit is not
+        // useful and we should fall back to the legacy no-init-guess
+        // secant path (which works for these sensors).
+        std::vector<double> const& u = m_projTransCoeffs;
+        double maxLineResid = 0.0;
+        for (int i = 0; i < (int)ip.size(); i++) {
+          double x = gp[i][0], y = gp[i][1], z = gp[i][2];
+          double den = 1.0 + u[4] * x + u[5] * y + u[6] * z;
+          if (den == 0.0 || std::isnan(den) || std::isinf(den)) {
+            maxLineResid = std::numeric_limits<double>::infinity();
+            break;
+          }
+          double predLine = (u[0] + u[1] * x + u[2] * y + u[3] * z) / den;
+          double resid = std::abs(predLine - ip[i][0]);
+          if (!std::isfinite(resid)) {
+            maxLineResid = std::numeric_limits<double>::infinity();
+            break;
+          }
+          if (resid > maxLineResid) maxLineResid = resid;
+        }
+        // Tolerance: 5% of the image height. The projective only needs
+        // to put the secant in the right basin; tighter than 5% would
+        // start tripping for healthy wide-FOV cameras with curvature
+        // that the linear-fractional projective can't represent
+        // exactly.
+        double residTol = std::max(50.0, 0.05 * cam->ParentLines());
+        if (!std::isfinite(maxLineResid) || maxLineResid > residTol) {
+          m_useApproxInitTrans = false;
+        }
       }
     }
     catch (...) {
@@ -308,7 +346,16 @@ namespace Isis {
       status = FindFocalPlane(surfacePoint, approxLine);
     }
     else {
-      status = FindFocalPlane(surfacePoint);
+      // Projective approximation either failed to fit (e.g. corner
+      // pixels off the body) or its training-point residuals were too
+      // large to trust (e.g. narrow-FOV/narrow-swath sensors where
+      // the 14-parameter linear-fractional fit is ill-conditioned).
+      // Use the middle line as a uniformly-OK initial guess: the
+      // secant generally converges from there for most pixels in a
+      // line-scanner image, even off-nadir, much better than the old
+      // quadratic-fit fallback in FindFocalPlane(surfacePoint).
+      double approxLine = p_camera->ParentLines() / 2.0;
+      status = FindFocalPlane(surfacePoint, approxLine);
     }
 
     if (status == Success) return true;
@@ -617,8 +664,8 @@ namespace Isis {
 
     if (lineRate == 0.0) return Failure;
 
-    LineOffsetFunctor offsetFunc(p_camera, surfacePoint);
-    SensorSurfacePointDistanceFunctor distanceFunc(p_camera, surfacePoint);
+    LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
+    SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
 
     // Use the line given as a start point for the secant method root search.
     p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
