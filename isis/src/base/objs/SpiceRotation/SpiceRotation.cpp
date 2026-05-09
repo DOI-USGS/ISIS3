@@ -212,6 +212,26 @@ namespace Isis {
    * @param frameCode The integer-valued frame code
    */
   void SpiceRotation::SetFrame(int frameCode) {
+    // If the frame is changing AND the chain has already been cached
+    // (e.g. by a previous LoadCache that ran FrameTrace from the
+    // original NaifFrameCode), invalidate the cached chain so that the
+    // next LoadCache re-runs FrameTrace from the new frame. This is
+    // needed for camera classes that override the instrument frame in
+    // their constructor (e.g. Chandrayaan2TmcCamera, Chandrayaan2OhrcCamera
+    // when the kernel chain involves a TK frame on top of the cube's
+    // NaifFrameCode). Without this, the chain misses the TK rotation
+    // between the cube's NaifFrameCode and the override frame, producing
+    // wrong rays for cameras whose IK boresight requires the TK rotation
+    // to be aligned with the ISIS +Z convention.
+    if (!p_constantFrames.empty() && p_constantFrames[0] != frameCode &&
+        !p_timeFrames.empty()) {
+      p_timeFrames.clear();
+      p_TC.clear();
+      // Note: leave m_orientation alone. The time-dependent rotation
+      // cache holds rotations from the time-dependent frame (e.g. the
+      // spacecraft frame) to J2000 - that data does not change when
+      // the constant (instrument) frame chain changes.
+    }
     p_constantFrames[0] = frameCode;
   }
 
