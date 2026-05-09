@@ -221,18 +221,27 @@ namespace Isis {
         gp[i][1] = surfacePt.GetY().meters();
         gp[i][2] = surfacePt.GetZ().meters();
 
-        // Second layer: shift the ground point radially outward to
-        // give the projective system non-degenerate depth coverage.
-        // Match CSM's createProjectiveApproximation choice of 100 m.
+        // Second layer: a second 3D point on the same camera ray.
+        // CSM does this by re-intersecting the ray against an
+        // ellipsoid 100 m higher; here we just walk 100 m along the
+        // ray toward the spacecraft. Same effect: a second point with
+        // identical image coords but different (X,Y,Z), giving the
+        // projective fit non-degenerate depth coverage. A radial shift
+        // would be wrong off-nadir because radial != ray direction.
         ip[i + numPts][0] = ip[i][0];
         ip[i + numPts][1] = ip[i][1];
-        const double delta_z = 100.0;
-        double r = std::sqrt(gp[i][0]*gp[i][0] + gp[i][1]*gp[i][1] + gp[i][2]*gp[i][2]);
-        if (r > 0.0) {
-          double scale = (r + delta_z) / r;
-          gp[i + numPts][0] = gp[i][0] * scale;
-          gp[i + numPts][1] = gp[i][1] * scale;
-          gp[i + numPts][2] = gp[i][2] * scale;
+        double scPos[3];
+        cam->instrumentPosition(scPos);  // body-fixed, in km
+        double dx = gp[i][0] - scPos[0] * 1000.0;
+        double dy = gp[i][1] - scPos[1] * 1000.0;
+        double dz = gp[i][2] - scPos[2] * 1000.0;
+        double dnorm = std::sqrt(dx*dx + dy*dy + dz*dz);
+        const double delta_along_ray = 100.0;  // meters
+        if (dnorm > 0.0) {
+          double scale = delta_along_ray / dnorm;
+          gp[i + numPts][0] = gp[i][0] - scale * dx;
+          gp[i + numPts][1] = gp[i][1] - scale * dy;
+          gp[i + numPts][2] = gp[i][2] - scale * dz;
         }
         else {
           m_useApproxInitTrans = false;
