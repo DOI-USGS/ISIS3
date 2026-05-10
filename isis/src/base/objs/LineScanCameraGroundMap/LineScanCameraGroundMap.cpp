@@ -701,6 +701,30 @@ namespace Isis {
         ux = p_camera->FocalLength() * lookC[0] / lookC[2];
         uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
+        // Verify: converted parent (sample,line) lands inside camera image
+        // bounds. Catches the wrong-root case where the secant finds a valid
+        // f-zero at a time/sample that doesn't correspond to a pixel
+        // actually in this cube. Cache-bound check is necessary; this is
+        // also sufficient.
+        double dxv, dyv;
+        if (p_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
+          dxv = p_camera->DistortionMap()->FocalPlaneX();
+          dyv = p_camera->DistortionMap()->FocalPlaneY();
+        }
+        else {
+          dxv = ux;
+          dyv = uy;
+        }
+        if (!p_camera->FocalPlaneMap()->SetFocalPlane(dxv, dyv)) return Failure;
+        double detSamp = p_camera->FocalPlaneMap()->DetectorSample();
+        double detLine = p_camera->FocalPlaneMap()->DetectorLine();
+        if (!p_camera->DetectorMap()->SetDetector(detSamp, detLine)) return Failure;
+        double parentSamp = p_camera->DetectorMap()->ParentSample();
+        double parentLine = p_camera->DetectorMap()->ParentLine();
+        if (parentSamp < 0.5 || parentSamp > p_camera->ParentSamples() + 0.5 ||
+            parentLine < 0.5 || parentLine > p_camera->ParentLines() + 0.5)
+          return Failure;
+
         p_focalPlaneX = ux;
         p_focalPlaneY = uy;
 
