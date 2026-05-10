@@ -346,6 +346,13 @@ namespace Isis {
 
     if (status == Success) return true;
 
+    // Secant from the projective approximation failed. Fall back to the
+    // legacy quadratic + Brent search. This is needed for variable-line-rate
+    // cameras (e.g. CRISM) where the line<->et mapping is not monotonic
+    // and the secant cannot converge from a single starting line.
+    status = FindFocalPlane(surfacePoint);
+    if (status == Success) return true;
+
     return false;
   }
 

@@ -33,8 +33,8 @@ For lower right corner ...
 Sample: 640.0000
 Line:   420.0000
 Line/Sample SetImage succeeded!
-DeltaSample = -0.0003
-DeltaLine = 0.0010
+DeltaSample = -0.0026
+DeltaLine = 0.0067
 
 For center pixel position ...
 Sample: 320.0000
