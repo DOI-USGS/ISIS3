@@ -76,6 +76,11 @@ namespace Isis {
 
     private:
       void ensureProjectiveFit();
+      // After a converged root, verify the resulting (sample, line) lands
+      // inside the camera's image bounds. Catches the "wrong root" case
+      // where a solver lands at a valid offset for a time/sample that
+      // doesn't correspond to a pixel actually in this cube.
+      bool convergedInBounds(double ux, double uy);
   };
 };
 #endif

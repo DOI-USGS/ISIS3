@@ -62,8 +62,12 @@ namespace Isis {
     CameraFocalPlaneMap *focalMap = new CameraFocalPlaneMap(this, naifIkCode());
 
     //  Retrieve boresight location from instrument kernel (IK) (addendum?)
+    // Same convention offset as TMC: Chandrayaan-2 OHRC IK writes the
+    // sample CENTER half a pixel off from what ISIS's SetDetectorOrigin
+    // expects (OHRC = n/2 vs CTX/LRO NAC = n/2 + 0.5). Apply +0.5 sample
+    // shift so ISIS's boresight matches CSM/ALE on the cube.
     QString centerKey = "INS" + toString((int)naifIkCode()) + "_CENTER";
-    double sampleCenter = getDouble(centerKey, 0);
+    double sampleCenter = getDouble(centerKey, 0) + 0.5;
     double lineCenter = getDouble(centerKey, 1);
 
     focalMap->SetDetectorOrigin(sampleCenter, lineCenter);
