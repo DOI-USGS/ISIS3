@@ -689,6 +689,7 @@ namespace Isis {
     // Iterate to refine the given approximate time that the instrument imaged the ground point
     for (int j=0; j < 10; j++) {
 
+      // f1 is in detector-line units (~ cube-pixel).
       if (fabs(f1) < 1e-6 || ((f1 - f0) == 0.0)) {
         if (x1 < cacheStart || x1 > cacheEnd) return Failure;
         p_camera->Sensor::setTime(x1);

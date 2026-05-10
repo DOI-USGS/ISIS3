@@ -21,8 +21,8 @@ NorthAzimuth: 269.544
 SunAzimuth: 168.17
 SpacecraftAzimuth: 184.591
 OffNadirAngle: 44.4012
-CelestialNorthClockAngle: 186.392
-RaDecResolution: 0.024029
+CelestialNorthClockAngle: 186.188
+RaDecResolution: 0.0216226
 
 GroundAzimuth in North: 59.9718
 GroundAzimuth in North: 89.4306
@@ -60,7 +60,7 @@ SunAzimuth: 168
 SpacecraftAzimuth: 185
 OffNadirAngle: 44.4
 CelestialNorthClockAngle: 186
-RaDecResolution: 0.024
+RaDecResolution: 0.0216
 PlanetocentricLatitude: 26.8
 PositiveEast360Longitude: 229
 
@@ -76,7 +76,7 @@ SunAzimuth: 168
 SpacecraftAzimuth: 185
 OffNadirAngle: 44.4
 CelestialNorthClockAngle: 186
-RaDecResolution: 0.024
+RaDecResolution: 0.0216
 PlanetocentricLatitude: 26.8
 PositiveEast360Longitude: 229
 
@@ -92,7 +92,7 @@ ObliqueSampleResolution: 746
 DetectorResolution: 157
 ObliqueDetectorResolution: 187
 LowestImageResolution: 2047
-HighestImageResolution: 429
+HighestImageResolution: 430
 Calling BasicMapping (pvl)...
 BasicMapping PVL: 
 Object = IsisCube
@@ -241,8 +241,8 @@ Group = Mapping
   MinimumLatitude    = 10.763445899478
   MaximumLatitude    = 34.449775120271
   MinimumLongitude   = 218.13667853438
-  MaximumLongitude   = 237.75645905034
-  PixelResolution    = 429.2371462
+  MaximumLongitude   = 237.62560286587
+  PixelResolution    = 429.5263218
   ProjectionName     = Sinusoidal
 End_Group
 End
@@ -255,7 +255,7 @@ Bands: 1
 ParentLines: 768
 ParentSamples: 640
 1
-0.024
+0.0216
 Calling Distortion, FocalPlane, Detector, Ground, and Sky Map functions... Done.
 Calling IgnoreProjection (false)...
 

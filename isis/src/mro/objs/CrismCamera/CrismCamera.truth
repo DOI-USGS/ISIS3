@@ -13,14 +13,14 @@ Sample: 1.0000
 Line:   1.0000
 Line/Sample SetImage succeeded!
 DeltaSample = -0.0000
-DeltaLine = -0.0000
+DeltaLine = 0.0000
 
 For upper right corner ...
 Sample: 640.0000
 Line:   1.0000
 Line/Sample SetImage succeeded!
-DeltaSample = -0.0000
-DeltaLine = -0.0000
+DeltaSample = 0.0000
+DeltaLine = 0.0000
 
 For lower left corner ...
 Sample: 1.0000
@@ -41,7 +41,7 @@ Sample: 320.0000
 Line:   210.0000
 Line/Sample SetImage succeeded!
 DeltaSample = 0.0000
-DeltaLine = 0.0000
+DeltaLine = 0.0001
 
 Latitude OK
 Longitude OK
