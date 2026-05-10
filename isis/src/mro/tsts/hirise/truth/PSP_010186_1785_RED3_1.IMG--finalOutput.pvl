@@ -47,7 +47,7 @@ Group = GroundPoint
   Phase                      = 56.36674462265 <DEGREE>
   Incidence                  = 56.565566277459 <DEGREE>
   Emission                   = 0.21924891709168 <DEGREE>
-  NorthAzimuth               = 96.469450069861 <DEGREE>
+  NorthAzimuth               = NULL
 
   # Time
   EphemerisTime              = 275849262.77719 <seconds>
