@@ -23,21 +23,34 @@ protected:
 
   void SetUp() override {
     TempTestingFiles::SetUp();
-    // These tests currently reuse the legacy equalizer ISISTESTDATA fixtures.
-    // The Makefile test runner is replaced here, but the external data dependency
-    // is intentionally preserved to maintain coverage.
-    testDataDir = FileName("$ISISTESTDATA/isis/src/base/apps/equalizer/tsts").expanded();
+    testDataDir = "data/equalizer";
   }
 
-  // Helper: Create fromlist file from ISISTESTDATA paths
-  QString createFromList(const QString& testCase, const QStringList& cubeNames) {
+  // Helper: Create fromlist file from local test data
+  QString createFromList(const QStringList& cubeNames) {
     QString fromListPath = tempDir.path() + "/fromlist.lis";
     QFile file(fromListPath);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
     for (const QString& name : cubeNames) {
-      QString fullPath = testDataDir + "/" + testCase + "/" + name;
+      QString fullPath = FileName("$ISISROOT/../isis/tests/" + testDataDir + "/" + name).expanded();
+      out << fullPath << "\n";
+    }
+    file.close();
+    return fromListPath;
+  }
+
+  // Helper: Create fromlist file from ISISTESTDATA (for tests requiring specific cubes)
+  QString createFromListISISTESTDATA(const QString& testCase, const QStringList& cubeNames) {
+    QString fromListPath = tempDir.path() + "/fromlist.lis";
+    QFile file(fromListPath);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    QString isistestdataDir = FileName("$ISISTESTDATA/isis/src/base/apps/equalizer/tsts").expanded();
+    for (const QString& name : cubeNames) {
+      QString fullPath = isistestdataDir + "/" + testCase + "/" + name;
       out << fullPath << "\n";
     }
     file.close();
@@ -45,14 +58,30 @@ protected:
   }
 
   // Helper: Create hold list file
-  QString createHoldList(const QString& testCase, const QStringList& cubeNames) {
+  QString createHoldList(const QStringList& cubeNames) {
     QString holdListPath = tempDir.path() + "/holdlist.lis";
     QFile file(holdListPath);
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
     for (const QString& name : cubeNames) {
-      QString fullPath = testDataDir + "/" + testCase + "/" + name;
+      QString fullPath = FileName("$ISISROOT/../isis/tests/" + testDataDir + "/" + name).expanded();
+      out << fullPath << "\n";
+    }
+    file.close();
+    return holdListPath;
+  }
+
+  // Helper: Create hold list from ISISTESTDATA
+  QString createHoldListISISTESTDATA(const QString& testCase, const QStringList& cubeNames) {
+    QString holdListPath = tempDir.path() + "/holdlist.lis";
+    QFile file(holdListPath);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    QString isistestdataDir = FileName("$ISISTESTDATA/isis/src/base/apps/equalizer/tsts").expanded();
+    for (const QString& name : cubeNames) {
+      QString fullPath = isistestdataDir + "/" + testCase + "/" + name;
       out << fullPath << "\n";
     }
     file.close();
@@ -82,31 +111,34 @@ protected:
  * Corresponds to: tsts/default/
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerDefault) {
-  // Create input list
+  // Create input list using local cropped cubes
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub",
-    "input/I02609002RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub",
+    "I02609002RDR.lev2.cub"
   };
-  QString fromList = createFromList("default", cubes);
+  QString fromList = createFromList(cubes);
 
   // Create hold list (hold first image)
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("default", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   // Create output list
   QStringList outputs = {
     "I00824006RDR.lev2.equ.cub",
     "I01523019RDR.lev2.equ.cub",
-    "I02609002RDR.lev2.equ.cub"
+    "I02609002RDR.lev2.cub"
   };
   QString toList = createToList(outputs);
+
+  QString outStats = tempDir.path() + "/equalizer_stats.pvl";
 
   // Build UI arguments
   QVector<QString> args = {
     "fromlist=" + fromList,
     "hold=" + holdList,
     "tolist=" + toList,
+    "outstats=" + outStats,
     "solvemethod=qrd"
   };
   UserInterface ui(APP_XML, args);
@@ -128,8 +160,25 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerDefault) {
     Cube outputCube(outputPath);
     EXPECT_GT(outputCube.sampleCount(), 0);
     EXPECT_GT(outputCube.lineCount(), 0);
-    EXPECT_GT(outputCube.bandCount(), 0);
+    EXPECT_EQ(outputCube.bandCount(), 10);
   }
+
+  // Verify statistics file and validate corrections
+  ASSERT_TRUE(QFile::exists(outStats));
+  Pvl stats(outStats);
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify overlap statistics
+  EXPECT_EQ((int)general.findKeyword("TotalOverlaps"), 20);
+  EXPECT_EQ((int)general.findKeyword("ValidOverlaps"), 20);
+  EXPECT_EQ((int)general.findKeyword("InvalidOverlaps"), 0);
+  EXPECT_EQ(QString(general.findKeyword("HasCorrections")), "true");
+
+  // Verify normalizations were computed (groups should exist)
+  EXPECT_GT(eqInfo.groups(), 0);
 }
 
 
@@ -141,13 +190,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerDefault) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsContrast) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub"
   };
-  QString fromList = createFromList("holdCalculateStats", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("holdCalculateStats", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   QString outStats = tempDir.path() + "/equalizer_stats_contrast.pvl";
 
@@ -168,11 +217,17 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsContrast) {
   }
 
   // Verify statistics file created
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
 
   // Parse and validate statistics
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify CONTRAST mode (Gains only)
+  EXPECT_EQ((int)general.findKeyword("SolutionType"),0);
 }
 
 
@@ -183,13 +238,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsContrast) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBrightness) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub"
   };
-  QString fromList = createFromList("holdCalculateStats", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("holdCalculateStats", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   QString outStats = tempDir.path() + "/equalizer_stats_brightness.pvl";
 
@@ -209,9 +264,15 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBrightness) {
     FAIL() << e.toString().toStdString();
   }
 
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify BRIGHTNESS mode (Offsets only)
+  EXPECT_EQ((int)general.findKeyword("SolutionType"),1);
 }
 
 
@@ -222,13 +283,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBrightness) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBoth) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub"
   };
-  QString fromList = createFromList("holdCalculateStats", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("holdCalculateStats", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   QString outStats = tempDir.path() + "/equalizer_stats_both.pvl";
 
@@ -248,9 +309,15 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBoth) {
     FAIL() << e.toString().toStdString();
   }
 
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify BOTH mode (both gains and offsets)
+  EXPECT_EQ((int)general.findKeyword("SolutionType"),2);
 }
 
 
@@ -263,13 +330,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldCalculateStatsBoth) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerApply) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub"
   };
-  QString fromList = createFromList("apply", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("apply", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   // First CALCULATE statistics
   QString stats = tempDir.path() + "/apply_stats.pvl";
@@ -332,13 +399,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerApply) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerGain) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub"
   };
-  QString fromList = createFromList("gain", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("gain", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   QString outStats = tempDir.path() + "/equalizer_stats_gain.pvl";
 
@@ -358,9 +425,15 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerGain) {
     FAIL() << e.toString().toStdString();
   }
 
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify GAIN mode (GainsWithoutNormalization)
+  EXPECT_EQ((int)general.findKeyword("SolutionType"),3);
 }
 
 
@@ -372,14 +445,14 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerGain) {
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerHoldBothCalculateAndApply) {
   QStringList cubes = {
-    "input/I00824006RDR.lev2.cub",
-    "input/I01523019RDR.lev2.cub",
-    "input/I02609002RDR.lev2.cub"
+    "I00824006RDR.lev2.cub",
+    "I01523019RDR.lev2.cub",
+    "I02609002RDR.lev2.cub"
   };
-  QString fromList = createFromList("holdBothCalculateAndApply", cubes);
+  QString fromList = createFromList(cubes);
 
-  QStringList holds = {"input/I00824006RDR.lev2.cub"};
-  QString holdList = createHoldList("holdBothCalculateAndApply", holds);
+  QStringList holds = {"I00824006RDR.lev2.cub"};
+  QString holdList = createHoldList(holds);
 
   QStringList outputs = {
     "I00824006RDR.lev2.equ.cub",
@@ -408,12 +481,24 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerHoldBothCalculateAndApply) {
   // Verify outputs AND statistics file
   for (const QString& output : outputs) {
     QString outputPath = tempDir.path() + "/" + output;
-    EXPECT_TRUE(QFile::exists(outputPath));
-  }
-  EXPECT_TRUE(QFile::exists(outStats));
+    ASSERT_TRUE(QFile::exists(outputPath));
 
+    Cube outputCube(outputPath);
+    EXPECT_GT(outputCube.sampleCount(), 0);
+    EXPECT_GT(outputCube.lineCount(), 0);
+    EXPECT_EQ(outputCube.bandCount(), 10);
+  }
+
+  ASSERT_TRUE(QFile::exists(outStats));
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify BOTH mode created corrections
+  EXPECT_EQ(QString(general.findKeyword("HasCorrections")), "true");
+  EXPECT_GT((int)general.findKeyword("ValidOverlaps"), 0);
 }
 
 
@@ -438,7 +523,7 @@ TEST_F(EqualizerTest, DISABLED_FunctionalTestEqualizerNoHoldApplyInputStats) {
     "input/I01523019RDR.lev2.cub",
     "input/I02609002RDR.lev2.cub"
   };
-  QString fromList = createFromList("default", cubes);
+  QString fromList = createFromListISISTESTDATA("default", cubes);
 
   // First CALCULATE statistics without hold list using SPARSE solver
   QString stats = tempDir.path() + "/noholdsparse_stats.pvl";
@@ -493,6 +578,7 @@ TEST_F(EqualizerTest, DISABLED_FunctionalTestEqualizerNoHoldApplyInputStats) {
  * FunctionalTestEqualizerNoHoldCalculateSparse
  *
  * Test SPARSE solver method without hold list.
+ * Uses ISISTESTDATA due to specific MVA cube requirements.
  * Corresponds to: tsts/noHoldCalculateSparse/
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerNoHoldCalculateSparse) {
@@ -504,7 +590,7 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNoHoldCalculateSparse) {
     "input/MVA_2B2_01_04195S120E3541.lev2.cub",
     "input/MVA_2B2_01_04195S125E3541.lev2.cub"
   };
-  QString fromList = createFromList("noHoldCalculateSparse", cubes);
+  QString fromList = createFromListISISTESTDATA("noHoldCalculateSparse", cubes);
 
   QString outStats = tempDir.path() + "/equalizer_stats_sparse.pvl";
 
@@ -523,11 +609,21 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNoHoldCalculateSparse) {
     FAIL() << e.toString().toStdString();
   }
 
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
 
   // Verify statistics computed with SPARSE method
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify solver succeeded (may fall back from SPARSE to QRD)
+  // SolveMethod: 1=SPARSE, 2=QRD
+  int solveMethod = (int)general.findKeyword("SolveMethod");
+  EXPECT_TRUE(solveMethod == 1 || solveMethod == 2); // SPARSE or fallback to QRD
+  EXPECT_GT((int)general.findKeyword("ValidOverlaps"), 0);
+  EXPECT_EQ(QString(general.findKeyword("HasCorrections")), "true");
 }
 
 
@@ -535,6 +631,7 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNoHoldCalculateSparse) {
  * FunctionalTestEqualizerNonOverlapRecalculate
  *
  * Test RECALCULATE mode for recovering from non-overlapping images.
+ * Uses ISISTESTDATA due to specific non-overlap scenario requirements.
  * Corresponds to: tsts/nonOverlapRecalculate/
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
@@ -545,7 +642,7 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
     "input/I51718010EDR.crop.proj.reduced.cub",
     "input/I56969027EDR.proj.reduced.cub"
   };
-  QString nonOverlapList = createFromList("nonOverlapRecalculate", nonOverlapCubes);
+  QString nonOverlapList = createFromListISISTESTDATA("nonOverlapRecalculate", nonOverlapCubes);
   QString nonOverlapStats = tempDir.path() + "/nonOverlapStats.pvl";
 
   QVector<QString> calcArgs = {
@@ -576,7 +673,7 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
     "input/I56969027EDR.proj.reduced.cub",
     "input/I50695002EDR.proj.reduced.cub"  // Bridging image
   };
-  QString fromList = createFromList("nonOverlapRecalculate", fixedCubes);
+  QString fromList = createFromListISISTESTDATA("nonOverlapRecalculate", fixedCubes);
   QString outStats = tempDir.path() + "/recalculatedStats.pvl";
 
   QVector<QString> args = {
@@ -595,9 +692,16 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
   }
 
   // Verify new statistics file
-  EXPECT_TRUE(QFile::exists(outStats));
+  ASSERT_TRUE(QFile::exists(outStats));
 
   // Verify successful recalculation (should have corrections now)
   Pvl stats(outStats);
-  EXPECT_TRUE(stats.hasObject("EqualizationInformation"));
+  ASSERT_TRUE(stats.hasObject("EqualizationInformation"));
+
+  PvlObject eqInfo = stats.findObject("EqualizationInformation");
+  PvlGroup general = eqInfo.findGroup("General");
+
+  // Verify RECALCULATE succeeded - NonOverlaps should be Null or absent
+  EXPECT_EQ(QString(general.findKeyword("HasCorrections")), "true");
+  EXPECT_GT((int)general.findKeyword("ValidOverlaps"), 0);
 }
