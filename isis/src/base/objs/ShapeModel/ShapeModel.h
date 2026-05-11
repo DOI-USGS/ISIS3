@@ -141,6 +141,7 @@ namespace Isis {
       // Set m_hasIntersection
       void setHasIntersection(bool b);
 
+
       // Set current surface point
       virtual void setSurfacePoint(const SurfacePoint &surfacePoint);
 

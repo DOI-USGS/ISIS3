@@ -136,6 +136,10 @@ class MyShape : public ShapeModel {
   void setNoNormal() {
     setHasNormal(false);
   }
+
+  void setIntersection(bool b) {
+    setHasIntersection(b);
+  }
 };
 
 
@@ -214,6 +218,10 @@ class MyEllipse : public ShapeModel {
 
   double resolution() {
     return ShapeModel::resolution();
+  }
+
+  void setIntersection(bool b) {
+    setHasIntersection(b);
   }
 };
 
@@ -390,7 +398,7 @@ int main() {
     cout << "      local normal = (" << myNormal[0] << ", " << myNormal[1] << ", " << myNormal[2] << ")" << endl;
 
     cout << endl << "  Testing setHasIntersection method" << endl;
-    shape.setHasIntersection(false);
+    shape.setIntersection(false);
     cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
     try {
       cout << "    Get the resolution:         ";
@@ -471,7 +479,7 @@ int main() {
         cout << endl << "    Testing  method calculateEllipsoidalSurfaceNormal with invalid intersection..." << endl;
         SurfacePoint badsp;
         eshape.setSurfacePoint(badsp);
-        eshape.setHasIntersection(true);
+        eshape.setIntersection(true);
         eshape.calculateLocalNormal(notUsed);
       }
       catch(Isis::IException &e) {
@@ -479,7 +487,7 @@ int main() {
       }
 
       cout << endl << "    Testing  method setHasIntersection false..." << endl;
-      eshape.setHasIntersection(false);
+      eshape.setIntersection(false);
       cout << "    Do we have an intersection? " << eshape.hasIntersection() << endl;
       try {
         cout << "    Get the resolution:         ";
@@ -534,7 +542,7 @@ int main() {
       cout << "    Test targetRadii() error message when there is no target:" << endl;
       e.print();
     }
-    defaultShape.setHasIntersection(true);
+    defaultShape.setIntersection(true);
     defaultShape.calculateDefaultNormal();
     cout << "    Is there a normal? " << defaultShape.normalStatus() << endl;
     cout << "    Number of normal components = " << defaultShape.normal().size() << endl;

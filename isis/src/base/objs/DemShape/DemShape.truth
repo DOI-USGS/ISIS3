@@ -29,9 +29,6 @@ Begin testing Dem Shape Model class....
   Testing localRadius method with bad lat/lon values...
     Local radius = -1.79769e+308
 
-  Testing setHasIntersection method
-    Do we have an intersection? 0
-
   Testing setSurfacePoint method ...
     Do we have an intersection? 1
     surface point = (-2123.36, -2380.37, 1194.68
