@@ -41,22 +41,6 @@ protected:
     return fromListPath;
   }
 
-  // Helper: Create fromlist from ISISTESTDATA (for tests requiring specific geometric relationships)
-  QString createFromListISISTESTDATA(const QString& testCase, const QStringList& cubeNames) {
-    QString fromListPath = tempDir.path() + "/fromlist.lis";
-    QFile file(fromListPath);
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
-
-    QString isistestdataDir = FileName("$ISISTESTDATA/isis/src/base/apps/equalizer/tsts").expanded();
-    for (const QString& name : cubeNames) {
-      QString fullPath = isistestdataDir + "/" + testCase + "/" + name;
-      out << fullPath << "\n";
-    }
-    file.close();
-    return fromListPath;
-  }
-
   // Helper: Create hold list file
   QString createHoldList(const QStringList& cubeNames) {
     QString holdListPath = tempDir.path() + "/holdlist.lis";
@@ -615,18 +599,19 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNoHoldCalculateSparse) {
  * FunctionalTestEqualizerNonOverlapRecalculate
  *
  * Test RECALCULATE mode for recovering from non-overlapping images.
- * Uses ISISTESTDATA due to specific geometric requirements for bridging scenario.
+ * Tests graph topology: 4 cubes with isolated nodes, then 5th cube bridges them.
+ * Cubes cropped to 800 lines (76% of original) to preserve sparse overlaps.
  * Corresponds to: tsts/nonOverlapRecalculate/
  */
 TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
   // First run CALCULATE with 4 non-overlapping images (will fail but create stats)
   QStringList nonOverlapCubes = {
-    "input/I10047011EDR.proj.reduced.cub",
-    "input/I25685003EDR.crop.proj.reduced.cub",
-    "input/I51718010EDR.crop.proj.reduced.cub",
-    "input/I56969027EDR.proj.reduced.cub"
+    "I10047011EDR.proj.reduced.cub",
+    "I25685003EDR.crop.proj.reduced.cub",
+    "I51718010EDR.crop.proj.reduced.cub",
+    "I56969027EDR.proj.reduced.cub"
   };
-  QString nonOverlapList = createFromListISISTESTDATA("nonOverlapRecalculate", nonOverlapCubes);
+  QString nonOverlapList = createFromList(nonOverlapCubes);
   QString nonOverlapStats = tempDir.path() + "/nonOverlapStats.pvl";
 
   QVector<QString> calcArgs = {
@@ -651,13 +636,13 @@ TEST_F(EqualizerTest, FunctionalTestEqualizerNonOverlapRecalculate) {
 
   // Now RECALCULATE with the 5-image list that includes the bridging image
   QStringList fixedCubes = {
-    "input/I10047011EDR.proj.reduced.cub",
-    "input/I25685003EDR.crop.proj.reduced.cub",
-    "input/I51718010EDR.crop.proj.reduced.cub",
-    "input/I56969027EDR.proj.reduced.cub",
-    "input/I50695002EDR.proj.reduced.cub"  // Bridging image
+    "I10047011EDR.proj.reduced.cub",
+    "I25685003EDR.crop.proj.reduced.cub",
+    "I51718010EDR.crop.proj.reduced.cub",
+    "I56969027EDR.proj.reduced.cub",
+    "I50695002EDR.proj.reduced.cub"  // Bridging cube - connects all isolated nodes
   };
-  QString fromList = createFromListISISTESTDATA("nonOverlapRecalculate", fixedCubes);
+  QString fromList = createFromList(fixedCubes);
   QString outStats = tempDir.path() + "/recalculatedStats.pvl";
 
   QVector<QString> args = {
