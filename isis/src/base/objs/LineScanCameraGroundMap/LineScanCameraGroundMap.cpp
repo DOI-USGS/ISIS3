@@ -285,31 +285,6 @@ namespace Isis {
   LineScanCameraGroundMap::~LineScanCameraGroundMap() {}
 
 
-  /** Verify a converged focal-plane (ux, uy) at the camera's current time
-   *  maps to a parent (sample, line) inside the image. Catches wrong-root
-   *  solutions where a solver lands at a valid f-zero outside the actual
-   *  cube footprint.
-   */
-  bool LineScanCameraGroundMap::convergedInBounds(double ux, double uy) {
-    double dxv, dyv;
-    if (p_camera->DistortionMap()->SetUndistortedFocalPlane(ux, uy)) {
-      dxv = p_camera->DistortionMap()->FocalPlaneX();
-      dyv = p_camera->DistortionMap()->FocalPlaneY();
-    }
-    else {
-      dxv = ux;
-      dyv = uy;
-    }
-    if (!p_camera->FocalPlaneMap()->SetFocalPlane(dxv, dyv)) return false;
-    double detSamp = p_camera->FocalPlaneMap()->DetectorSample();
-    double detLine = p_camera->FocalPlaneMap()->DetectorLine();
-    if (!p_camera->DetectorMap()->SetDetector(detSamp, detLine)) return false;
-    double parentSamp = p_camera->DetectorMap()->ParentSample();
-    double parentLine = p_camera->DetectorMap()->ParentLine();
-    return parentSamp >= 0.5 && parentSamp <= p_camera->ParentSamples() + 0.5 &&
-           parentLine >= 0.5 && parentLine <= p_camera->ParentLines() + 0.5;
-  }
-
   /** Compute undistorted focal plane coordinate from ground position
    *
    * @param lat planetocentric latitude in degrees
@@ -564,8 +539,6 @@ namespace Isis {
       ux = p_camera->FocalLength() * lookC[0] / lookC[2];
       uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
-      if (!convergedInBounds(ux, uy)) return Failure;
-
       p_focalPlaneX = ux;
       p_focalPlaneY = uy;
 
@@ -658,8 +631,6 @@ namespace Isis {
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];
 
-    if (!convergedInBounds(ux, uy)) return Failure;
-
     p_focalPlaneX = ux;
     p_focalPlaneY = uy;
 
@@ -730,8 +701,6 @@ namespace Isis {
         p_camera->Sensor::LookDirection(lookC);
         ux = p_camera->FocalLength() * lookC[0] / lookC[2];
         uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-        if (!convergedInBounds(ux, uy)) return Failure;
 
         p_focalPlaneX = ux;
         p_focalPlaneY = uy;
