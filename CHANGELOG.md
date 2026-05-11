@@ -47,6 +47,15 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
+## [10.0.0_RC3] - 2026-05-11
+
+### Fixed
+
+- Fixed missing exception throw in the UniversalGroundMap constructor ([#6036](https://github.com/DOI-USGS/ISIS3/issues/6036))
+- Fixes most of the `isiscore` wrapper to handle any `QString const &` argument, and exposes the ISIS `Table` interface. ([#6045](https://github.com/DOI-USGS/ISIS3/issues/6045))
+- Fixed `spiceinit` issue where users would get an error when web=true. ([#6027](https://github.com/DOI-USGS/ISIS3/pull/6027))
+
+
 ## [10.0.0_RC2] - 2026-03-30
 
 ### Added
