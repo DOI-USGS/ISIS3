@@ -20,13 +20,13 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-variant: Miniforge3
-          auto-update-conda: true
+          auto-update-conda: false
           use-mamba: true
       - name: Build Release
         run: |
           export ISIS_VERSION=$(date +%Y.%m.%d)
           echo $ISIS_VERSION
-          mamba install python=3.12 conda-build anaconda-client
+          conda install python=3.12 conda-build anaconda-client --solver=classic -y
           git fetch origin
           git checkout dev
           cd recipe
