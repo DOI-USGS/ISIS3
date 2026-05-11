@@ -78,7 +78,6 @@ void IsisAml::PutAsString(const QString &paramName,
 
   param->values.clear();
   param->values.push_back(value);
-
 }
 
 /**
@@ -106,7 +105,6 @@ void IsisAml::PutAsString(const QString &paramName,
 
   param->values.resize(value.size());
   param->values = value;
-
 }
 
 
@@ -2018,9 +2016,8 @@ QString IsisAml::HelperIcon(const int &group, const int &param,
  * @return True if the parameter was entered, and false if it was not
  */
 bool IsisAml::WasEntered(const QString &paramName) const {
-
   const IsisParameterData *param = ReturnParam(paramName);
-
+  
   if(param->values.size() == 0) {
     return false;
   }
@@ -2624,7 +2621,7 @@ void IsisAml::VerifyAll() {
         bool paramOneSet = false;
         try {
           paramOneSet = WasEntered(param->name);
-          if (param->type == "boolean") {
+          if (param->type == "boolean" && paramOneSet) {
             paramOneSet = GetBoolean(param->name);
           }
         }
@@ -2634,7 +2631,7 @@ void IsisAml::VerifyAll() {
         bool paramTwoSet = false;
         try {
           paramTwoSet = WasEntered(param2->name);
-          if (param2->type == "boolean") {
+          if (param2->type == "boolean" && paramTwoSet) {
             paramTwoSet = GetBoolean(param2->name);
           }
         }

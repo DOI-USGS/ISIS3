@@ -18,6 +18,8 @@ find files of those names at the top level of this repository. **/
 #include <QTemporaryFile>
 #include <QRegularExpression>
 
+#include <cpl_vsi.h>
+
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "IException.h"
@@ -449,9 +451,13 @@ namespace Isis {
    * @return Boolean
    */
   bool FileName::fileExists() const {
-    if (toString().contains((QString)"https://")) { 
-      return true; 
+    QString path = toString();
+
+    if (path.startsWith("/vsi")) {
+      VSIStatBufL statBuf;
+      return (VSIStatL(path.toStdString().c_str(), &statBuf) == 0);
     }
+
     return QFileInfo(expanded()).exists();
   }
 
