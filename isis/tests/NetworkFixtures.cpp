@@ -12,9 +12,15 @@ namespace Isis {
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
 
-    // Load the MGS spacecraft clock kernel so SCLK<->ET conversions
-    // work for the fromIsd cubes set up below. fromIsd does not
-    // auto-furnsh, and some camera code paths need an SCLK in the pool.
+    // MGS MOC camera construction calls SpiceQL::strSclkToEt via
+    // MocLabels::Compute to resolve the spacecraft clock. SpiceQL
+    // needs either a populated local inventory (spiceqldb.hdf in
+    // SPICEQL_CACHE_DIR, built via pyspiceql.create_database) or
+    // an SCLK kernel already furnshed in the SPICE pool. The
+    // fromIsd cubes set up below do not leave a kernel in the
+    // pool, and a populated SpiceQL inventory is not guaranteed
+    // across dev environments, so furnsh the MGS SCLK explicitly
+    // here to keep this test suite self-sufficient.
     FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
     furnsh_c(mgsSclk.expanded().toLatin1().data());
 
