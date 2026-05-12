@@ -34,7 +34,7 @@ protected:
     QTextStream out(&file);
 
     for (const QString& name : cubeNames) {
-      QString fullPath = FileName("$ISISROOT/../isis/tests/" + testDataDir + "/" + name).expanded();
+      QString fullPath = testDataDir + "/" + name;
       out << fullPath << "\n";
     }
     file.close();
@@ -49,7 +49,7 @@ protected:
     QTextStream out(&file);
 
     for (const QString& name : cubeNames) {
-      QString fullPath = FileName("$ISISROOT/../isis/tests/" + testDataDir + "/" + name).expanded();
+      QString fullPath = testDataDir + "/" + name;
       out << fullPath << "\n";
     }
     file.close();
