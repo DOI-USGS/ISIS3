@@ -2,6 +2,14 @@
 #define ringscam2map_h
 
 #include "Transform.h"
+#include "UserInterface.h"
+
+namespace Isis {
+  class Camera;
+  class RingPlaneProjection;
+
+  extern void ringscam2map(UserInterface &ui);
+}
 
 using namespace Isis;
 
