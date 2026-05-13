@@ -657,13 +657,6 @@ namespace Isis {
    *
    */
   void ShapeModel::setHasIntersection(bool b) {
-    if (Isis::Preference::Preferences().getShowDeprecatedPref()) {
-        QString msg = "Shapemodel::setHasIntersection will be deprecated and moved "
-                      "to protected in a future release. Please avoid calling this "
-                      "from public scope.";
-        std::cerr << msg.toStdString() << std::endl;
-    }
-
     m_hasIntersection  = b;
     setHasNormal(false);
     setHasLocalNormal(false);
