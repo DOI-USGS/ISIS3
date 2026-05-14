@@ -23,7 +23,7 @@ protected:
 
   void SetUp() override {
     TempTestingFiles::SetUp();
-    testDataDir = "data/equalizer";
+    testDataDir = QString(_SOURCE_PREFIX) + "/data/equalizer";
   }
 
   // Helper: Create fromlist file from local test data
