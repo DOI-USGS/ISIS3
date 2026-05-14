@@ -34,7 +34,10 @@
     </ul>
 
     If you are unfamilar with SPICE terminology it is recommended you read the NAIF required
-    reading at http://naif.jpl.nasa.gov/naif/doc_C.html
+    reading at 
+    <a href="https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/index.html" target="_blank" rel="noopener noreferrer">
+      https://naif.jpl.nasa.gov/pub/naif/toolkit_docs/C/req/index.html
+    </a>
 
     <p>
       The program modifies the kernels group and writes the name of the SPICE files that need to
@@ -108,7 +111,10 @@
     line scan times. When using the SPICE server, only the label is returned 
     causing the camera model to fail initialization. In order to run spiceinit on 
     HRSC images, download the MEX data locally. See download instructions at 
-    https://github.com/DOI-USGS/ISIS3/blob/dev/README.md#mission-specific-data-downloads.
+    <a href="https://astrogeology.usgs.gov/docs/how-to-guides/environment-setup-and-maintenance/isis-data-area/#mission-specific-data-areas" target="_blank" rel="noopener noreferrer">
+      https://astrogeology.usgs.gov/docs/how-to-guides/environment-setup-and-maintenance/isis-data-area/#mission-specific-data-areas
+    </a>
+    .
     </p> 
 
   </description>
