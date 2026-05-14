@@ -37,7 +37,7 @@ class Dsk2isisDefault : public TempTestingFiles {
     }
 
     QString testDataPath(const QString &fileName) {
-      return FileName("$ISISROOT/../isis/tests/data/dsk2isis/" + fileName).expanded();
+      return QString(_SOURCE_PREFIX) + "/data/dsk2isis/" + fileName;
     }
 };
 
