@@ -312,15 +312,12 @@ namespace Isis {
         rad = Distance(rproj->UniversalRingRadius(),Distance::Meters);
       }
       if (!rad.isValid()) {
-        shape->setHasIntersection(false);
         return false;
       }
       SurfacePoint surfPt(lat, lon, rad);
       if (SetGround(surfPt)) {
         p_childSample = sample;
         p_childLine = line;
-
-        shape->setHasIntersection(true);
         return true;
       }
     }
