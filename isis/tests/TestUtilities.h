@@ -21,8 +21,24 @@
 #include "PvlObject.h"
 
 #include "CSVReader.h"
+#include "Cube.h"
 
 namespace Isis {
+
+  ::testing::AssertionResult AssertHistogramStats(
+          const char* cube_expr,
+          const char* expectedAverage_expr,
+          const char* expectedSum_expr,
+          const char* expectedValidPixels_expr,
+          const char* expectedStdDev_expr,
+          Cube &cube,
+          double expectedAverage,
+          double expectedSum,
+          BigInt expectedValidPixels,
+          double expectedStdDev,
+          double averageTolerance = 1e-9,
+          double sumTolerance = 1e-4,
+          double stdDevTolerance = 1e-9);
 
   ::testing::AssertionResult AssertIExceptionMessage(
           const char* e_expr,
