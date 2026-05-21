@@ -133,6 +133,26 @@ TEST_F(DefaultCube, FunctionalTestGetsnAppend) {
 }
 
 
+// Regression test for issue #6061: KPLO ShadowCam cubes returned
+// SerialNumber "Unknown" because KploShadowCamCameraSerialNumber.trn used
+// the bare keyword "Auto" instead of "Auto = 1", which the PVL translation
+// table parser does not recognize. Without the .trn fix, this expectation
+// fails and getsn yields "Unknown".
+TEST_F(ShadowCamCube, FunctionalTestGetsnShadowCam) {
+  QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
+  QString expectedSN = "KPLO/1200:1731688/ShadowCam";
+
+  QVector<QString> args = { "SN=TRUE" };
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  getsn( testCube.get(), options, &appLog );
+  PvlGroup results = appLog.findGroup("Results");
+
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, results.findKeyword("SerialNumber"), expectedSN);
+}
+
+
 // Test that append false overwrites file
 TEST_F(DefaultCube, FunctionalTestGetsnOverwrite) {
   QString APP_XML = FileName("$ISISROOT/bin/xml/getsn.xml").expanded();
