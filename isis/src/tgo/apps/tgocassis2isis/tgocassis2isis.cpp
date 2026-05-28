@@ -69,7 +69,7 @@ namespace Isis {
       QString transRawFile = "TgoCassisInstrument.trn";
       QFile xmlFile(xmlFileName.expanded());
       QDomDocument xmlDoc;
-      xmlDoc.setContent(&xmlFile, true);
+      xmlDoc.setContent(&xmlFile, QDomDocument::ParseOption::UseNamespaceProcessing);
       // If any instances of "Optical_Filter" or "Mission_Area" exist, use PSA .trn file
       QString transExportFile;
       if (!xmlDoc.elementsByTagName("Optical_Filter").isEmpty() &&
@@ -215,7 +215,7 @@ namespace Isis {
       QString missionDir = "$ISISROOT/appdata/translations/";
       QDomDocument xmlDoc;
       QFile xmlFile(xmlFileName.expanded());
-      xmlDoc.setContent(&xmlFile, true);
+      xmlDoc.setContent(&xmlFile, QDomDocument::ParseOption::UseNamespaceProcessing);
       // If any instances of "Observing_System_Component" exist, use PSA .trn file
       FileName mapTransFile;
       if (xmlDoc.elementsByTagName("cart:a_axis_radius").size()){
@@ -259,13 +259,12 @@ namespace Isis {
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
-    QString errmsg;
-    int errline, errcol;
-    if ( !xmlDoc.setContent(&xmlFile, false, &errmsg, &errline, &errcol) ) {
+    QDomDocument::ParseResult result = xmlDoc.setContent(&xmlFile);
+    if ( !bool(result) ) {
       xmlFile.close();
       QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
-          + "] at line [" + toString(errline) + "], column [" + toString(errcol)
-          + "], message: " + errmsg;
+          + "] at line [" + QString::number(result.errorLine) + "], column [" + QString::number(result.errorColumn)
+          + "], message: " + result.errorMessage;
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 

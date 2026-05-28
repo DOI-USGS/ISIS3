@@ -89,7 +89,7 @@ namespace Isis {
    * is currently running.
    */
   WorkOrder::WorkOrder(const WorkOrder &other) :
-      QAction(other.icon(), ((QAction &)other).text(), other.parentWidget()),
+      QAction(other.icon(), ((QAction &)other).text(), other.parent()),
       QUndoCommand(((QUndoCommand &)other).text()) {
     // Copy the action's what's this and tool tip (hover text).
     QAction::setWhatsThis(other.whatsThis());
@@ -1075,7 +1075,7 @@ namespace Isis {
         if (dependency) {
           QString dependencyText = dependency->bestText();
 
-          if (dependencyText.count() > 5) {
+          if (dependencyText.size() > 5) {
             dependencyText = dependencyText.mid(0, 5) + "...";
           }
 
@@ -1155,7 +1155,7 @@ namespace Isis {
       if (dependency && !isUndoing() && !isRedoing()) {
         QString prevText = dependency->bestText();
 
-        if (prevText.count() > 5) {
+        if (prevText.size() > 5) {
           prevText = prevText.mid(0, 5) + "...";
         }
 

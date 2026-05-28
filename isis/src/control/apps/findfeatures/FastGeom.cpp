@@ -208,7 +208,7 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
 
   // Set up the transform pointer for applying the desired affect. Do
   // preserve option first.
-  QScopedPointer<GenericTransform> fastg(0);
+  std::unique_ptr<GenericTransform> fastg(nullptr);
   if ( "map" == m_geomtype ) {
     // Compute preserved image output size and translation matrix
     cv::Mat tMat;
@@ -240,11 +240,11 @@ ImageTransform *FastGeom::compute(MatchImage &query, MatchImage &train,
 
  // If a mapper has not been allocated, allocate mapping to query image size
  // (as cam2cam does).
-  if ( fastg.isNull() ) {
+  if ( fastg == nullptr ) {
     fastg.reset(new GenericTransform("FastGeomCamera", mapper, qSize.size()));
   }
 
-  return ( fastg.take() );
+  return ( fastg.release() );
 }
 
 /**

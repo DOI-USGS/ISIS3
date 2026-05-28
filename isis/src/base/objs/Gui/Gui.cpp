@@ -608,7 +608,8 @@ namespace Isis {
     int status = QMessageBox::warning(this,
                                       ui.ProgramName(),
                                       p_errorString,
-                                      "Ok", "Abort", "", 0, 1);
+                                      QMessageBox::Ok | QMessageBox::Abort,
+                                      QMessageBox::Ok);
     p_errorString.clear();
     return status;
   }
@@ -634,22 +635,22 @@ namespace Isis {
     if(p_processAction->isEnabled()) return;
 
     Isis::UserInterface &ui = Application::GetUserInterface();
-    switch(QMessageBox::information(this,
-                                    ui.ProgramName(),
-                                    QString("Program suspended, choose to ") +
-                                    QString("continue processing, stop ") +
-                                    QString("processing or exit the program"),
-                                    "Continue",
-                                    "Stop",
-                                    "Exit", 0, 2)) {
-      case 0: // Pressed continue
+    int ret = QMessageBox::information(this,
+                                       ui.ProgramName(),
+                                       QString("Program suspended, choose to ") +
+                                       QString("continue processing, stop ") +
+                                       QString("processing or exit the program"),
+                                       QMessageBox::Yes | QMessageBox::No | QMessageBox::Close,
+                                       QMessageBox::Close);
+    switch(ret) {
+      case QMessageBox::Yes: // Pressed continue
         break;
 
-      case 1: // Pressed stop
+      case QMessageBox::No: // Pressed stop
         p_stop = true;
         break;
 
-      case 2: // Pressed exit
+      case QMessageBox::Close: // Pressed exit
         p_stop = true;
         qApp->quit();
     }

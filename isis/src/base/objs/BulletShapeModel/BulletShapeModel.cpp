@@ -99,8 +99,8 @@ namespace Isis {
       shapefile = (QString) kernels["ShapeModel"];
     }
 
-    QScopedPointer<BulletTargetShape> v_shape( BulletTargetShape::load(shapefile) );
-    if (v_shape.isNull() ) {
+    std::unique_ptr<BulletTargetShape> v_shape( BulletTargetShape::load(shapefile) );
+    if (v_shape == nullptr) {
       QString mess = "Cannot create a BulletShape from " + shapefile;
       throw IException(IException::User, mess, _FILEINFO_);
     }
@@ -108,7 +108,7 @@ namespace Isis {
     // Attempt to initialize the DSK file - exception ensues if errors occur
     // error thrown if ShapeModel=Null (i.e. Ellipsoid)
     m_model.reset(new BulletWorldManager(shapefile));
-    m_model->addTarget( v_shape.take() );
+    m_model->addTarget( v_shape.release() );
   }
 
 

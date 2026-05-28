@@ -89,7 +89,8 @@ namespace Isis {
                        p_camera->FocalPlaneMap()->DetectorLineOrigin();
 
     // Find distance from input point to all nominal reseaus
-    double distances[p_numRes], wt[5];
+    std::vector<double> distances(p_numRes, 0.0);
+    double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {
@@ -199,7 +200,8 @@ namespace Isis {
     double undistortedFocalLine = uy / p_pixelPitch + p_undistortedLines / 2.0;
 
     // Find distance from input point to all nominal reseaus
-    double distances[p_numRes], wt[5];
+    std::vector<double> distances(p_numRes, 0.0);
+    double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {

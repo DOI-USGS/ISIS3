@@ -73,7 +73,7 @@ namespace Isis {
     QToolButton *reverse = new QToolButton(buttons);
     reverse->setIcon(QPixmap(toolIconDir() + "/blinkReverse.png"));
     reverse->setIconSize(QSize(22, 22));
-    reverse->setShortcut(Qt::CTRL + Qt::Key_Delete);
+    reverse->setShortcut(Qt::CTRL | Qt::Key_Delete);
     reverse->setToolTip("Previous");
     QString text = "<b>Function:</b> Show previous linked viewport and \
       stop automatic timed blinking \

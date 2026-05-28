@@ -420,7 +420,7 @@ namespace Isis {
   }
 
   void ImageTreeWidget::dropEvent(QDropEvent *event) {
-    QTreeWidgetItem *droppedAtItem = itemAt(event->pos());
+    QTreeWidgetItem *droppedAtItem = itemAt(event->position().toPoint());
 
     if(droppedAtItem) {
       disableSort();

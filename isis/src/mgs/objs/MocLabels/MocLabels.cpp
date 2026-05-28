@@ -100,10 +100,10 @@ namespace Isis {
     p_ns = a.AlphaSamples();
     p_nl = a.AlphaLines();
 
-    // Get the two kernels for time computations
-    PvlGroup &kerns = lab.findGroup("Kernels", Pvl::Traverse);
-    p_lsk = FileName(kerns["LeapSecond"][0]);
-    p_sclk = FileName(kerns["SpacecraftClock"][0]);
+    // // Get the two kernels for time computations
+    // PvlGroup &kerns = lab.findGroup("Kernels", Pvl::Traverse);
+    // p_lsk = FileName(kerns["LeapSecond"][0]);
+    // p_sclk = FileName(kerns["SpacecraftClock"][0]);
   }
 
   /**

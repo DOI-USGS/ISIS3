@@ -60,14 +60,14 @@ namespace Isis {
       QPair<int, int> binXYIndices(int binIndex) const;
       QPair<int, int> binXYIndices(double x, double y) const;
 
-      QScopedPointer<Stretch> m_xDnToBinStretch; //!< Stretch 1
-      QScopedPointer<Stretch> m_yDnToBinStretch; //!< Stretch 2
+      std::unique_ptr<Stretch> m_xDnToBinStretch; //!< Stretch 1
+      std::unique_ptr<Stretch> m_yDnToBinStretch; //!< Stretch 2
 
       /**
        * The bin counts stored by 2D (x/y) index position. The first dimension
        *   is the y-index.
        */
-      QScopedPointer< QVector< QVector<int> > > m_counts;
+      std::unique_ptr< QVector< QVector<int> > > m_counts;
 
       //! The maximum value in m_counts, stored for efficiency
       int m_maxCount;
@@ -75,7 +75,7 @@ namespace Isis {
       /**
        * map from bin index to alarm state (true for alarmed)
        */
-      QScopedPointer< QMap<int, bool> > m_alarmedBins;
+      std::unique_ptr< QMap<int, bool> > m_alarmedBins;
 
       //! The minimum DN value for the x cube
       double m_xCubeMin;

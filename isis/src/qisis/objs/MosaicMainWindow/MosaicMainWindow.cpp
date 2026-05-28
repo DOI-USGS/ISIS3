@@ -188,7 +188,7 @@ namespace Isis {
 
     QAction *saveProject = new QAction(this);
     saveProject->setText("Save Project");
-    saveProject->setShortcut(Qt::CTRL + Qt::Key_S);
+    saveProject->setShortcut(Qt::CTRL | Qt::Key_S);
     saveProject->setIcon(QPixmap(QString::fromStdString(iconDir.c_str()) + "/mActionFileSave.png"));
     m_actionsRequiringOpen.append(saveProject);
     connect(saveProject, SIGNAL(triggered()), this, SLOT(saveProject()));

@@ -754,8 +754,8 @@ namespace Isis {
       //  These text geometries tend to be huge and consume lots of memory.
       if ( !geom.isEmpty() ) {
         
-        QScopedPointer<GisGeometry> geosgeom(new GisGeometry(geom, GisGeometry::type(gisType)));
-        if ( geosgeom.isNull() ) {
+        std::unique_ptr<GisGeometry> geosgeom(new GisGeometry(geom, GisGeometry::type(gisType)));
+        if ( geosgeom == nullptr ) {
             if ( isDebug() ) {
                 cout << resource->name() << " geometry failed to construct\n";
             }
@@ -786,7 +786,7 @@ namespace Isis {
             }
             geosgeom.reset( geosgeom->buffer(0) );
             if ( isDebug() ) {
-              if (geosgeom.isNull() || !geosgeom->isValid() ) {
+              if (geosgeom == nullptr || !geosgeom->isValid() ) {
                  cout << "  Geometry could not be repaired!\n";
               }
               else {
@@ -798,7 +798,7 @@ namespace Isis {
           // Now check state and take final action regarding a failed
           // geometry 
 
-          if (geosgeom.isNull() || !geosgeom->isValid() ) {
+          if (geosgeom == nullptr || !geosgeom->isValid() ) {
             if ( isDebug() ) {
                 cout << "  All efforts to convert geometry failed!\n";
             }
@@ -826,7 +826,7 @@ namespace Isis {
           npoints = geosgeom->points();
         }
 
-        resource->add(geosgeom.take());
+        resource->add(geosgeom.release());
 
         // Add the geometry point count to the resource if requested
         QString pointsKey = translateKeywordArgs("GisGeometryPointsKey", 

@@ -502,16 +502,16 @@ namespace Isis {
     QString busy = BusyLeafItem().getData().toString();
 
     bool lessThan;
-    if (leftData.type() == QVariant::String &&
-        rightData.type() == QVariant::String) {
+    if (leftData.typeId() == QMetaType::QString &&
+        rightData.typeId() == QMetaType::QString) {
       lessThan = leftData.toString() < rightData.toString();
     }
-    else if (leftData.type() == QVariant::Double &&
-        rightData.type() == QVariant::Double) {
+    else if (leftData.typeId() == QMetaType::Double &&
+        rightData.typeId() == QMetaType::Double) {
       lessThan = (leftData.toDouble() < rightData.toDouble());
     }
-    else if (leftData.type() == QVariant::Double ||
-        rightData.type() == QVariant::Double) {
+    else if (leftData.typeId() == QMetaType::Double ||
+        rightData.typeId() == QMetaType::Double) {
       // We are comparing a BusyLeafItem to a double. BusyLeafItem's should
       // always be less than the double.
       lessThan = (leftData.toString() == busy);

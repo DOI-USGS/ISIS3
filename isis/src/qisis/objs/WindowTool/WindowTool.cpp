@@ -47,7 +47,7 @@ namespace Isis {
 
     p_closeAllWindows = new QAction(parent);
     p_closeAllWindows->setText("Close All");
-    p_closeAllWindows->setShortcut(Qt::CTRL + Qt::Key_F3);
+    p_closeAllWindows->setShortcut(Qt::CTRL | Qt::Key_F3);
     p_closeAllWindows->setEnabled(false);
 
     p_nextWindow = new QAction(parent);
@@ -79,7 +79,7 @@ namespace Isis {
       of each viewport titlebar indicate the current link state</p> \
       <p><b>Tools using Link:</b> Zoom, Pan, Blink, and Advanced Tracking </p>";
     p_linkWindow->setWhatsThis(text);
-    p_linkWindow->setShortcut(Qt::CTRL + Qt::Key_L);
+    p_linkWindow->setShortcut(Qt::CTRL | Qt::Key_L);
     p_linkWindow->setCheckable(true);
     p_linkWindow->setEnabled(false);
 

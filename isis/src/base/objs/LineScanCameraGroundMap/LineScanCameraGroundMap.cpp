@@ -209,8 +209,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
-      const Longitude &lon) {
+  bool LineScanCameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
 
     if (radius.isValid()) {

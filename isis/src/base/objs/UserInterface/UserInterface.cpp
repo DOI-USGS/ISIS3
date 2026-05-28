@@ -351,7 +351,7 @@ namespace Isis {
 
       QStringList tokens = t.split(",");
 
-      foreach (QString token, tokens) {
+      for(QString token : tokens) {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
         token = token.remove( QRegularExpression("[\"']") );
         p_batchList[i].push_back(token);
@@ -610,7 +610,7 @@ namespace Isis {
             if (!matchesDefault) {
               PutAsString(keyword, values);
               commandline += keyword + "=";
-              foreach(QString val, values) {
+              for(QString val : values) {
                 commandline += val + " ";
               }
             }

@@ -87,9 +87,9 @@ namespace Isis {
     // Destroy the cubes still in memory
     if (p_managedCubes) {
       for (int i = p_managedCubes->size() - 1; i >= 0; i--) {
-        if ((p_managedCubes->end() - 1)->first) // only delete if we own it!
-          delete (p_managedCubes->end() - 1).value().second;
-        p_managedCubes->erase(p_managedCubes->end() - 1);
+        if (std::prev(p_managedCubes->end())->first) // only delete if we own it!
+          delete std::prev(p_managedCubes->end()).value().second;
+        p_managedCubes->erase(std::prev(p_managedCubes->end()));
       }
     }
 

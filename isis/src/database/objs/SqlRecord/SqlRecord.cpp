@@ -103,8 +103,8 @@ namespace Isis {
    * @return QString  Type of the field/column
    */
   QString SqlRecord::getType(const QString &name) const {
-    QVariant ftype(field(name).type());
-    return (QtTypeField(ftype.typeName()));
+    QMetaType ftype(field(name).metaType());
+    return (QtTypeField(ftype.name()));
   }
 
   /**
@@ -128,8 +128,8 @@ namespace Isis {
    * @return QString Type of the field/column at given index.
    */
   QString SqlRecord::getType(int index) const {
-    QVariant ftype(field(index).type());
-    return (QtTypeField(ftype.typeName()));
+    QMetaType ftype(field(index).metaType());
+    return (QtTypeField(ftype.name()));
   }
 
   /**

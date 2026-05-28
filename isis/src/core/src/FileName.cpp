@@ -626,7 +626,7 @@ namespace Isis {
     bool success = false;
 
     for (int i = files.count() - 1; !success && i >= 0; i--) {
-      foundValue = files[i].mid(before.count(), width).toLong(&success);
+      foundValue = files[i].mid(before.size(), width).toLong(&success);
     }
 
     if (success) {

@@ -488,7 +488,7 @@ namespace Isis {
       QScopedPointer<Cube> m_rightCube;
 
       QString m_groundFile;
-      QScopedPointer<Cube> m_groundCube;
+      std::unique_ptr<Cube> m_groundCube;
       QString m_groundSN;
       QScopedPointer<UniversalGroundMap> m_groundGmap;
       bool m_groundOpen;
