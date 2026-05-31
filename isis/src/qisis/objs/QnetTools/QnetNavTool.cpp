@@ -866,7 +866,7 @@ namespace Isis {
                                     message,
                                     QMessageBox::Yes | QMessageBox::No);
     switch (ret) {
-      case 0: // Yes was clicked or Enter was pressed, delete points
+      case QMessageBox::Yes: // Yes was clicked or Enter was pressed, delete points
         QApplication::setOverrideCursor(Qt::WaitCursor);
         int lockedPoints = 0;
         for (int i = 0; i < selected.size(); i++) {
@@ -892,7 +892,7 @@ namespace Isis {
         if (lockedPoints != selected.size()) emit netChanged();
 
         break;
-        //  case 1: // No was clicked, close window and do nothing to points
+        //  case QMessageBox::No: // No was clicked, close window and do nothing to points
     }
     return;
   }
@@ -937,7 +937,7 @@ namespace Isis {
                                     + " point(s). Do you want to continue?",
                                     QMessageBox::Yes | QMessageBox::No);
     switch (ret) {
-      case 0: // Yes was clicked or Enter was pressed, delete points
+      case QMessageBox::Yes: // Yes was clicked or Enter was pressed, delete points
 
 
 #if 0 //  If resetting filtered list, then re-filtering too slow, try code below
@@ -986,7 +986,7 @@ namespace Isis {
         emit deletedPoints();
         emit netChanged();
         break;
-        //  case 1: // No was clicked, close window and do nothing to points
+        //  case QMessageBox::No: // No was clicked, close window and do nothing to points
     }
     return;
   }
@@ -1271,13 +1271,15 @@ namespace Isis {
 
 
 
-    switch (QMessageBox::question((QWidget *)parent(),
-        "Control Network Navigator - Ignore Points",
-        "You have chosen to set "
-        + QString::number(selected.size())
-        + " point(s) to ignore. Do you want to continue?",
-        "&Yes", "&No", 0, 0)) {
-      case 0: // Yes was clicked or Enter was pressed, delete points
+    QString message = "You have chosen to set " +
+                      QString::number(selected.size()) +
+                      " point(s) to ignore. Do you want to continue?";
+    int ret = QMessageBox::question((QWidget *)parent(),
+                                    "Control Network Navigator - Ignore Points",
+                                    message,
+                                    QMessageBox::Yes | QMessageBox::No);
+    switch (ret) {
+      case QMessageBox::Yes: // Yes was clicked or Enter was pressed, delete points
         QApplication::setOverrideCursor(Qt::WaitCursor);
           emit pointChanged((*g_controlNetwork)[g_filteredPoints[index]]->GetId());
         }

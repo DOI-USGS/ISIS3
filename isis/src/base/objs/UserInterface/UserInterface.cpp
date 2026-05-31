@@ -610,7 +610,7 @@ namespace Isis {
             if (!matchesDefault) {
               PutAsString(keyword, values);
               commandline += keyword + "=";
-              for(QString val : values) {
+              for (const QString &val : values) {
                 commandline += val + " ";
               }
             }
