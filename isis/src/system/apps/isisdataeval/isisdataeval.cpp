@@ -334,7 +334,7 @@ namespace Isis {
                 else {
                   // Read (in (1MB * HASHBUFFER) chunks) bytes and add to hashes
                   while ( !v_file.atEnd() ) {
-                    qint64 nread = v_file.read(file_data.get(), MaxBytesToRead );
+                    v_file.read(file_data.get(), MaxBytesToRead );
 
                     // Add to hashes
                     file_hash.addData(   QByteArrayView(file_data.get()));
