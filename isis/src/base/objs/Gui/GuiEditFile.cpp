@@ -198,7 +198,7 @@ namespace Isis {
                                       tr("Are you sure you want to save this file?"),
                                       QMessageBox::Save | QMessageBox::Cancel,
                                       QMessageBox::Save);
-      if(ret) {
+      if (ret == QMessageBox::Save) {
         saveFile();
       }
     }

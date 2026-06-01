@@ -1763,12 +1763,12 @@ namespace Isis {
       QString message = "You are saving changes to a measure on an ignored ";
       message += "point.  Do you want to set Ignore = False on the point and ";
       message += "both measures?";
-      int ret = QMessageBox::question(this, "Save Measure", message, 
+      int ret = QMessageBox::question(this, "Save Measure", message,
                                       QMessageBox::Yes | QMessageBox::No,
                                       QMessageBox::Yes);
       switch (ret) {
         // Yes:  set Ignore=false for the point and measures and save point
-        case 0:
+        case QMessageBox::Yes:
           m_editPoint->SetIgnored(false);
           emit ignorePointChanged();
           if (m_leftMeasure->IsIgnored()) {
@@ -1780,7 +1780,7 @@ namespace Isis {
             emit ignoreRightChanged();
           }
         // No: keep Ignore=true and save measure
-        case 1:
+        case QMessageBox::No:
           break;
       }
     }
@@ -1902,7 +1902,7 @@ namespace Isis {
                                            message, QMessageBox::Yes | QMessageBox::No);
       switch (response) {
         // Yes:  set Ignore=false for the right measure and save point
-        case 0:
+        case QMessageBox::Yes:
             m->SetIgnored(false);
             if (side == "left") {
               emit ignoreLeftChanged();
@@ -1911,8 +1911,8 @@ namespace Isis {
               emit ignoreRightChanged();
             }
         // No:  keep Ignore=true and save point
-        case 1:
-          break;;
+        case QMessageBox::No:
+          break;
       }
     }
 
@@ -1930,10 +1930,10 @@ namespace Isis {
                                           QMessageBox::Yes | QMessageBox::No);
           switch(ret) {
             // Yes:  Save measure
-            case 0:
+            case QMessageBox::Yes:
               break;
             // No:  keep original reference, return without saving
-            case 1:
+            case QMessageBox::No:
               ControlMeasure *origLeftMeasure =
                 m_editPoint->GetMeasure(m_leftMeasure->GetCubeSerialNumber());
               m_measureEditor->setLeftPosition(origLeftMeasure->GetSample(),

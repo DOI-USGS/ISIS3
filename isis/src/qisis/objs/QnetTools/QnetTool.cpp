@@ -738,7 +738,7 @@ namespace Isis {
                                       message, QMessageBox::Yes | QMessageBox::No);
       switch (ret) {
         // Yes:  set Ignore=false for the point and measures and save point
-        case 0:
+        case QMessageBox::Yes:
           m_editPoint->SetIgnored(false);
           emit ignorePointChanged();
           if (m_leftMeasure->IsIgnored()) {
@@ -750,7 +750,7 @@ namespace Isis {
             emit ignoreRightChanged();
           }
         // No: keep Ignore=true and save measure
-        case 1:
+        case QMessageBox::No:
           break;
 
       }
@@ -762,11 +762,11 @@ namespace Isis {
                                       message, QMessageBox::Yes | QMessageBox::No);
       switch(ret) {
         // Yes:  set Ignore=false for the right measure and save point
-        case 0:
+        case QMessageBox::Yes:
             m_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
         // No:  keep Ignore=true and save point
-        case 1:
+        case QMessageBox::No:
           break;
       }
     }
@@ -917,10 +917,10 @@ namespace Isis {
                                       message, QMessageBox::Yes | QMessageBox::No);
       switch(ret) {
         // Yes:  Save measure
-        case 0:
+        case QMessageBox::Yes:
           return true;
         // No:  keep original reference, return ChipViewports to previous states
-        case 1:
+        case QMessageBox::No:
           selectRightMeasure(m_rightCombo->currentIndex());
           selectLeftMeasure(m_leftCombo->currentIndex());
           return false;
@@ -2050,10 +2050,10 @@ namespace Isis {
                                             QMessageBox::Yes | QMessageBox::No);
             switch (ret) {
               //  Yes:  skip to end of switch todelete the measure
-              case 0:
+              case QMessageBox::Yes:
                 break;
               //  No:  continue to next measure in the loop
-              case 1:
+              case QMessageBox::No:
                 //  if only a single measure and it's reference and user chooses not to delete,
                 //  simply return.  The point has not changed.
                 if (numDeleted == 1) {
