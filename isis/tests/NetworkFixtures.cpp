@@ -1,8 +1,5 @@
 #include "NetworkFixtures.h"
 
-#include <SpiceUsr.h>
-
-#include "FileName.h"
 #include "ImagePolygon.h"
 #include "LineManager.h"
 #include "OriginalLabel.h"
@@ -11,12 +8,6 @@ namespace Isis {
 
   void ThreeImageNetwork::SetUp() {
     TempTestingFiles::SetUp();
-
-    // Load the MGS spacecraft clock kernel so SCLK<->ET conversions
-    // work for the fromIsd cubes set up below. fromIsd does not
-    // auto-furnsh, and some camera code paths need an SCLK in the pool.
-    FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
-    furnsh_c(mgsSclk.expanded().toLatin1().data());
 
     FileName labelPath1("data/threeImageNetwork/cube1.pvl");
     FileName labelPath2("data/threeImageNetwork/cube2.pvl");
@@ -137,11 +128,6 @@ namespace Isis {
 
     delete threeImageOverlapFile;
     delete twoImageOverlapFile;
-
-    // Match the furnsh_c in SetUp so successive tests don't accumulate
-    // SPICE kernel state.
-    FileName mgsSclk("$mgs/kernels/sclk/MGS_SCLKSCET.00061.tsc");
-    unload_c(mgsSclk.expanded().toLatin1().data());
   }
 
 
