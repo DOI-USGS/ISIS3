@@ -42,29 +42,6 @@ protected:
     TempTestingFiles::SetUp();
   }
 
-  // Generate cube with DN pattern: DN = base + (line * lineMult) + (sample * sampMult) + (band * bandMult)
-  QString generateCube(const QString &filename, int samples, int lines, int bands,
-                      double base = 0.0, double lineMult = 1.0, double sampMult = 1.0, double bandMult = 0.0) {
-    QString cubePath = tempDir.path() + "/" + filename;
-
-    Cube cube;
-    cube.setDimensions(samples, lines, bands);
-    cube.create(cubePath);
-
-    for (int band = 1; band <= bands; band++) {
-      for (int line = 1; line <= lines; line++) {
-        LineManager mgr(cube);
-        mgr.SetLine(line, band);
-        for (int samp = 1; samp <= samples; samp++) {
-          mgr[samp-1] = base + (line * lineMult) + (samp * sampMult) + (band * bandMult);
-        }
-        cube.write(mgr);
-      }
-    }
-    cube.close();
-    return cubePath;
-  }
-
   // Get DN value at specific location
   double getPixel(const QString &cubePath, int sample, int line, int band) {
     Cube cube(cubePath);
@@ -82,8 +59,8 @@ protected:
  * Expected: output = 3*sample + 2*line
  */
 TEST_F(FxTest, FunctionalTestFxSingleLine) {
-  QString input1 = generateCube("in1.cub", 5, 5, 1, 0.0, 1.0, 1.0, 0.0);  // DN = line + sample
-  QString input2 = generateCube("in2.cub", 5, 5, 1, 0.0, 1.0, 2.0, 0.0);  // DN = line + 2*sample
+  QString input1 = createLinearPatternCube(tempDir.path() + "/in1.cub", 5, 5, 1, 0.0, 1.0, 1.0, 0.0);  // DN = line + sample
+  QString input2 = createLinearPatternCube(tempDir.path() + "/in2.cub", 5, 5, 1, 0.0, 1.0, 2.0, 0.0);  // DN = line + 2*sample
   QString output = tempDir.path() + "/result.cub";
 
   QVector<QString> args = {"f1=" + input1, "f2=" + input2, "to=" + output, "equation=f1+f2"};
@@ -122,7 +99,7 @@ TEST_F(FxTest, FunctionalTestFxSingleLine) {
  */
 TEST_F(FxTest, FunctionalTestFxDefault) {
   // Create 2-band cube: band1=15, band2=20 (constant per band)
-  QString input = generateCube("input.cub", 4, 4, 2, 10.0, 0.0, 0.0, 5.0);
+  QString input = createLinearPatternCube(tempDir.path() + "/input.cub", 4, 4, 2, 10.0, 0.0, 0.0, 5.0);
   QString output = tempDir.path() + "/result.cub";
 
   QVector<QString> args = {"f1=" + input + "+1", "f2=" + input + "+2", "to=" + output, "equation=--f1+f2/cos(1/2)"};
@@ -157,8 +134,8 @@ TEST_F(FxTest, FunctionalTestFxDefault) {
  * f2: DNs range 10-15 (10,11,12,13,14,15)
  */
 TEST_F(FxTest, FunctionalTestFxCubestats) {
-  QString input1 = generateCube("in1.cub", 3, 2, 1, 0.0, 0.0, 1.0, 0.0);   // DN = sample (1,2,3)
-  QString input2 = generateCube("in2.cub", 3, 2, 1, 10.0, 0.0, 1.0, 0.0);  // DN = 10+sample (11,12,13)
+  QString input1 = createLinearPatternCube(tempDir.path() + "/in1.cub", 3, 2, 1, 0.0, 0.0, 1.0, 0.0);   // DN = sample (1,2,3)
+  QString input2 = createLinearPatternCube(tempDir.path() + "/in2.cub", 3, 2, 1, 10.0, 0.0, 1.0, 0.0);  // DN = 10+sample (11,12,13)
 
   // Test: cubemax(f1) - cubemin(f2)
   // cubemax(f1) = 3, cubemin(f2) = 11
@@ -243,7 +220,7 @@ TEST_F(FxTest, FunctionalTestFxCubestats) {
  * Uses tiny 5x5 cube with simple DN pattern.
  */
 TEST_F(FxTest, FunctionalTestFxOperators) {
-  QString input = generateCube("input.cub", 5, 5, 2, 50.0, 1.0, 1.0, 10.0);
+  QString input = createLinearPatternCube(tempDir.path() + "/input.cub", 5, 5, 2, 50.0, 1.0, 1.0, 10.0);
   // Band 1: DN = 50 + line + sample + 10*1 = 61-70
   // Band 2: DN = 50 + line + sample + 10*2 = 71-80
 
@@ -401,9 +378,9 @@ TEST_F(FxTest, FunctionalTestFxOutputonly) {
  * Expected: output = 10 + 20 + 30 = 60
  */
 TEST_F(FxTest, FunctionalTestFxFilelist) {
-  QString input1 = generateCube("in1.cub", 4, 4, 1, 10.0, 0.0, 0.0, 0.0);
-  QString input2 = generateCube("in2.cub", 4, 4, 1, 20.0, 0.0, 0.0, 0.0);
-  QString input3 = generateCube("in3.cub", 4, 4, 1, 30.0, 0.0, 0.0, 0.0);
+  QString input1 = createLinearPatternCube(tempDir.path() + "/in1.cub", 4, 4, 1, 10.0, 0.0, 0.0, 0.0);
+  QString input2 = createLinearPatternCube(tempDir.path() + "/in2.cub", 4, 4, 1, 20.0, 0.0, 0.0, 0.0);
+  QString input3 = createLinearPatternCube(tempDir.path() + "/in3.cub", 4, 4, 1, 30.0, 0.0, 0.0, 0.0);
 
   QString fromlist = tempDir.path() + "/fromlist.lis";
   FileList cubeList;
@@ -448,8 +425,8 @@ TEST_F(FxTest, FunctionalTestFxFilelist) {
 TEST_F(FxTest, FunctionalTestFxFilelistattributes) {
   // Create multiband cubes: each band has distinct DN value
   // Band N: DN = 10 * N (using bandMult=10.0)
-  QString vims1 = generateCube("vims1.cub", 4, 4, 5, 0.0, 0.0, 0.0, 10.0);
-  QString vims2 = generateCube("vims2.cub", 4, 4, 5, 0.0, 0.0, 0.0, 10.0);
+  QString vims1 = createLinearPatternCube(tempDir.path() + "/vims1.cub", 4, 4, 5, 0.0, 0.0, 0.0, 10.0);
+  QString vims2 = createLinearPatternCube(tempDir.path() + "/vims2.cub", 4, 4, 5, 0.0, 0.0, 0.0, 10.0);
 
   QString listPath = tempDir.path() + "/list.lis";
   // Write this list manually because FileList::write() normalizes FileName entries

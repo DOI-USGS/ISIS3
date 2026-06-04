@@ -357,4 +357,39 @@ namespace Isis {
     cubeFileList.write(cubeListPath);
   }
 
+
+  /**
+   * Creates a test cube with a linear DN pattern.
+   * DN = base + (line * lineMult) + (sample * sampMult) + (band * bandMult)
+   *
+   * @param cubePath Full path where the cube will be created
+   * @param samples Number of samples
+   * @param lines Number of lines
+   * @param bands Number of bands
+   * @param base Base DN value
+   * @param lineMult Multiplier for line number
+   * @param sampMult Multiplier for sample number
+   * @param bandMult Multiplier for band number
+   * @return The path to the created cube
+   */
+  QString createLinearPatternCube(const QString &cubePath, int samples, int lines, int bands,
+                                   double base, double lineMult, double sampMult, double bandMult) {
+    Cube cube;
+    cube.setDimensions(samples, lines, bands);
+    cube.create(cubePath);
+
+    for (int band = 1; band <= bands; band++) {
+      for (int line = 1; line <= lines; line++) {
+        LineManager mgr(cube);
+        mgr.SetLine(line, band);
+        for (int samp = 1; samp <= samples; samp++) {
+          mgr[samp-1] = base + (line * lineMult) + (samp * sampMult) + (band * bandMult);
+        }
+        cube.write(mgr);
+      }
+    }
+    cube.close();
+    return cubePath;
+  }
+
 }
