@@ -59,7 +59,13 @@ namespace Isis {
     double currEt = p_camera->time().Et();
     int rateIndex = p_lineRates.size() - 1;
 
-    while (rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt() - 0.5) {
+    // Find the rate section containing currEt. A section starts at the time of
+    // line (GetStartLine() - 0.5), which by the SetParent() formula below is
+    // exactly GetStartEt(), so the section boundary in time is GetStartEt().
+    // (Do not subtract 0.5 here: this is a time in seconds, not a line number,
+    // and a 0.5 second offset would mis-select the section near a rate change,
+    // breaking the line/time round trip. SetParent uses 0.5 in line units.)
+    while (rateIndex >= 0 && currEt < p_lineRates[rateIndex].GetStartEt()) {
       rateIndex --;
     }
 
