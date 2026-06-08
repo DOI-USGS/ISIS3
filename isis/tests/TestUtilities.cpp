@@ -26,7 +26,6 @@ namespace Isis {
           double stdDevTolerance) {
     Histogram *stats = cube.histogram();
 
-    bool success = true;
     ::testing::AssertionResult result = ::testing::AssertionSuccess();
 
     if (std::abs(stats->Average() - expectedAverage) > averageTolerance) {
@@ -35,33 +34,29 @@ namespace Isis {
           << " (" << stats->Average() << ") does not match "
           << expectedAverage_expr << " (" << expectedAverage
           << ") within tolerance " << averageTolerance;
-      success = false;
     }
 
-    if (success && std::abs(stats->Sum() - expectedSum) > sumTolerance) {
+    if (result && std::abs(stats->Sum() - expectedSum) > sumTolerance) {
       result = ::testing::AssertionFailure()
           << "Histogram Sum for " << cube_expr
           << " (" << stats->Sum() << ") does not match "
           << expectedSum_expr << " (" << expectedSum
           << ") within tolerance " << sumTolerance;
-      success = false;
     }
 
-    if (success && stats->ValidPixels() != expectedValidPixels) {
+    if (result && stats->ValidPixels() != expectedValidPixels) {
       result = ::testing::AssertionFailure()
           << "Histogram ValidPixels for " << cube_expr
           << " (" << stats->ValidPixels() << ") does not match "
           << expectedValidPixels_expr << " (" << expectedValidPixels << ")";
-      success = false;
     }
 
-    if (success && std::abs(stats->StandardDeviation() - expectedStdDev) > stdDevTolerance) {
+    if (result && std::abs(stats->StandardDeviation() - expectedStdDev) > stdDevTolerance) {
       result = ::testing::AssertionFailure()
           << "Histogram StandardDeviation for " << cube_expr
           << " (" << stats->StandardDeviation() << ") does not match "
           << expectedStdDev_expr << " (" << expectedStdDev
           << ") within tolerance " << stdDevTolerance;
-      success = false;
     }
 
     delete stats;
