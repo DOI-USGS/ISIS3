@@ -52,16 +52,20 @@ TEST(HrscCameraTests, HrscCameraUnitTest) {
 }
 
 /**
- * Regression test for the VariableLineScanCameraDetectorMap round-trip near a
- * line-rate change. HRSC scans with a variable line rate, so the camera uses
- * VariableLineScanCameraDetectorMap. SetDetector (time -> line) used to select
- * the rate section by comparing the ephemeris time against GetStartEt() - 0.5,
- * where the 0.5 is the half-pixel offset of the line convention, not a time. In
- * the window just before a rate change this mis-selected the section and broke
- * the image <-> ground round trip.
+ * Regression test for the line/time round trip of a variable-rate line scanner.
  *
- * In this cube the first line-rate change is at line 633; line 585 is inside
- * that window and round-tripped about 1 pixel off before the fix.
+ * HRSC does not scan at a constant rate: the line exposure time changes in a few
+ * discrete steps partway down the image, so the camera uses
+ * VariableLineScanCameraDetectorMap. Mapping a pixel to the ground and back,
+ * image -> ground -> image, must return the original pixel.
+ *
+ * The bug was in the ground -> image direction. When the ephemeris time landed
+ * shortly before one of the rate changes, SetDetector selected the wrong rate
+ * section, so the round trip did not close. The sample and line below are picked
+ * to fall in that window, just ahead of a rate change for this cube; there the
+ * round trip was off by about a pixel before the fix and closes to a small
+ * fraction of a pixel after it. The check is that the round trip closes, not any
+ * absolute coordinate.
  */
 TEST(HrscCameraTests, VariableLineRateRoundTrip) {
   Cube cube("$ISISTESTDATA/isis/src/mex/unitTestData/h2254_0000_s12.cub", "r");
@@ -73,8 +77,9 @@ TEST(HrscCameraTests, VariableLineRateRoundTrip) {
   double lat = cam->UniversalLatitude();
   double lon = cam->UniversalLongitude();
   ASSERT_TRUE(cam->SetUniversalGround(lat, lon));
-  // The round trip is ~1e-5 px with the fix and was ~1 px off without it, so
-  // this tolerance is generous for portability while still catching the bug.
+  // Require the round trip to close. Without the fix it missed by about a pixel
+  // here; with it the error is a tiny fraction of a pixel. The tolerance is kept
+  // loose enough to stay portable across platforms.
   EXPECT_NEAR(cam->Sample(), sample, 0.02);
   EXPECT_NEAR(cam->Line(), line, 0.02);
 
