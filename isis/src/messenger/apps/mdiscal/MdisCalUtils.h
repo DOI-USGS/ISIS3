@@ -82,7 +82,7 @@ namespace Isis {
         //  Determine if the target is a valid NAIF target
         try{
           SpiceQL::translateNameToCode(target.toLatin1().data(), "mdis", useWeb);
-        }catch(std::invalid_argument){
+        } catch(const std::invalid_argument &){
           return false;
         }
 

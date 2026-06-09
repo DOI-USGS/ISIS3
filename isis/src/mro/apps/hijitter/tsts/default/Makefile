@@ -29,8 +29,10 @@ commands:
 	  to=$(OUTPUT)/red6.stats.pvl > /dev/null;
 	$(RM) $(OUTPUT)/files.lis $(OUTPUT)/outlist.lis;
 	$(RM) $(OUTPUT)/jitter.bc $(OUTPUT)/red5.cub print.prt;
-#	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub;
-# Red 5 has special pixel differences so use stats to compare instead for now 
+# RED4 cube content is verified indirectly via red4.stats.pvl; drop the cube
+# itself from the output set so the test does not need a 75 MB truth cube.
+	$(RM) $(OUTPUT)/PSP_007556_2010_RED4.balance.cropped.cub;
+# Red 5 has special pixel differences so use stats to compare instead for now
 # since ignorespecial option is gone.
 	$(RM) $(OUTPUT)/PSP_007556_2010_RED5.balance.cropped.cub;
 # Red 6 has special pixel differences so use stats to compare instead for now 

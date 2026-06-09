@@ -53,7 +53,7 @@ namespace Isis {
     // This method was derived from an algorithm in the text
     // Numerical Recipes in C: The Art of Scientific Computing
     // Section 4.3 by Flannery, Press, Teukolsky, and Vetterling
-    int maxits = 20;       // maximium number of iterations allowed to converge
+    constexpr int maxits = 20; // maximium number of iterations allowed to converge
     double dss = 0;        // error estimate for
     double h[maxits+1];    // relative stepsizes for trap
     double trap[maxits+1]; // successive trapeziodal approximations

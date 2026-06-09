@@ -227,7 +227,7 @@ namespace Isis {
 
     QAction *closeQtieTool = new QAction(p_tieTool);
     closeQtieTool->setText("&Close");
-    closeQtieTool->setShortcut(Qt::ALT + Qt::Key_F4);
+    closeQtieTool->setShortcut(Qt::ALT | Qt::Key_F4);
     whatsThis = "<b>Function:</b> Closes the Qtie Tool window for this point \
                 <p><b>Shortcut:</b> Alt+F4 </p>";
     closeQtieTool->setWhatsThis(whatsThis);

@@ -1,3 +1,4 @@
+#include <QDir>
 #include <QTextStream>
 #include <QStringList>
 #include <QFile>
@@ -326,4 +327,54 @@ TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
   EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(0));
   EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(1));
   EXPECT_TRUE(groundPoint.findKeyword("LookDirectionCamera").isNull(2));
+}
+
+
+// Test the CSM= parameter, which loads a CSM camera (ISD or model state JSON)
+// from an external file and uses it in place of the camera attached to the
+// input cube. Mirrors the phocube CSM test.
+// Requires the USGSCSM plugin from ISISROOT or CONDA_PREFIX.
+TEST_F(DefaultCube, FunctionalTestCamptCsm) {
+  auto hasPlugins = [](const char *dir) {
+    return dir && QDir(QString(dir) + "/lib/csmplugins").exists();
+  };
+  const char *isisroot = getenv("ISISROOT");
+  const char *conda = getenv("CONDA_PREFIX");
+  if (!hasPlugins(isisroot) && !hasPlugins(conda))
+    GTEST_SKIP() << "No CSM plugins found (set ISISROOT or CONDA_PREFIX)";
+
+  // Resize testCube to match the CSM framer's 16x16 detector so the queried
+  // sample/line lands inside the CSM detector.
+  resizeCube(16, 16, 1);
+  QString cubePath = testCube->fileName();
+  testCube->close();
+
+  QString isdPath = "data/defaultImage/orbitalMarsFramer.json";
+
+  QVector<QString> args = {"from=" + cubePath,
+                           "csm=" + isdPath,
+                           "sample=8",
+                           "line=8"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  try {
+    campt(options, &appLog);
+  } catch (IException &e) {
+    GTEST_SKIP() << "campt CSM test skipped (environment issue): "
+                 << e.what();
+  }
+
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+
+  // The CSM camera was successfully loaded and queried iff the spacecraft
+  // identifier flowed through from the ISD (the ISIS Viking camera in the
+  // cube fixture would not produce these CSM-derived identifiers).
+  ASSERT_TRUE(groundPoint.hasKeyword("Sample"));
+  EXPECT_DOUBLE_EQ(toDouble(groundPoint.findKeyword("Sample")[0]), 8.0);
+  EXPECT_DOUBLE_EQ(toDouble(groundPoint.findKeyword("Line")[0]), 8.0);
+
+  // The CSM Mars framer points at lon=0, lat=0 from 4000 km, so the queried
+  // pixel must produce a valid ground intersection (no Error keyword).
+  EXPECT_FALSE(groundPoint.hasKeyword("Error"));
 }

@@ -42,7 +42,7 @@ namespace Isis {
 
     foreach (QAction *menuAction, menuBar()->actions()) {
       if (menuAction->text() == "&Options") {
-        QMenu *optsMenu = qobject_cast<QMenu *>(menuAction->parentWidget());
+        QMenu *optsMenu = qobject_cast<QMenu *>(menuAction->parent());
 
         optsMenu->addAction(m_showHideBandMarkers);
       }

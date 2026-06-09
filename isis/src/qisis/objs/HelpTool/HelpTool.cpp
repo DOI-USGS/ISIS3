@@ -18,7 +18,7 @@ namespace Isis {
   // Constructor
   HelpTool::HelpTool(QWidget *parent) : Tool(parent) {
     p_whatsThis = new QAction(parent);
-    p_whatsThis->setShortcut(Qt::SHIFT + Qt::Key_F1);
+    p_whatsThis->setShortcut(Qt::SHIFT | Qt::Key_F1);
     p_whatsThis->setText("&What's This?");
     p_whatsThis->setIcon(QPixmap(toolIconDir() + "/contexthelp.png"));
     p_whatsThis->setToolTip("What's This");
@@ -30,7 +30,7 @@ namespace Isis {
     connect(p_whatsThis, SIGNAL(triggered()), this, SLOT(whatsThis()));
 
     p_aboutProgram = new QAction(parent);
-    p_aboutProgram->setShortcut(Qt::CTRL + Qt::Key_H);
+    p_aboutProgram->setShortcut(Qt::CTRL | Qt::Key_H);
     QString s = "About ";
     s += QApplication::applicationName();
     p_aboutProgram->setText(s);

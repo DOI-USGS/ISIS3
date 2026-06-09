@@ -27,11 +27,11 @@ DeltaLine = 0.000000000
 
 For lower left corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.010806839
+DeltaLine = 0.000000000
 
 For lower right corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.011730711
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK
@@ -56,19 +56,19 @@ Start Time: 476823679.937990844
 End Time:   476825050.406471491
 For upper left corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.038726648
+DeltaLine = 0.000000000
 
 For upper right corner ...
 DeltaSample = 0.000000000
-DeltaLine = -0.057422638
+DeltaLine = 0.000000000
 
 For lower left corner ...
 DeltaSample = 0.000000000
-DeltaLine = 1.101867835
+DeltaLine = 0.000000000
 
 For lower right corner ...
 DeltaSample = 0.000000000
-DeltaLine = 1.209474087
+DeltaLine = 0.000000000
 
 For center pixel position ...
 Latitude OK

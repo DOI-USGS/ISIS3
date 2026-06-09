@@ -37,9 +37,6 @@ Testing method intersectSurface...
   Testing localRadius method ...
     Local radius = 3393.711719
 
-  Testing setHasIntersection method
-    Do we have an intersection? 0
-
   Testing setSurfacePoint method ...
      Do we have an intersection? 1
      surface point = (-2105.830811, -2380.77411, 1189.409824

@@ -73,9 +73,9 @@ class QDebugLogger {
 
       // Set up file access logging
       FileName t_fname(filename);
-      QScopedPointer<QFile> t_dbugfile( QDebugLogger::open( t_fname.expanded(), omode) );
-      QScopedPointer<QDebugStreamType> t_dbuglog( new QDebugStreamType( t_dbugfile.data() ) );
-      return ( QDebugStream( new QDebugLogger( t_dbugfile.take(), t_dbuglog.take() ) ) );
+      std::unique_ptr<QFile> t_dbugfile( QDebugLogger::open( t_fname.expanded(), omode) );
+      std::unique_ptr<QDebugStreamType> t_dbuglog( new QDebugStreamType( t_dbugfile.get() ) );
+      return ( QDebugStream( new QDebugLogger( t_dbugfile.release(), t_dbuglog.release() ) ) );
     }
 
     /** Map streams like stdout, stderr, etc..., using this method */
@@ -84,10 +84,10 @@ class QDebugLogger {
                                                          QIODevice::Append |
                                                          QIODevice::Text |
                                                          QIODevice::Unbuffered) ) {
-       QScopedPointer<QFile> t_dbugfile( new QFile() );
+       std::unique_ptr<QFile> t_dbugfile( new QFile() );
        t_dbugfile->open( fh, omode );
-       QScopedPointer<QDebugStreamType> t_dbuglog( new QDebugStreamType( t_dbugfile.data() ) );
-       return ( QDebugStream( new QDebugLogger( t_dbugfile.take(), t_dbuglog.take() ) ) );
+       std::unique_ptr<QDebugStreamType> t_dbuglog( new QDebugStreamType( t_dbugfile.get() ) );
+       return ( QDebugStream( new QDebugLogger( t_dbugfile.release(), t_dbuglog.release() ) ) );
     }
 
 
@@ -103,14 +103,14 @@ class QDebugLogger {
                         _FILEINFO_);
 #endif
 
-       QScopedPointer<QFile> t_dbugfile( 0 );
+       std::unique_ptr<QFile> t_dbugfile( nullptr );
 #if ( STRING_OMODE_OK == 0 )
-       QScopedPointer<QDebugStreamType> t_dbuglog( new QDebugStreamType( dbstring, omode ) );
+       std::unique_ptr<QDebugStreamType> t_dbuglog( new QDebugStreamType( dbstring, omode ) );
 #else
-       QScopedPointer<QDebugStreamType> t_dbuglog( new QDebugStreamType( dbstring ) );
+       std::unique_ptr<QDebugStreamType> t_dbuglog( new QDebugStreamType( dbstring ) );
 #endif
 
-       return ( QDebugStream( new QDebugLogger( t_dbugfile.take(), t_dbuglog.take() ) ) );
+       return ( QDebugStream( new QDebugLogger( t_dbugfile.release(), t_dbuglog.release() ) ) );
     }
 
     /** Default constructor to null device */
@@ -165,13 +165,13 @@ class QDebugLogger {
     static QFile *open(const QString &filename,
                        const QIODevice::OpenMode &omode) {
       FileName t_fname(filename);
-      QScopedPointer<QFile> t_dbugfile(new QFile( t_fname.expanded() ) );
+      std::unique_ptr<QFile> t_dbugfile(new QFile( t_fname.expanded() ) );
       if ( !t_dbugfile->open(omode) ) {
         QString mess = "Unable to open/create debug log stream for file: " +
                        filename;
         throw IException(IException::User, mess, _FILEINFO_);
       }
-      return ( t_dbugfile.take() );
+      return ( t_dbugfile.release() );
     }
 };
 

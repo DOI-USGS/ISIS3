@@ -1,5 +1,6 @@
 Unit test for Chandrayaan2TMC camera.
-FileName: ch2_tmc_ncf_20231030T1757326391_d_img_d18.cub
+
+FileName: ch2_tmc_ncn_20231030T1757326423_d_img_d18-crop.cub
 CK Frame: -152220
 
 Kernel IDs: 
@@ -33,7 +34,47 @@ For center pixel position ...
 DeltaSample = 0.000000000
 DeltaLine = 0.000000000
 
-Universal latitude: -87.603907998
-Universal longitude: 189.674455379
-RightAscension: 280.344745141
-Declination: 65.563417917
+Universal latitude: -87.603875729
+Universal longitude: 189.672833351
+RightAscension: 280.348134109
+Declination: 65.563199390
+
+FileName: ch2_tmc_ncf_20231101T0125121344_d_img_d18-crop.cub
+CK Frame: -152221
+
+Kernel IDs: 
+CK Frame ID = -152001
+CK Reference ID = 1
+SPK Target ID = -152
+SPK Reference ID = 1
+
+Spacecraft Name Long: Chandrayaan 2
+Spacecraft Name Short: Chan2
+Instrument Name Long: Terrain Mapping Camera-2
+Instrument Name Short: TMC-2
+
+For upper left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For upper right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower left corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For lower right corner ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+For center pixel position ...
+DeltaSample = 0.000000000
+DeltaLine = 0.000000000
+
+Universal latitude: -87.502644308
+Universal longitude: 53.309937847
+RightAscension: 275.824647054
+Declination: 43.510515748
+

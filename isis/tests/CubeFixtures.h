@@ -11,7 +11,14 @@
 #include "FileList.h"
 #include "TempFixtures.h"
 
+#include <QString>
+
 namespace Isis {
+
+  // Utility function to create a test cube with a linear DN pattern
+  QString createLinearPatternCube(const QString &cubePath, int samples, int lines, int bands,
+                                   double base = 0.0, double lineMult = 1.0,
+                                   double sampMult = 1.0, double bandMult = 0.0);
 
   class SmallCube : public TempTestingFiles {
     protected:

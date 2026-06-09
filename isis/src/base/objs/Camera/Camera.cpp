@@ -297,47 +297,31 @@ namespace Isis {
     Latitude lat;
     Longitude lon;
     Distance rad;
-    if (shape->name() != "Plane") { // this is the normal behavior
-      if (p_projection->SetWorld(sample, line)) {
+    if (p_projection->SetWorld(sample, line)) {
+
+      if (shape->name() != "Plane") { // this is the normal behavior
         TProjection *tproj = (TProjection *) p_projection;
         lat = Latitude(tproj->UniversalLatitude(), Angle::Degrees);
         lon = Longitude(tproj->UniversalLongitude(), Angle::Degrees);
         rad = Distance(LocalRadius(lat, lon));
-        if (!rad.isValid()) {
-          shape->setHasIntersection(false);
-          return false;
-        }
-        SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt)) {
-          p_childSample = sample;
-          p_childLine = line;
-
-          shape->setHasIntersection(true);
-          return true;
-        }
       }
-    }
-    else { // shape is ring plane
-      if (p_projection->SetWorld(sample, line)) {
+      else { // shape is ring plane
         RingPlaneProjection *rproj = (RingPlaneProjection *) p_projection;
         lat = Latitude(0.0, Angle::Degrees);
         lon = Longitude(rproj->UniversalRingLongitude(), Angle::Degrees);
         rad = Distance(rproj->UniversalRingRadius(),Distance::Meters);
-
-        if (!rad.isValid()) {
-          shape->setHasIntersection(false);
-          return false;
-        }
-        SurfacePoint surfPt(lat, lon, rad);
-        if (SetGround(surfPt)) {
-          p_childSample = sample;
-          p_childLine = line;
-
-          shape->setHasIntersection(true);
-          return true;
-        }
+      }
+      if (!rad.isValid()) {
+        return false;
+      }
+      SurfacePoint surfPt(lat, lon, rad);
+      if (SetGround(surfPt)) {
+        p_childSample = sample;
+        p_childLine = line;
+        return true;
       }
     }
+
     shape->clearSurfacePoint();
     return false;
   }
@@ -358,7 +342,7 @@ namespace Isis {
     TProjection *tproj = (TProjection *) p_projection;
     if (tproj->SetWorld(sample, line)) {
       if (SetRightAscensionDeclination(tproj->Longitude(),
-                                      tproj->UniversalLatitude())) {
+                                       tproj->UniversalLatitude())) {
         p_childSample = sample;
         p_childLine = line;
 
@@ -481,7 +465,6 @@ namespace Isis {
             p_childSample = p_alphaCube->BetaSample(parentSample);
             p_childLine = p_alphaCube->BetaLine(parentLine);
             p_pointComputed = true;
-            shape->setHasIntersection(true);
             return true;
           }
           else if (p_projection->IsSky()) {
@@ -489,7 +472,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -498,7 +480,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -511,7 +492,6 @@ namespace Isis {
               p_childSample = p_projection->WorldX();
               p_childLine = p_projection->WorldY();
               p_pointComputed = true;
-              shape->setHasIntersection(true);
               return true;
             }
           }
@@ -545,7 +525,7 @@ namespace Isis {
     }
 
     target()->shape()->clearSurfacePoint();
-   return false;
+    return false;
   }
 
 
@@ -2954,6 +2934,15 @@ namespace Isis {
    */
   void Camera::IgnoreProjection(bool ignore) {
     p_ignoreProjection = ignore;
+  }
+
+  /**
+   * Whether or not the camera is ignoring the Projection
+   *
+   * @param ignore
+   */
+  bool Camera::isProjectionIgnored() {
+    return p_ignoreProjection;
   }
   /**
    * @brief Provides target code for instruments SPK NAIF kernel

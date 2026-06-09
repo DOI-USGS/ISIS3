@@ -194,7 +194,7 @@ namespace Isis {
 
     QAction *closeStereoTool = new QAction(m_stereoTool);
     closeStereoTool->setText("&Close");
-    closeStereoTool->setShortcut(Qt::ALT + Qt::Key_F4);
+    closeStereoTool->setShortcut(Qt::ALT | Qt::Key_F4);
     whatsThis =
       "<b>Function:</b> Closes the Stereo Tool window for this point \
        <p><b>Shortcut:</b> Alt+F4 </p>";

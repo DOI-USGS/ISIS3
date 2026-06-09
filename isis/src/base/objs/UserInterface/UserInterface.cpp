@@ -351,7 +351,7 @@ namespace Isis {
 
       QStringList tokens = t.split(",");
 
-      foreach (QString token, tokens) {
+      for(QString token : tokens) {
         // removes quotes from tokens. NOTE: also removes escaped quotes.
         token = token.remove( QRegularExpression("[\"']") );
         p_batchList[i].push_back(token);
@@ -458,6 +458,7 @@ namespace Isis {
     bool usedDashLast = false;
     bool usedDashRestore = false; //< for throwing -batchlist exceptions at end of function
 
+    
     // pre-process command line for -HELP first
     preProcess("-HELP", options);
     // pre-process command line for -WEBHELP
@@ -468,6 +469,7 @@ namespace Isis {
     for (unsigned int currArgument = 1; currArgument < (unsigned)argc; currArgument++) {
       QString paramName;
       vector<QString> paramValue;
+
 
       getNextParameter(currArgument, paramName, paramValue);
 
@@ -542,6 +544,7 @@ namespace Isis {
       msg += " the -BATCHLIST option";
       throw IException(IException::User, msg, _FILEINFO_);
     }
+    
   }
 
   QString UserInterface::BuildNewCommandLineFromPvl(Pvl temp){
@@ -607,7 +610,7 @@ namespace Isis {
             if (!matchesDefault) {
               PutAsString(keyword, values);
               commandline += keyword + "=";
-              foreach(QString val, values) {
+              for (const QString &val : values) {
                 commandline += val + " ";
               }
             }

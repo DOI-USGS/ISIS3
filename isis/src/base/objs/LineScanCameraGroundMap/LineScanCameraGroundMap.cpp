@@ -6,9 +6,12 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 #include "LineScanCameraGroundMap.h"
+#include "EigenUtilities.h"
 
+#include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <limits>
 
 #include <QTime>
 #include <QList>
@@ -67,15 +70,6 @@ class LineOffsetFunctor :
       double uy = 0.0;
       double dx = 0.0;
       double dy = 0.0;
-
-      // Verify the time is with the cache bounds
-      double startTime = m_camera->cacheStartTime().Et();
-      double endTime = m_camera->cacheEndTime().Et();
-      if (et < startTime || et > endTime) {
-        IString msg = "Ephemeris time passed to LineOffsetFunctor is not within the image "
-                      "cache bounds";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
 
       m_camera->Sensor::setTime(et);
 
@@ -161,15 +155,6 @@ class SensorSurfacePointDistanceFunctor :
     double operator()(double et) {
       double s[3], p[3];
 
-      //verify the time is with the cache bounds
-      double startTime = m_camera->cacheStartTime().Et();
-      double endTime = m_camera->cacheEndTime().Et();
-
-      if (et < startTime || et > endTime) {
-        IString msg = "Ephemeris time passed to SensorSurfacePointDistanceFunctor is not within the image "
-                      "cache bounds";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
       m_camera->Sensor::setTime(et);
       if (!m_camera->Sensor::SetGround(surfacePoint, false)) {
          IString msg = "Sensor::SetGround failed for surface point in LineScanCameraGroundMap.cpp"
@@ -194,13 +179,111 @@ namespace Isis {
    *
    * @param cam pointer to camera model
    */
-  LineScanCameraGroundMap::LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {}
+  LineScanCameraGroundMap::LineScanCameraGroundMap(Camera *cam) : CameraGroundMap(cam) {
+    // Defer projective-fit construction (which ray-traces) until first
+    // SetGround call. This lets cubes whose SPICE chain is not fully
+    // loaded at camera construction succeed.
+    m_projectiveFitAttempted = false;
+    m_useApproxInitTrans = false;
+  }
+
+
+  /** Sample the image, ray-trace, and fit the projective transform that
+   * gives an initial guess for the secant in SetGround. Runs once per
+   * instance, on the first SetGround call.
+   */
+  void LineScanCameraGroundMap::ensureProjectiveFit() {
+    if (m_projectiveFitAttempted) return;
+    m_projectiveFitAttempted = true;
+
+    Camera *cam = p_camera;
+    bool originalIgnoreProj = cam->isProjectionIgnored();
+    try {
+      // Sample a 5x5 image grid at two ground heights to fit the
+      // projective transform robustly: 5x5 covers wide-FOV corner
+      // distortion, two layers break the rank-deficiency that single-
+      // layer sampling has on narrow-FOV/narrow-swath sensors (HiRISE).
+      const int gridDim = 5;
+      const int numPts = gridDim * gridDim;
+      double u_factors[numPts];
+      double v_factors[numPts];
+      for (int gi = 0; gi < gridDim; gi++) {
+        for (int gj = 0; gj < gridDim; gj++) {
+          u_factors[gi * gridDim + gj] = static_cast<double>(gi) / (gridDim - 1);
+          v_factors[gi * gridDim + gj] = static_cast<double>(gj) / (gridDim - 1);
+        }
+      }
+
+      cam->IgnoreProjection(true);
+      // Use cube samples/lines, not parent. Camera::SetImage does its
+      // own AlphaCube translation; passing parent coords double-
+      // translates and breaks subsetted cubes (e.g. the CTX test cube
+      // with cube Lines=50 vs ParentLines=52224).
+      cam->SetImage(cam->Samples()/2.0, cam->Lines()/2.0);
+      SurfacePoint refPt = cam->GetSurfacePoint();
+
+      double numImageRows = cam->Lines();
+      double numImageCols = cam->Samples();
+
+      std::vector<std::vector<double>> ip(2 * numPts, std::vector<double>(2, 0.0));
+      std::vector<std::vector<double>> gp(2 * numPts, std::vector<double>(3, 0.0));
+      m_useApproxInitTrans = true;
+
+      // Two layers along the camera ray. Layer 0 is the shape-model
+      // ground point itself (delta = 0); layer 1 walks 100 m along the
+      // ray toward the spacecraft. Two distinct (X,Y,Z) sharing the
+      // same (line, sample) gives the projective fit non-degenerate
+      // depth coverage. CSM uses the same idea, intersecting the ray
+      // against an ellipsoid 100 m higher.
+      const double deltas[] = {0.0, 100.0};
+      const int numLayers = sizeof(deltas) / sizeof(deltas[0]);
+      for (int i = 0; i < numPts; i++) {
+        double line = u_factors[i] * numImageRows;
+        double samp = v_factors[i] * numImageCols;
+        if (!cam->SetImage(samp, line)) {
+          m_useApproxInitTrans = false;
+        }
+        SurfacePoint base = cam->GetSurfacePoint();
+        double Px = base.GetX().meters();
+        double Py = base.GetY().meters();
+        double Pz = base.GetZ().meters();
+        double scPos[3];
+        cam->instrumentPosition(scPos);  // body-fixed, in km
+        double dx = Px - scPos[0] * 1000.0;
+        double dy = Py - scPos[1] * 1000.0;
+        double dz = Pz - scPos[2] * 1000.0;
+        double dnorm = std::sqrt(dx*dx + dy*dy + dz*dz);
+        if (dnorm <= 0.0) {
+          m_useApproxInitTrans = false;
+          continue;
+        }
+        for (int k = 0; k < numLayers; k++) {
+          int idx = i + k * numPts;
+          double scale = deltas[k] / dnorm;
+          ip[idx][0] = line;
+          ip[idx][1] = samp;
+          gp[idx][0] = Px - scale * dx;
+          gp[idx][1] = Py - scale * dy;
+          gp[idx][2] = Pz - scale * dz;
+        }
+      }
+
+      if (m_useApproxInitTrans) {
+        computeBestFitProjectiveTransform(ip, gp, m_projTransCoeffs);
+      }
+    }
+    catch (...) {
+      m_useApproxInitTrans = false;
+    }
+    cam->IgnoreProjection(originalIgnoreProj);
+  }
 
 
   /** Destructor
    *
    */
   LineScanCameraGroundMap::~LineScanCameraGroundMap() {}
+
 
   /** Compute undistorted focal plane coordinate from ground position
    *
@@ -209,8 +292,7 @@ namespace Isis {
    *
    * @return conversion was successful
    */
-  bool LineScanCameraGroundMap::SetGround(const Latitude &lat,
-      const Longitude &lon) {
+  bool LineScanCameraGroundMap::SetGround(const Latitude &lat, const Longitude &lon) {
     Distance radius(p_camera->LocalRadius(lat, lon));
 
     if (radius.isValid()) {
@@ -222,31 +304,54 @@ namespace Isis {
   }
 
 
-  /** Compute undistorted focal plane coordinate from ground position
-   *
-   * @param lat planetocentric latitude in degrees
-   * @param lon planetocentric longitude in degrees
-   * @param radius local radius in meters
-   *
-   * @return conversion was successful
-   */
-  bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint, const int &approxLine) {
-    FindFocalPlaneStatus status = FindFocalPlane(approxLine, surfacePoint);
-    if (status == Success) return true;
-    //if(status == Failure) return false;
-    return false;
-  }
-
-
-  /** Compute undistorted focal plane coordinate from ground position
+  /** Compute undistorted focal plane coordinate from ground position.
+   *  See FindFocalPlane for more details.
    *
    * @param surfacePoint 3D point on the surface of the planet
    *
    * @return conversion was successful
    */
   bool LineScanCameraGroundMap::SetGround(const SurfacePoint &surfacePoint) {
-    FindFocalPlaneStatus status = FindFocalPlane(-1, surfacePoint);
+    ensureProjectiveFit();
+    FindFocalPlaneStatus status = FindFocalPlaneStatus::Failure;
+    if (m_useApproxInitTrans) {
+      std::vector<double> const& u = m_projTransCoeffs; // alias, to save on typing
 
+      double x = surfacePoint.GetX().meters();
+      double y = surfacePoint.GetY().meters();
+      double z = surfacePoint.GetZ().meters();
+      double line_den = 1 + u[4]  * x + u[5]  * y + u[6]  * z;
+      double approxLine = 0;
+      double numRows = p_camera->Lines();
+
+      // Sanity checks. Ensure we don't divide by 0 and that the numbers are valid.
+      if (line_den == 0.0 || std::isnan(line_den) || std::isinf(line_den)) {
+        approxLine = numRows / 2.0;
+      }
+      else {
+        // Apply the formula
+        approxLine = (u[0] + u[1] * x + u[2] * y + u[3]  * z) / line_den;        
+      }
+
+      // Since this is valid only over the image,
+      // don't let the result go beyond the image border.
+      if (approxLine < 0.0) approxLine = 0.0;
+      if (approxLine > numRows) approxLine = numRows - 1;
+      status = FindFocalPlane(surfacePoint, approxLine);
+    }
+    else {
+      // Projective fit failed; fall back to the middle of the image.
+      double approxLine = p_camera->Lines() / 2.0;
+      status = FindFocalPlane(surfacePoint, approxLine);
+    }
+
+    if (status == Success) return true;
+
+    // Secant from the projective approximation failed. Fall back to the
+    // legacy quadratic + Brent search. This is needed for variable-line-rate
+    // cameras (e.g. CRISM) where the line<->et mapping is not monotonic
+    // and the secant cannot converge from a single starting line.
+    status = FindFocalPlane(surfacePoint);
     if (status == Success) return true;
 
     return false;
@@ -265,14 +370,20 @@ namespace Isis {
     return p_camera->SlantDistance();
   }
 
-
-  LineScanCameraGroundMap::FindFocalPlaneStatus
-      LineScanCameraGroundMap::FindFocalPlane(const int &approxLine,
-                                              const SurfacePoint &surfacePoint) {
-
+  /** Helper function to compute undistorted focal plane coordinate 
+   *  from ground position. This method tries two different methods.
+   *  First a quadratic method searching through all times within the 
+   *  image. If this fails then it tries to use Brents 
+   *  method (Numerical Recipies 454 - 456) to compute the undistorted
+   *  focal plane coordinates.
+   *
+   * @param surfacePoint 3D point on the surface of the planet
+   *
+   * @return conversion was successful
+   */
+  FindFocalPlaneStatus LineScanCameraGroundMap::FindFocalPlane(const SurfacePoint &surfacePoint) {
     //CameraDistortionMap *distortionMap = p_camera->DistortionMap();
     //CameraFocalPlaneMap *focalMap = p_camera->FocalPlaneMap();
-
     double approxTime = 0;
     double approxOffset = 0;
     double lookC[3] = {0.0, 0.0, 0.0};
@@ -289,93 +400,6 @@ namespace Isis {
 
     LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
     SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
-
-    // METHOD #1
-    // Use the line given as a start point for the secant method root search.
-    if (approxLine >= 0.5) {
-
-      // convert the approxLine to an approximate time and offset
-      p_camera->DetectorMap()->SetParent(p_camera->ParentSamples() / 2.0, approxLine);
-      approxTime = p_camera->time().Et();
-
-      approxOffset = offsetFunc(approxTime);
-
-      // Check to see if there is no need to improve this root, it's good enough
-      if (fabs(approxOffset) < 1e-2) {
-        p_camera->Sensor::setTime(approxTime);
-        // check to make sure the point isn't behind the planet
-        if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-          return Failure;
-        }
-        p_camera->Sensor::LookDirection(lookC);
-        ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-        uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-        p_focalPlaneX = ux;
-        p_focalPlaneY = uy;
-
-        return Success;
-      }
-
-      double fl, fh, xl, xh;
-
-      // starting times for the secant method, kept within the domain of the cache
-      xh = approxTime;
-      if (xh + lineRate < cacheEnd) {
-        xl = xh + lineRate;
-      }
-      else {
-        xl = xh - lineRate;
-      }
-
-      // starting offsets
-      fh = approxOffset;  //the first is already calculated
-      fl = offsetFunc(xl);
-
-      // Iterate to refine the given approximate time that the instrument imaged the ground point
-      for (int j=0; j < 10; j++) {
-        if (fl-fh == 0.0) {
-          return Failure;
-        }
-        double etGuess = xl + (xh - xl) * fl / (fl - fh);
-
-        if (etGuess < cacheStart) etGuess = cacheStart;
-        if (etGuess > cacheEnd) etGuess = cacheEnd;
-
-        double f = offsetFunc(etGuess);
-
-
-        // elliminate the node farthest away from the current best guess
-        if (fabs( xl- etGuess) > fabs( xh - etGuess)) {
-          xl = etGuess;
-          fl = f;
-        }
-        else {
-          xh = etGuess;
-          fh = f;
-        }
-
-        // See if we converged on the point so set up the undistorted focal plane values and return
-        if (fabs(f) < 1e-2) {
-          p_camera->Sensor::setTime(approxTime);
-          // check to make sure the point isn't behind the planet
-          if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
-            return Failure;
-          }
-          p_camera->Sensor::LookDirection(lookC);
-          ux = p_camera->FocalLength() * lookC[0] / lookC[2];
-          uy = p_camera->FocalLength() * lookC[1] / lookC[2];
-
-          p_focalPlaneX = ux;
-          p_focalPlaneY = uy;
-
-          return Success;
-        }
-      } // End itteration using a guess
-      // return Failure; // Removed to let the lagrange method try to find the line if secant fails
-    } // End use a guess
-
-
     // METHOD #2
     // The guess or middle line did not work so try estimating with a quadratic
     // The offsets are typically quadratic, so three points will be used to approximate a quadratic
@@ -598,9 +622,11 @@ namespace Isis {
       }
 
       p_camera->Sensor::setTime(root[j]);
+      if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+        return Failure;
+      }
     }
 
-    // No need to make sure the point isn't behind the planet, it was done above
     p_camera->Sensor::LookDirection(lookC);
     ux = p_camera->FocalLength() * lookC[0] / lookC[2];
     uy = p_camera->FocalLength() * lookC[1] / lookC[2];
@@ -609,6 +635,89 @@ namespace Isis {
     p_focalPlaneY = uy;
 
     return Success;
+  }
+
+  /** Helper function to compute undistorted focal plane coordinate
+   *  from ground position. This method uses an initial guess with
+   *  the secent method https://en.wikipedia.org/wiki/Secant_method
+   *  to compute the undistorted focal plane coordinates.
+   *
+   * @param surfacePoint 3D point on the surface of the planet
+   * @param approxLine The approximate like computed from another source
+   *
+   * @return conversion was successful
+   */
+  FindFocalPlaneStatus LineScanCameraGroundMap::FindFocalPlane(const SurfacePoint &surfacePoint, const double &approxLine) {
+    double approxTime = 0;
+    double approxOffset = 0;
+    double lookC[3] = {0.0, 0.0, 0.0};
+    double ux = 0.0;
+    double uy = 0.0;
+
+    double lineRate = ((LineScanCameraDetectorMap *)p_camera->DetectorMap())->LineRate(); //line rate
+
+    if (lineRate == 0.0) return Failure;
+
+    // The cube's SPICE time range. The secant must stay inside this.
+    const double cacheStart = p_camera->Spice::cacheStartTime().Et();
+    const double cacheEnd = p_camera->Spice::cacheEndTime().Et();
+
+    LineOffsetFunctor offsetFunc(p_camera,surfacePoint);
+    SensorSurfacePointDistanceFunctor distanceFunc(p_camera,surfacePoint);
+
+    // Use the line given as a start point for the secant method root search.
+    // approxLine is in cube coordinates. Route through Camera::SetImage with
+    // IgnoreProjection set so the AlphaCube translation to parent coords
+    // runs but the map-projection path (which would re-enter SetGround and
+    // recurse on map-projected cubes) is bypassed.
+    bool savedIgnoreProj = p_camera->isProjectionIgnored();
+    p_camera->IgnoreProjection(true);
+    p_camera->SetImage(p_camera->Samples() / 2.0, approxLine);
+    p_camera->IgnoreProjection(savedIgnoreProj);
+    approxTime = p_camera->time().Et();
+    approxOffset = offsetFunc(approxTime);
+
+    double f0, f1, x0, x1;
+
+    // starting times for the secant method
+    x0 = approxTime;
+    x1 = x0 + lineRate;
+
+    // starting offsets
+    f0 = approxOffset;  //the first is already calculated
+    f1 = offsetFunc(x1);
+
+    // Iterate to refine the given approximate time that the instrument imaged the ground point
+    for (int j=0; j < 10; j++) {
+
+      // f1 is in detector-line units (~ cube-pixel).
+      if (fabs(f1) < 1e-6 || ((f1 - f0) == 0.0)) {
+        if (x1 < cacheStart || x1 > cacheEnd) return Failure;
+        p_camera->Sensor::setTime(x1);
+        // check to make sure the point isn't behind the planet
+        if (!p_camera->Sensor::SetGround(surfacePoint, true)) {
+          return Failure;
+        }
+        p_camera->Sensor::LookDirection(lookC);
+        ux = p_camera->FocalLength() * lookC[0] / lookC[2];
+        uy = p_camera->FocalLength() * lookC[1] / lookC[2];
+
+        p_focalPlaneX = ux;
+        p_focalPlaneY = uy;
+
+        return Success;
+      }
+
+      double x2 = x1 - f1 * (x1 - x0) / (f1 - f0);
+
+      double f2 = offsetFunc(x2);
+
+      x0 = x1;
+      f0 = f1;
+      x1 = x2;
+      f1 = f2;
+    } // End use a guess
+    return Failure;
   }
 }
 

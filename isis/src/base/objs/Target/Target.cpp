@@ -86,15 +86,21 @@ namespace Isis {
       string s(naifBuf);
       (*m_systemName).append(s.c_str());
 
-      // QString radiiKey = "BODY" + QString((BigInt) naifBodyCode()) + "_RADII";
-      // m_radii[0] = Distance(getDouble(radiiKey, 0), Distance::Kilometers);
-      // m_radii[1] = Distance(getDouble(radiiKey, 1), Distance::Kilometers);
-      // m_radii[2] = Distance(getDouble(radiiKey, 2), Distance::Kilometers);
+
     }
     // Override it if it exists in the labels
     if (kernels.hasKeyword("NaifBodyCode")) {
       *m_bodyCode = (int) kernels["NaifBodyCode"];
     }
+    
+    // Ensure the reference ellipsoid radii are present for ShapeModels
+    if ( !m_sky && ( nullptr != spice ) ) {
+      QString radiiKey = "BODY" + toString( *m_bodyCode ) + "_RADII";
+      m_radii[0] = Distance( spice->getDouble(radiiKey, 0), Distance::Kilometers);
+      m_radii[1] = Distance( spice->getDouble(radiiKey, 1), Distance::Kilometers);
+      m_radii[2] = Distance( spice->getDouble(radiiKey, 2), Distance::Kilometers);      
+    }
+
     m_shape = ShapeModelFactory::create(this, lab);
   }
 

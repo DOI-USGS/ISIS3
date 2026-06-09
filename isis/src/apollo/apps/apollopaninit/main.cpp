@@ -248,7 +248,7 @@ void IsisMain() {
      auto [output, kernels] = SpiceQL::getTargetFrameInfo(301, mission.toLower().toStdString(), useWeb);
      frameCode = output["frameCode"].get<SpiceInt>();
      frameName = output["frameName"].get<std::string>();
-   } catch(std::invalid_argument) {
+   } catch(const std::invalid_argument &) {
      std::string naifTarget = "IAU_MOON";
      auto [frameCode, kernels] = SpiceQL::translateNameToCode(naifTarget, mission.toLower().toStdString(), useWeb);
      if(frameCode == 0) {

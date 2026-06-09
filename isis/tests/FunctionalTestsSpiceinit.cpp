@@ -792,3 +792,33 @@ TEST(Spiceinit, TestSpiceinitHrscWebError) {
     EXPECT_THAT(e.what(), HasSubstr("Spice Server does not support MEX HRSC images. Please rerun spiceinit with local MEX data."));
   }
 }
+
+
+TEST_F(DefaultCube, SpiceinitWebTrue) {
+  QVector<QString> args = {"from=" + testCube->fileName(), "web=true"};
+  UserInterface options(APP_XML, args);
+  Pvl log;
+  
+  try {
+    spiceinit(options, &log);
+  }
+  catch (IException &e) {
+    FAIL() << "spiceinit threw an exception: " << e.what();
+  }
+}
+
+
+TEST_F(DefaultCube, SpiceinitMissingShapeModelFile) {
+  QVector<QString> args = {"shape=user", "model=/nonexistent/missing.cub"};
+  UserInterface options(APP_XML, args);
+
+  try {
+    spiceinit(testCube, options);
+    FAIL() << "Expected exception for missing shape model file";
+  }
+  catch (IException &e) {
+    QString errorMsg = e.toString();
+    EXPECT_THAT(errorMsg.toStdString(),
+                HasSubstr("does not exist"));
+  }
+}

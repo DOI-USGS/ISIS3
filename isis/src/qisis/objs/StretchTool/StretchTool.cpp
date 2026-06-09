@@ -69,12 +69,12 @@ namespace Isis {
     hiddenButton->setDefault(true);
 
     m_stretchGlobal = new QAction(parent);
-    m_stretchGlobal->setShortcut(Qt::CTRL + Qt::Key_G);
+    m_stretchGlobal->setShortcut(Qt::CTRL | Qt::Key_G);
     m_stretchGlobal->setText("Global Stretch");
     connect(m_stretchGlobal, SIGNAL(triggered()), this, SLOT(stretchGlobal()));
 
     m_stretchRegional = new QAction(parent);
-    m_stretchRegional->setShortcut(Qt::CTRL + Qt::Key_R);
+    m_stretchRegional->setShortcut(Qt::CTRL | Qt::Key_R);
     m_stretchRegional->setText("Regional Stretch");
     connect(m_stretchRegional, SIGNAL(triggered()), this, SLOT(stretchRegional()));
 

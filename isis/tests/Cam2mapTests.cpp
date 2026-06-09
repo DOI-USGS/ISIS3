@@ -844,7 +844,6 @@ protected:
   void SetUp() override {
     DemCube::SetUp();
 
-    int samples = testCube->sampleCount();
     int lines = testCube->lineCount();
     int bands = 3;
 

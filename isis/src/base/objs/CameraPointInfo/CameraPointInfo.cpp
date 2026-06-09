@@ -12,6 +12,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Brick.h"
 #include "Camera.h"
+#include "CameraFactory.h"
 #include "CameraFocalPlaneMap.h"
 #include "Cube.h"
 #include "CubeManager.h"
@@ -75,6 +76,22 @@ namespace Isis {
   void CameraPointInfo::SetCube(const QString &cubeFileName) {
     m_currentCube = m_usedCubes->OpenCube(cubeFileName);
     m_camera = m_currentCube->camera();
+  }
+
+
+  /**
+   * Open the cube and replace its camera with one built from an external
+   * CSM ISD or model state JSON file. The input cube does not need to be
+   * run through spiceinit in this mode.
+   *
+   * @param cubeFileName A cube file name.
+   * @param csmFileName  A JSON file holding either a CSM ISD or a CSM model state.
+   */
+  void CameraPointInfo::SetCube(const QString &cubeFileName, const QString &csmFileName) {
+    m_currentCube = m_usedCubes->OpenCube(cubeFileName);
+    Camera *cam = CameraFactory::CreateFromIsd(csmFileName, *m_currentCube);
+    m_currentCube->setCamera(cam);
+    m_camera = cam;
   }
 
 

@@ -19,25 +19,25 @@
 namespace Isis {
   PanTool::PanTool(QWidget *parent) : Tool(parent) {
     p_panRight = new QAction(parent);
-    p_panRight->setShortcut(Qt::CTRL + Qt::Key_Right);
+    p_panRight->setShortcut(Qt::CTRL | Qt::Key_Right);
     p_panRight->setText("&Pan Right");
     p_panRight->setIcon(QPixmap(toolIconDir() + "/forward.png"));
     connect(p_panRight, SIGNAL(triggered()), this, SLOT(panRight()));
 
     p_panLeft = new QAction(parent);
-    p_panLeft->setShortcut(Qt::CTRL + Qt::Key_Left);
+    p_panLeft->setShortcut(Qt::CTRL | Qt::Key_Left);
     p_panLeft->setText("&Pan Left");
     p_panLeft->setIcon(QPixmap(toolIconDir() + "/back.png"));
     connect(p_panLeft, SIGNAL(triggered()), this, SLOT(panLeft()));
 
     p_panUp = new QAction(parent);
-    p_panUp->setShortcut(Qt::CTRL + Qt::Key_Up);
+    p_panUp->setShortcut(Qt::CTRL | Qt::Key_Up);
     p_panUp->setText("&Pan Up");
     p_panUp->setIcon(QPixmap(toolIconDir() + "/up.png"));
     connect(p_panUp, SIGNAL(triggered()), this, SLOT(panUp()));
 
     p_panDown = new QAction(parent);
-    p_panDown->setShortcut(Qt::CTRL + Qt::Key_Down);
+    p_panDown->setShortcut(Qt::CTRL | Qt::Key_Down);
     p_panDown->setText("&Pan Down");
     p_panDown->setIcon(QPixmap(toolIconDir() + "/down.png"));
     connect(p_panDown, SIGNAL(triggered()), this, SLOT(panDown()));

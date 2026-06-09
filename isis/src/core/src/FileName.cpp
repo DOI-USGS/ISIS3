@@ -18,6 +18,8 @@ find files of those names at the top level of this repository. **/
 #include <QTemporaryFile>
 #include <QRegularExpression>
 
+#include <cpl_vsi.h>
+
 #include "Preference.h"
 #include "PvlGroup.h"
 #include "IException.h"
@@ -449,9 +451,13 @@ namespace Isis {
    * @return Boolean
    */
   bool FileName::fileExists() const {
-    if (toString().contains((QString)"https://") || toString().contains((QString)"/vsi")) { 
-      return true; 
+    QString path = toString();
+
+    if (path.startsWith("/vsi")) {
+      VSIStatBufL statBuf;
+      return (VSIStatL(path.toStdString().c_str(), &statBuf) == 0);
     }
+
     return QFileInfo(expanded()).exists();
   }
 
@@ -620,7 +626,7 @@ namespace Isis {
     bool success = false;
 
     for (int i = files.count() - 1; !success && i >= 0; i--) {
-      foundValue = files[i].mid(before.count(), width).toLong(&success);
+      foundValue = files[i].mid(before.size(), width).toLong(&success);
     }
 
     if (success) {
@@ -808,9 +814,6 @@ namespace Isis {
 
     int varSearchStartPos = 0;
     int varStartPos = -1;
-    if(Preference::Preferences().hasGroup("DataDirectory")) {
-      PvlGroup &testing = Preference::Preferences().findGroup("DataDirectory");
-    }
     // Loop while there are any "$" at the current position or after
     // Some "$" might be skipped if no translation can be found
     while((varStartPos = expandedStr.indexOf("$", varSearchStartPos)) != -1) {

@@ -20,7 +20,7 @@ namespace Isis {
     Statistics stats;
     stats.SetValidRange(mdMinDN, mdMaxDN);
     for(int i = 0; i < chip.Samples(); i++) {
-      double pixels[chip.Lines()];
+      std::vector<double> pixels(chip.Lines());
       int n = 0;
       for(int j = 0; j < chip.Lines(); j++) {
         if(!IsSpecial(chip.GetValue(i + 1, j + 1))) {
@@ -28,7 +28,7 @@ namespace Isis {
           n++;
         }
       }
-      stats.AddData(pixels, n);
+      stats.AddData(&pixels[0], n);
     }
 
     return stats.StandardDeviation();

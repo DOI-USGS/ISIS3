@@ -323,7 +323,7 @@ namespace Isis {
         QString actionText(action->text());
         if (actionText == "&Recent Projects") {
           // Grab the pointer to the actual ""&Recent Projects" menu in IPCE
-          recentProjectsMenu = qobject_cast<QMenu*>(action->parentWidget());
+          recentProjectsMenu = qobject_cast<QMenu*>(action->parent());
           break;
         }
       }

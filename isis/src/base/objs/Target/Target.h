@@ -59,6 +59,8 @@ namespace Isis {
    *  @history 2021-02-17 Kristin Berry, Jesse Mapel, and Stuart Sides - Added the ability to
    *                          create a Target without SPICE data and later set the sensor
    *                          model pointer.
+   *  @history 2026-05-30 Kris J Becker - Add retrieval of target body radii for
+   *                          for shape model construction in constructor
    */
   class Target {
 

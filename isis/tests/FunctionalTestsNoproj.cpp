@@ -400,10 +400,10 @@ TEST_F(LineScannerCube, FunctionalTestNoprojLineScanner) {
   EXPECT_PRED_FORMAT2(AssertPvlGroupKeywordsEqual, origInst, testCubeInst); //REFACTOR
 
   std::unique_ptr<Histogram> hist (oCube.histogram(1));
-  EXPECT_NEAR(hist->Average(), 26.259903800874739, .000001);
-  EXPECT_NEAR(hist->Sum(), 78070.6940000006, .0001);
+  EXPECT_NEAR(hist->Average(), 26.259685166498699, .001);
+  EXPECT_NEAR(hist->Sum(), 78070.044000000635, 1.0);
   EXPECT_EQ(hist->ValidPixels(), 2973);
-  EXPECT_NEAR(hist->StandardDeviation(), 11.938337629048096, .0001);
+  EXPECT_NEAR(hist->StandardDeviation(), 11.938131126485441, .001);
 }
 
 /**

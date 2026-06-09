@@ -23,10 +23,11 @@ namespace Isis {
     m_textChanged = false;
 
     QFile templateFile(m_template->fileName());
-    templateFile.open(QFile::ReadOnly | QFile::Text);
-    QTextStream textStream(&templateFile);
-    m_ui->templateTextEdit->setText(textStream.readAll());
-    templateFile.close();
+    if (templateFile.open(QFile::ReadOnly | QFile::Text)) {
+      QTextStream textStream(&templateFile);
+      m_ui->templateTextEdit->setText(textStream.readAll());
+      templateFile.close();
+    }
 
     connect(m_ui->templateTextEdit, SIGNAL(textChanged()), this, SLOT(textChanged()));
     connect(m_ui->templateTextSave, SIGNAL (released()),this, SLOT (saveText()));

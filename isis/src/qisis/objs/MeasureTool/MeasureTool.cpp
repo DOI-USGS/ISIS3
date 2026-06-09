@@ -121,7 +121,7 @@ namespace Isis {
       click on the first point and releasing the mouse at the second point. \
       <p><b>Shortcut:</b>  CTRL+M</p>";
     measureButton->setWhatsThis(text);
-    measureButton->setShortcut(Qt::CTRL + Qt::Key_M);
+    measureButton->setShortcut(Qt::CTRL | Qt::Key_M);
     connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(showTable()));
     connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(syncColumns()));
     connect(measureButton, SIGNAL(clicked()), m_tableWin, SLOT(raise()));

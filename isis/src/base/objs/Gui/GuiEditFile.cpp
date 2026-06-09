@@ -87,7 +87,7 @@ namespace Isis {
 
     // Action File-> Open
     m_open = new QAction(menuBar);
-    m_open->setShortcut(Qt::CTRL + Qt::Key_O);
+    m_open->setShortcut(Qt::CTRL | Qt::Key_O);
     m_open->setText("&Open...");
     m_open->setToolTip("Open File");
     QString whatsThis = "Open a file to edit";
@@ -97,7 +97,7 @@ namespace Isis {
 
     // Action File-> Save
     m_save = new QAction(menuBar);
-    m_save->setShortcut(Qt::CTRL + Qt::Key_S);
+    m_save->setShortcut(Qt::CTRL | Qt::Key_S);
     m_save->setText("&Save...");
     m_save->setToolTip("Save File");
     m_save->setWhatsThis("Save the current file");
@@ -107,7 +107,7 @@ namespace Isis {
     // Action File->Save As
     m_saveAs = new QAction(menuBar);
     m_saveAs->setText("Save &As...");
-    m_saveAs->setShortcut(Qt::CTRL + Qt::Key_A);
+    m_saveAs->setShortcut(Qt::CTRL | Qt::Key_A);
     m_saveAs->setToolTip("Save As File");
     m_saveAs->setWhatsThis("Save the current file into another file");
     connect(m_saveAs, SIGNAL(triggered()), this, SLOT(saveAs()));
@@ -116,7 +116,7 @@ namespace Isis {
     // Action File->close
     m_close = new QAction(menuBar);
     m_close->setText("&Close...");
-    m_close->setShortcut(Qt::CTRL + Qt::Key_C);
+    m_close->setShortcut(Qt::CTRL | Qt::Key_C);
     m_close->setToolTip("Close File");
     m_close->setWhatsThis("Close the current file");
     connect(m_close, SIGNAL(triggered()), this, SLOT(closeFile()));
@@ -124,7 +124,7 @@ namespace Isis {
 
     // Action Exit
     m_exit = menuBar->addAction("&Exit");
-    m_exit->setShortcut(Qt::CTRL + Qt::Key_E);
+    m_exit->setShortcut(Qt::CTRL | Qt::Key_E);
     m_exit->setText("&Exit...");
     m_exit->setToolTip("Exit");
     m_exit->setWhatsThis("Exit the Editor");
@@ -194,10 +194,11 @@ namespace Isis {
     //Set up the list of filters that are default with this dialog.
     //cerr << "setTextChanged=" << m_textChanged << endl;
     if (m_textChanged) {
-      if(QMessageBox::question((QWidget *)parent(), tr("Save File?"),
-                               tr("Are you sure you want to save this file?"),
-                               tr("&Save"), tr("&Cancel"),
-                               QString(), 1, 0)) {
+      int ret = QMessageBox::question((QWidget *)parent(), tr("Save File?"),
+                                      tr("Are you sure you want to save this file?"),
+                                      QMessageBox::Save | QMessageBox::Cancel,
+                                      QMessageBox::Save);
+      if (ret == QMessageBox::Save) {
         saveFile();
       }
     }
@@ -215,7 +216,7 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/20/2011)
    */
-  void GuiEditFile::closeFile(){
+  void GuiEditFile::closeFile() {
     if (m_textChanged) {
       if(QMessageBox::question((QWidget *)parent(), tr("Save File?"),
                                tr("Changes have been made to the file. Do you want to Save?"),
@@ -236,7 +237,7 @@ namespace Isis {
    *
    * @param psOutFile
    */
-  void GuiEditFile::OpenFile(QString psOutFile){
+  void GuiEditFile::OpenFile(QString psOutFile) {
     //cerr << "Open File " << psOutFile.toStdString() << "\n";
     if(psOutFile.isEmpty()){
       QMessageBox::information((QWidget *)parent(), "Error", "No output file selected");
@@ -251,7 +252,7 @@ namespace Isis {
     //m_editWin->setWindowTitle(FileName(psOutFile.toStdString()).Name().c_str());
     windowTitle(psOutFile);
 
-    if (m_editFile->open(QIODevice::ReadWrite)){
+    if (m_editFile->open(QIODevice::ReadWrite)) {
       char buf[1024];
       QString bufStr;
       qint64 lineLength = m_editFile->readLine(buf, sizeof(buf));
@@ -274,8 +275,8 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/20/2011)
    */
-  void GuiEditFile::saveFile(){
-    if (m_editFile){
+  void GuiEditFile::saveFile() {
+    if (m_editFile) {
       clearFile();
       QTextStream out(m_editFile);
       out << m_txtEdit->document()->toPlainText();
@@ -315,9 +316,10 @@ namespace Isis {
     m_editFile->close();
     delete(m_editFile);
     m_editFile = new QFile(psNewFile);
-    m_editFile->open(QFile::ReadWrite);
-    saveFile();
-    windowTitle(psNewFile);
+    if (m_editFile->open(QFile::ReadWrite)) {
+      saveFile();
+      windowTitle(psNewFile);
+    }
   }
 
   /**
@@ -326,10 +328,9 @@ namespace Isis {
    *
    * @author Sharmila Prasad (5/23/2011)
    */
-  void GuiEditFile::clearFile(){
-    if (m_editFile){
+  void GuiEditFile::clearFile() {
+    if (m_editFile) {
       m_editFile->close();
-      //m_editFile->open(QIODevice::Truncate | QIODevice::ReadWrite);
       m_editFile->open(QFile::ReadWrite | QFile::Truncate);
     }
   }

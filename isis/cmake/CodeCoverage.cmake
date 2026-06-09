@@ -793,7 +793,7 @@ function(append_coverage_compiler_flags_to_target name)
 endfunction()
 
 # Add a custom target to clean all *.gcda files in the build directory.
-add_custom_target(covlean
+add_custom_target(covclean
     COMMAND ${CMAKE_COMMAND} -E echo "Cleaning all *.gcda coverage data files in ${CMAKE_BINARY_DIR}/"
     COMMAND find ${CMAKE_BINARY_DIR} -type f -name "*.gcda" -delete
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}

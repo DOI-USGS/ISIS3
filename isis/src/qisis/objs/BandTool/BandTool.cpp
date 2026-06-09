@@ -470,12 +470,15 @@ namespace Isis {
    */
   void BandTool::updateTool() {
 
-    disconnect(p_comboBox, 0, 0, 0);
-    disconnect(p_graySpin, 0, 0, 0);
-    disconnect(p_redSpin, 0, 0, 0);
-    disconnect(p_grnSpin, 0, 0, 0);
-    disconnect(p_bluSpin, 0, 0, 0);
-    disconnect(p_rgbButton, 0, 0, 0);
+    disconnect(p_comboBox, SIGNAL(activated(int)), this, SLOT(setList()));
+    disconnect(p_comboBox, SIGNAL(activated(int)), this, SLOT(setDisplay()));
+
+    disconnect(p_graySpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+    disconnect(p_redSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+    disconnect(p_grnSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+    disconnect(p_bluSpin, SIGNAL(valueChanged(int)), this, SLOT(changeView()));
+
+    disconnect(p_rgbButton, SIGNAL(toggled(bool)), this, SLOT(changeView()));
 
     MdiCubeViewport *cvp = cubeViewport();
     if(cvp != NULL) {

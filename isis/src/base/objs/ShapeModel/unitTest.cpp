@@ -215,6 +215,10 @@ class MyEllipse : public ShapeModel {
   double resolution() {
     return ShapeModel::resolution();
   }
+
+  void setIntersection(bool b) {
+    setHasIntersection(b);
+  }
 };
 
 

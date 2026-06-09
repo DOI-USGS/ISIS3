@@ -1,0 +1,1 @@
+Refactored `handmos` to be callable and migrated tests to gtest/CTest framework. Eliminated test data footprint entirely (from 105 MB legacy to 0 MB) by replacing band-priority tests with existing equalizer fixtures and replacing large overlay fixtures with synthetic generated cubes that provide superior positioning validation.

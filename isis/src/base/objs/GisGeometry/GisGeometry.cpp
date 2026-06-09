@@ -331,12 +331,12 @@ namespace Isis {
     }
 
     GisTopology *gis(GisTopology::instance());
-    QScopedPointer<GisGeometry> geom(new GisGeometry());
+    std::unique_ptr<GisGeometry> geom(new GisGeometry());
 
     geom->m_type = m_type;
     geom->m_geom = gis->clone(m_geom);
     geom->m_preparedGeom = makePrepared(geom->m_geom);
-    return (geom.take());
+    return (geom.release());
   }
 
 

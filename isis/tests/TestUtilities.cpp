@@ -3,7 +3,66 @@
 #include <cmath>
 #include <string>
 
+#include "Histogram.h"
+
 namespace Isis {
+
+  /**
+   * Custom Histogram assertion that checks cube histogram statistics.
+   */
+  ::testing::AssertionResult AssertHistogramStats(
+          const char* cube_expr,
+          const char* expectedAverage_expr,
+          const char* expectedSum_expr,
+          const char* expectedValidPixels_expr,
+          const char* expectedStdDev_expr,
+          Cube &cube,
+          double expectedAverage,
+          double expectedSum,
+          BigInt expectedValidPixels,
+          double expectedStdDev,
+          double averageTolerance,
+          double sumTolerance,
+          double stdDevTolerance) {
+    Histogram *stats = cube.histogram();
+
+    ::testing::AssertionResult result = ::testing::AssertionSuccess();
+
+    if (std::abs(stats->Average() - expectedAverage) > averageTolerance) {
+      result = ::testing::AssertionFailure()
+          << "Histogram Average for " << cube_expr
+          << " (" << stats->Average() << ") does not match "
+          << expectedAverage_expr << " (" << expectedAverage
+          << ") within tolerance " << averageTolerance;
+    }
+
+    if (result && std::abs(stats->Sum() - expectedSum) > sumTolerance) {
+      result = ::testing::AssertionFailure()
+          << "Histogram Sum for " << cube_expr
+          << " (" << stats->Sum() << ") does not match "
+          << expectedSum_expr << " (" << expectedSum
+          << ") within tolerance " << sumTolerance;
+    }
+
+    if (result && stats->ValidPixels() != expectedValidPixels) {
+      result = ::testing::AssertionFailure()
+          << "Histogram ValidPixels for " << cube_expr
+          << " (" << stats->ValidPixels() << ") does not match "
+          << expectedValidPixels_expr << " (" << expectedValidPixels << ")";
+    }
+
+    if (result && std::abs(stats->StandardDeviation() - expectedStdDev) > stdDevTolerance) {
+      result = ::testing::AssertionFailure()
+          << "Histogram StandardDeviation for " << cube_expr
+          << " (" << stats->StandardDeviation() << ") does not match "
+          << expectedStdDev_expr << " (" << expectedStdDev
+          << ") within tolerance " << stdDevTolerance;
+    }
+
+    delete stats;
+    return result;
+  }
+
 
   /**
    * Custom IException assertion that checks that the exception message contains

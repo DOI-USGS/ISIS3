@@ -461,7 +461,7 @@ namespace Isis {
     m_saveNet = new QAction(QPixmap(toolIconDir() + "/mActionFileSave.png"),
                             "Save Control Network ...",
                             m_matchTool);
-    m_saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
+    m_saveNet->setShortcut(Qt::CTRL | Qt::Key_S);
     m_saveNet->setToolTip("Save current control network");
     m_saveNet->setStatusTip("Save current control network");
     QString whatsThis = "<b>Function:</b> Saves the current <i>"
@@ -484,7 +484,7 @@ namespace Isis {
                                    m_matchTool);
     m_closeMatchTool->setToolTip("Close this window");
     m_closeMatchTool->setStatusTip("Close this window");
-    m_closeMatchTool->setShortcut(Qt::ALT + Qt::Key_F4);
+    m_closeMatchTool->setShortcut(Qt::ALT | Qt::Key_F4);
     whatsThis = "<b>Function:</b> Closes the Match Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeMatchTool->setWhatsThis(whatsThis);
@@ -801,10 +801,12 @@ namespace Isis {
       QString message = "You are saving changes to a measure on an ignored ";
       message += "point.  Do you want to set Ignore = False on the point and ";
       message += "both measures?";
-      switch (QMessageBox::question(m_matchTool, "Match Tool Save Measure",
-                                    message, "&Yes", "&No", 0, 0)) {
+      int ret = QMessageBox::question(m_matchTool, "Match Tool Save Measure",
+                                      message, 
+                                      QMessageBox::Yes | QMessageBox::No);
+      switch (ret) {
         // Yes:  set Ignore=false for the point and measures and save point
-        case 0:
+        case QMessageBox::Yes:
           m_editPoint->SetIgnored(false);
           emit ignorePointChanged();
           if (m_leftMeasure->IsIgnored()) {
@@ -816,7 +818,7 @@ namespace Isis {
             emit ignoreRightChanged();
           }
         // No: keep Ignore=true and save measure
-        case 1:
+        case QMessageBox::No:
           break;
       }
     }
@@ -891,7 +893,7 @@ namespace Isis {
       message += "for editing.  Do you want to set EditLock = False for this ";
       message += "measure?";
       int response = QMessageBox::question(m_matchTool, "Match Tool Save Measure",
-                                    message, QMessageBox::Yes | QMessageBox::No);
+                                           message, QMessageBox::Yes | QMessageBox::No);
       // Yes:  set EditLock=false for the right measure
       if (response == QMessageBox::Yes) {
         m->SetEditLock(false);
@@ -911,10 +913,12 @@ namespace Isis {
     if (origMeasure->IsIgnored() && m->IsIgnored()) {
       QString message = "The " + side + "measure is ignored.  ";
       message += "Do you want to set Ignore = False on the measure?";
-      switch(QMessageBox::question(m_matchTool, "Match Tool Save Measure",
-                                   message, "&Yes", "&No", 0, 0)){
+      int ret = QMessageBox::question(m_matchTool, "Match Tool Save Measure",
+                                      message,
+                                      QMessageBox::Yes | QMessageBox::No);
+      switch(ret) {
         // Yes:  set Ignore=false for the right measure and save point
-        case 0:
+        case QMessageBox::Yes:
             m->SetIgnored(false);
             if (side == "left") {
               emit ignoreLeftChanged();
@@ -923,8 +927,8 @@ namespace Isis {
               emit ignoreRightChanged();
             }
         // No:  keep Ignore=true and save point
-        case 1:
-          break;;
+        case QMessageBox::No:
+          break;
       }
     }
 
@@ -937,13 +941,15 @@ namespace Isis {
           message += "may need to move all of the other measures to match the new ";
           message += " coordinate of the reference measure.  Do you really want to ";
           message += " change the reference measure's location? ";
-          switch(QMessageBox::question(m_matchTool, "Match Tool Save Measure",
-                                       message, "&Yes", "&No", 0, 0)){
+          int ret = QMessageBox::question(m_matchTool, "Match Tool Save Measure",
+                                          message, 
+                                          QMessageBox::Yes | QMessageBox::No);
+          switch(ret) {
             // Yes:  Save measure
-            case 0:
+            case QMessageBox::Yes:
               break;
             // No:  keep original reference, return without saving
-            case 1:
+            case QMessageBox::No:
               loadPoint();
               return false;
           }
@@ -1798,14 +1804,15 @@ namespace Isis {
                 (*m_editPoint)[i]->GetCubeSerialNumber())) {
             QString message = "You are trying to delete the Reference measure."
                 "  Do you really want to delete the Reference measure?";
-            switch (QMessageBox::question(m_matchTool,
-                                          "Delete Reference measure?", message,
-                                          "&Yes", "&No", 0, 0)) {
+            int ret = QMessageBox::question(m_matchTool,
+                                            "Delete Reference measure?", message,
+                                            QMessageBox::Yes | QMessageBox::No);
+            switch (ret) {
               //  Yes:  skip to end of switch to delete the measure
-              case 0:
+              case QMessageBox::Yes:
                 break;
               //  No:  continue to next measure in the loop
-              case 1:
+              case QMessageBox::No:
                 //  if only a single measure and it's reference and user chooses not to delete,
                 //  simply return.  The point has not changed.
                 if (numDeleted == 1) {

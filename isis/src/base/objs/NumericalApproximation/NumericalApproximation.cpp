@@ -2752,7 +2752,7 @@ namespace Isis {
     }
     int n = Size();
     p_clampedSecondDerivs.resize(n);
-    double u[n];
+    std::vector<double> u(n);
     double p, sig, qn, un;
 
     if(p_clampedDerivFirstPt > 0.99e30) {
@@ -3244,7 +3244,9 @@ namespace Isis {
     double y;
 
     int ns;
-    double den, dif, dift, c[n], d[n], ho, hp, w;
+    std::vector<double> c(n);
+    std::vector<double> d(n);
+    double den, dif, dift, ho, hp, w;
     double *err = 0;
     ns = 1;
     dif = fabs(a - p_x[0]);

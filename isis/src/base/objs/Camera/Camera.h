@@ -17,6 +17,7 @@ find files of those names at the top level of this repository. **/
 
 namespace Isis {
   class Angle;
+  class AlphaCube;
   class CameraDetectorMap;
   class CameraFocalPlaneMap;
   class CameraDistortionMap;
@@ -342,6 +343,7 @@ namespace Isis {
                                   double slon);
 
       void IgnoreProjection(bool ignore);
+      bool isProjectionIgnored();
 
       void LoadCache();
       std::pair< double, double > StartEndEphemerisTimes();

@@ -58,7 +58,7 @@ namespace Isis {
     p_action = new QAction(parent);
     p_action->setText("Tracking ...");
     p_action->setIcon(QPixmap(toolIconDir() + "/goto.png"));
-    p_action->setShortcut(Qt::CTRL + Qt::Key_T);
+    p_action->setShortcut(Qt::CTRL | Qt::Key_T);
     p_action->setWhatsThis("<b>Function: </b> Opens the Advanced Tracking Tool \
                            window. This window will track sample/line positions,\
                            lat/lon positions, and many other pieces of \
@@ -123,7 +123,7 @@ namespace Isis {
     QMenu *helpMenu = menuBar->addMenu("&Help");
     QAction *help = new QAction(p_tableWin);
     help->setText("&Tool Help");
-    help->setShortcut(Qt::CTRL + Qt::Key_H);
+    help->setShortcut(Qt::CTRL | Qt::Key_H);
     connect(help, SIGNAL(triggered()), this, SLOT(helpDialog()));
     helpMenu->addAction(help);
     p_tableWin->setMenuBar(menuBar);

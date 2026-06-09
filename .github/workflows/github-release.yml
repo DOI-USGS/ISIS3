@@ -39,14 +39,14 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3
         with:
           miniforge-variant: Miniforge3
-          auto-update-conda: true
+          auto-update-conda: false
           use-mamba: true
 
       - name: Build Release
         env:
           ISIS_VERSION: ${{ steps.set_version.outputs.isis_version }}
         run: |
-          mamba install conda-build anaconda-client
+          conda install python=3.12 conda-build anaconda-client --solver=classic -y
           git fetch origin
           if [[ "$ISIS_VERSION" =~ .*_RC[0-9]$ ]]; then 
             git checkout $ISIS_VERSION

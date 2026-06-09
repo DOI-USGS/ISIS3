@@ -46,6 +46,12 @@ namespace Isis {
    *            coding standards. References #972.
    *
    */
+  enum FindFocalPlaneStatus {
+    Success,
+    BoundingProblem,
+    Failure
+  };
+
   class LineScanCameraGroundMap : public CameraGroundMap {
     public:
 
@@ -57,19 +63,19 @@ namespace Isis {
 
       virtual bool SetGround(const Latitude &lat, const Longitude &lon);
       virtual bool SetGround(const SurfacePoint &surfacePoint);
-      virtual bool SetGround(const SurfacePoint &surfacePoint, const int &approxLine);
 
     protected:
-      enum FindFocalPlaneStatus {
-        Success,
-        BoundingProblem,
-        Failure
-      };
-
-      FindFocalPlaneStatus FindFocalPlane(const int &approxLine,
-                                          const SurfacePoint &surfacePoint);
+      FindFocalPlaneStatus FindFocalPlane(const SurfacePoint &surfacePoint);
+      FindFocalPlaneStatus FindFocalPlane(const SurfacePoint &surfacePoint, const double &approxLine);
       double FindSpacecraftDistance(int line, const SurfacePoint &surfacePoint);
 
+      // Store here the projective approximation of the sensor model
+      std::vector<double> m_projTransCoeffs;
+      bool m_useApproxInitTrans;
+      bool m_projectiveFitAttempted;
+
+    private:
+      void ensureProjectiveFit();
   };
 };
 #endif

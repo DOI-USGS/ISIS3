@@ -441,12 +441,8 @@ namespace Isis {
     }
 
     QDomDocument document;
-    QString errorMsg;
-    int errorLine, errorCol;
-
-    if(!p_response->isEmpty() &&
-        document.setContent(QString(p_response->toLatin1()),
-                            &errorMsg, &errorLine, &errorCol)) {
+    QDomDocument::ParseResult result = document.setContent(QString(p_response->toLatin1()));
+    if(!p_response->isEmpty() && bool(result)) {
       return document.firstChild().toElement();
     }
     else {

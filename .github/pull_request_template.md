@@ -32,7 +32,7 @@
 - [ ] I have read the [**CONTRIBUTING**](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CONTRIBUTING.md) document.
 - [ ] My change requires a change to the documentation and I have updated the documentation accordingly.
 - [ ] I have added tests to cover my changes.
-- [ ] I have added myself to the [.zenodo.json](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/.zenodo.json) document.
+- [ ] My changes include code created using generative AI.
 - [ ] I have added my user impacting change to the [CHANGELOG.md](https://github.com/USGS-Astrogeology/ISIS3/blob/dev/CHANGELOG.md) document. <!--- NOTE: You can only have one changelog entry per PR, see https://github.com/DOI-USGS/ISIS3/blob/dev/CONTRIBUTING.md -->
 
 

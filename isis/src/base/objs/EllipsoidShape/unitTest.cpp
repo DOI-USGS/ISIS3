@@ -143,11 +143,6 @@ int main() {
     cout  << "    Local radius = " << shape.localRadius(Latitude(20.532461495381, Angle::Degrees),
                                                     Longitude(228.26609149754, Angle::Degrees)).kilometers() << endl;
 
-
-    cout << endl << "  Testing setHasIntersection method" << endl;
-    shape.setHasIntersection(false);
-    cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
-
     cout << endl << "  Testing setSurfacePoint method ..." << endl;
     shape.setSurfacePoint(*sp);
     cout << "     Do we have an intersection? " << shape.hasIntersection() << endl;

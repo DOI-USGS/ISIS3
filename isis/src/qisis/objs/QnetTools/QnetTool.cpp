@@ -531,7 +531,7 @@ namespace Isis {
 
     m_saveNet = new QAction(QIcon(toolIconDir() + "/filesave.png"), "Save Control Network ...",
                             m_qnetTool);
-    m_saveNet->setShortcut(Qt::CTRL + Qt::Key_S);
+    m_saveNet->setShortcut(Qt::CTRL | Qt::Key_S);
     m_saveNet->setToolTip("Save current control network");
     m_saveNet->setStatusTip("Save current control network");
     whatsThis = "<b>Function:</b> Saves the current <i>"
@@ -551,7 +551,7 @@ namespace Isis {
     m_closeQnetTool = new QAction(QIcon(toolIconDir() + "/fileclose.png"), "&Close", m_qnetTool);
     m_closeQnetTool->setToolTip("Close this window");
     m_closeQnetTool->setStatusTip("Close this window");
-    m_closeQnetTool->setShortcut(Qt::ALT + Qt::Key_F4);
+    m_closeQnetTool->setShortcut(Qt::ALT | Qt::Key_F4);
     whatsThis = "<b>Function:</b> Closes the Qnet Tool window for this point "
         "<p><b>Shortcut:</b> Alt+F4 </p>";
     m_closeQnetTool->setWhatsThis(whatsThis);
@@ -734,10 +734,11 @@ namespace Isis {
       QString message = "You are saving changes to a measure on an ignored ";
       message += "point.  Do you want to set Ignore = False on the point and ";
       message += "both measures?";
-      switch (QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
-                                    message, "&Yes", "&No", 0, 0)) {
+      int ret = QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
+                                      message, QMessageBox::Yes | QMessageBox::No);
+      switch (ret) {
         // Yes:  set Ignore=false for the point and measures and save point
-        case 0:
+        case QMessageBox::Yes:
           m_editPoint->SetIgnored(false);
           emit ignorePointChanged();
           if (m_leftMeasure->IsIgnored()) {
@@ -749,7 +750,7 @@ namespace Isis {
             emit ignoreRightChanged();
           }
         // No: keep Ignore=true and save measure
-        case 1:
+        case QMessageBox::No:
           break;
 
       }
@@ -757,14 +758,15 @@ namespace Isis {
     if (origRightMeasure->IsIgnored() && m_rightMeasure->IsIgnored()) {
       QString message = "You are saving changes to an ignored measure.  ";
       message += "Do you want to set Ignore = False on the right measure?";
-      switch(QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
-                                   message, "&Yes", "&No", 0, 0)){
+      int ret = QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
+                                      message, QMessageBox::Yes | QMessageBox::No);
+      switch(ret) {
         // Yes:  set Ignore=false for the right measure and save point
-        case 0:
+        case QMessageBox::Yes:
             m_rightMeasure->SetIgnored(false);
             emit ignoreRightChanged();
         // No:  keep Ignore=true and save point
-        case 1:
+        case QMessageBox::No:
           break;
       }
     }
@@ -911,13 +913,14 @@ namespace Isis {
       message += "may need to move all of the other measures to match the new ";
       message += " coordinate of the reference measure.  Do you really want to ";
       message += " change the reference measure? ";
-      switch(QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
-                                   message, "&Yes", "&No", 0, 0)){
+      int ret = QMessageBox::question(m_qnetTool, "Qnet Tool Save Measure",
+                                      message, QMessageBox::Yes | QMessageBox::No);
+      switch(ret) {
         // Yes:  Save measure
-        case 0:
+        case QMessageBox::Yes:
           return true;
         // No:  keep original reference, return ChipViewports to previous states
-        case 1:
+        case QMessageBox::No:
           selectRightMeasure(m_rightCombo->currentIndex());
           selectLeftMeasure(m_leftCombo->currentIndex());
           return false;
@@ -2042,14 +2045,15 @@ namespace Isis {
                 (*m_editPoint)[i]->GetCubeSerialNumber())) {
             QString message = "You are trying to delete the Reference measure."
                 "  Do you really want to delete the Reference measure?";
-            switch (QMessageBox::question(m_qnetTool,
-                                          "Delete Reference measure?", message,
-                                          "&Yes", "&No", 0, 0)) {
+            int ret = QMessageBox::question(m_qnetTool,
+                                            "Delete Reference measure?", message,
+                                            QMessageBox::Yes | QMessageBox::No);
+            switch (ret) {
               //  Yes:  skip to end of switch todelete the measure
-              case 0:
+              case QMessageBox::Yes:
                 break;
               //  No:  continue to next measure in the loop
-              case 1:
+              case QMessageBox::No:
                 //  if only a single measure and it's reference and user chooses not to delete,
                 //  simply return.  The point has not changed.
                 if (numDeleted == 1) {
@@ -3712,12 +3716,12 @@ namespace Isis {
     m_groundGmap.reset(NULL);
 
     try {
-      QScopedPointer<Cube> newGroundCube(new Cube(ground, "r"));
-      QScopedPointer<UniversalGroundMap> newGroundGmap(new UniversalGroundMap(*newGroundCube));
+      std::unique_ptr<Cube> newGroundCube(new Cube(ground, "r"));
+      std::unique_ptr<UniversalGroundMap> newGroundGmap(new UniversalGroundMap(*newGroundCube));
 
       m_groundFile = FileName(newGroundCube->fileName()).name();
-      m_groundCube.reset(newGroundCube.take());
-      m_groundGmap.reset(newGroundGmap.take());
+      m_groundCube.reset(newGroundCube.release());
+      m_groundGmap.reset(newGroundGmap.release());
 
       m_serialNumberList->add(ground, true);
     }
@@ -3740,7 +3744,7 @@ namespace Isis {
     m_groundSourceFile = ground;
     m_groundOpen = true;
 
-    m_workspace->addCubeViewport(m_groundCube.data());
+    m_workspace->addCubeViewport(m_groundCube.get());
 
     //  Get viewport so connect can be made when ground source viewport closed to clean up
     // ground source
@@ -3915,10 +3919,10 @@ namespace Isis {
       }
 
       try {
-        QScopedPointer<Cube> newDemCube(new Cube(demFile, "r"));
+        std::unique_ptr<Cube> newDemCube(new Cube(demFile, "r"));
 
         m_demFile = FileName(newDemCube->fileName()).name();
-        m_demCube.reset(newDemCube.take());
+        m_demCube.reset(newDemCube.release());
       }
       catch (IException &e) {
         QMessageBox::critical(m_qnetTool, "Error", e.toString());
@@ -3971,7 +3975,7 @@ namespace Isis {
     MdiCubeViewport *vp;
     for (int i=0; i<(int)cubeViewportList()->size(); i++) {
       vp = (*(cubeViewportList()))[i];
-      if (vp->cube() == m_groundCube.data()) {
+      if (vp->cube() == m_groundCube.get()) {
         //  disconnect signal to avoid recursive situartion.  When a viewport is closed, a signal
         //  is emitted which would then call groundViewportClosed, then this method again.
         disconnect(vp, SIGNAL(viewportClosed(CubeViewport *)),
@@ -3984,7 +3988,7 @@ namespace Isis {
     //  If we could not find the ground source in the open viewports, user might
     //  have closed the viewport , reset ground source variables and re-open.
     m_groundOpen = false;
-    m_groundCube.take();
+    m_groundCube.release();
     m_groundFile.clear();
     m_groundGmap.reset(NULL);
 

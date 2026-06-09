@@ -202,7 +202,7 @@ namespace Isis {
     Table timesTable("LineScanTimes", timesRecord);
 
     int lineCount = 1;
-    for (int i = 0; i < eisTimes.size(); i++) {
+    for (size_t i = 0; i < eisTimes.size(); i++) {
       timesRecord[0] = eisTimes[i].start;
       timesRecord[1] = eisTimes[i].exposureDuration;
       timesRecord[2] = lineCount;

@@ -1,0 +1,23 @@
+Group = Results
+  From                    = output/PSP_007556_2010_RED6.balance.cropped.cub
+  Band                    = 1
+  Average                 = 0.10805084862657
+  StandardDeviation       = 0.010158128611242
+  Variance                = 1.03187576882524e-04
+  Median                  = 0.10725896304888
+  Mode                    = 0.10446588012637
+  Skew                    = 0.2338675580901
+  Minimum                 = 0.076718203879787
+  Maximum                 = 0.16293746852058
+  Sum                     = 321617.5649201
+  TotalPixels             = 34000000
+  ValidPixels             = 2976539
+  OverValidMaximumPixels  = 0
+  UnderValidMinimumPixels = 0
+  NullPixels              = 31023461
+  LisPixels               = 0
+  LrsPixels               = 0
+  HisPixels               = 0
+  HrsPixels               = 0
+End_Group
+End

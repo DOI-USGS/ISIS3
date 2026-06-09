@@ -3,10 +3,10 @@
 </p>
 
 # ISIS
+  
 
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis3/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis3)
 [![Anaconda-Server Badge](https://anaconda.org/usgs-astrogeology/isis/badges/version.svg)](https://anaconda.org/usgs-astrogeology/isis)
-
 
 ## Quick Reference
 
@@ -29,6 +29,15 @@ For Development and Contributing, see:
 
 - [Building ISIS](https://astrogeology.usgs.gov/docs/how-to-guides/isis-developer-guides/developing-isis3-with-cmake/)
 - [Contributing](https://astrogeology.usgs.gov/docs/how-to-guides/isis-developer-guides/contributing-to-isis/)
+
+## Generative AI Disclosure
+
+This repository contains software code that was generated or modified with the
+assistance of artificial intelligence (AI) tools, in accordance with U.S.
+Geological Survey (USGS) disclosure requirements. All AI-generated or AI-assisted
+code has been reviewed and validated by USGS developers. Users are responsible for
+reviewing and testing this code for their specific applications. See [RFC 14](https://github.com/DOI-USGS/ISIS3/discussions/6013)
+for more information.
 
 ## In this README:
 

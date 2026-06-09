@@ -2632,15 +2632,6 @@ namespace Isis {
     FileName matrixFile(m_bundleSettings->outputFilePrefix() + "inverseMatrix.dat");
     //???FileName matrixFile = FileName::createTempFile(m_bundleSettings.outputFilePrefix()
     //???                                               + "inverseMatrix.dat");
-    // Create file handle
-    QFile matrixOutput(matrixFile.expanded());
-
-    // Check to see if creating the inverse correlation matrix is turned on
-    if (m_bundleSettings->createInverseMatrix()) {
-      // Open file to write to
-      matrixOutput.open(QIODevice::WriteOnly);
-    }
-    QDataStream outStream(&matrixOutput);
 
     int i, j, k;
     int columnIndex = 0;
@@ -2735,7 +2726,6 @@ namespace Isis {
 
       // Output the inverse matrix if requested
       if (m_bundleSettings->createInverseMatrix()) {
-        outStream << inverseMatrix;
       }
 
       // now loop over all object points to sum contributions into 3x3 point covariance matrix
@@ -2824,10 +2814,18 @@ namespace Isis {
     }
 
     if (m_bundleSettings->createInverseMatrix()) {
-      // Close the file.
-      matrixOutput.close();
-      // Save the location of the "covariance" matrix
-      m_bundleResults.setCorrMatCovFileName(matrixFile);
+      // Create file handle
+      QFile matrixOutput(matrixFile.expanded());
+      // Open file to write to
+      if (matrixOutput.open(QIODevice::WriteOnly)) {
+        QDataStream outStream(&matrixOutput);
+        outStream << inverseMatrix;
+        
+        // Close the file.
+        matrixOutput.close();
+        // Save the location of the "covariance" matrix
+        m_bundleResults.setCorrMatCovFileName(matrixFile);
+      }
     }
 
     // can free sparse normals now

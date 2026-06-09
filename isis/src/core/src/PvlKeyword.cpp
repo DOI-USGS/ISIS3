@@ -824,7 +824,7 @@ namespace Isis {
     int  quoteStart = -1;
 
     // if its an array, indent subsequent lines 1 more
-    if (textToWrite.count() > 0 && (textToWrite[0] == '(' || textToWrite[0] == '"')) {
+    if (textToWrite.size() > 0 && (textToWrite[0] == '(' || textToWrite[0] == '"')) {
       startColumn ++;
     }
 

@@ -208,7 +208,7 @@ namespace Isis {
       vector<QString> kernelStrings;
       ui.GetAsString(parameterName, kernelStrings);
 
-      foreach (QString kernelString, kernelStrings) {
+      for (const QString &kernelString : kernelStrings) {
         FileName kernelFileName = safeHighestVersion(kernelString);
 
         // Try to get kernel file names out of db, if a db was specified instead of an actual kernel

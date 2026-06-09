@@ -273,9 +273,30 @@ xsi:noNamespaceSchemaLocation=
         <description>
           Input image, which requires <def>SPICE</def> (see <i>spiceinit</i>)
           and must be a <def>Level0</def> or a <def>Level1</def> ISIS cube.
+          If a <def>CSM</def> camera file is provided in the CSM parameter,
+          the cube does not need to be run through spiceinit.
         </description>
         <filter>
           *.cub
+        </filter>
+      </parameter>
+
+      <parameter name="CSM">
+        <type>filename</type>
+        <fileMode>input</fileMode>
+        <brief>
+          Load the camera model in CSM format from this file, rather than the
+          one from the input cube.
+        </brief>
+        <internalDefault>None</internalDefault>
+        <description>
+          JSON file containing either a CSM ISD (Instrument Support Data) or a
+          CSM model state. When provided, the camera is built from this file
+          and used in place of the camera attached to the input cube. The
+          input cube does not need to be run through spiceinit.
+        </description>
+        <filter>
+          *.json
         </filter>
       </parameter>
 

@@ -895,11 +895,11 @@ namespace Isis {
   bool AutoReg::ComputeChipZScore(Chip &chip) {
     Statistics patternStats;
     for(int i = 0; i < chip.Samples(); i++) {
-      double pixels[chip.Lines()];
+      std::vector<double> pixels(chip.Lines());
       for(int j = 0; j < chip.Lines(); j++) {
         pixels[j] = chip.GetValue(i + 1, j + 1);
       }
-      patternStats.AddData(pixels, chip.Lines());
+      patternStats.AddData(&pixels[0], chip.Lines());
     }
 
     // If it does not pass, return

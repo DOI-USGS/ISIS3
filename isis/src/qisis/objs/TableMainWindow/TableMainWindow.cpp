@@ -121,7 +121,7 @@ namespace Isis {
 
     p_save = new QAction(this);
     p_save->setText("Save...");
-    p_save->setShortcut(Qt::CTRL + Qt::Key_S);
+    p_save->setShortcut(Qt::CTRL | Qt::Key_S);
     connect(p_save, SIGNAL(triggered()), this, SLOT(saveTable()));
     p_save->setDisabled(true);
 
@@ -140,7 +140,7 @@ namespace Isis {
 
     QAction *clear = new QAction(this);
     clear->setText("Clear table");
-    clear->setShortcut(Qt::CTRL + Qt::Key_Delete);
+    clear->setShortcut(Qt::CTRL | Qt::Key_Delete);
     connect(clear, SIGNAL(triggered()), this, SLOT(clearTable()));
 
     QAction *close = new QAction(this);
@@ -787,7 +787,7 @@ namespace Isis {
     // Read data into table
     QString str = p_currentFile.readLine();
 
-    while(str.count() != 0) {
+    while(str.size() != 0) {
       // Do we need more rows?
       if (p_currentRow + 1 > p_table->rowCount()) {
         p_table->insertRow(p_currentRow);

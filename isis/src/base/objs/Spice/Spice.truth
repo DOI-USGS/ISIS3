@@ -592,8 +592,8 @@ Target Name = Mars
 
 Get Stored Naif Keywords...
 Object = NaifKeywords
-  BODY_CODE = 499
   BODY499_RADII = (3397.0, 3397.0, 3375.0)
+  BODY_CODE = 499
   BODY_FRAME_CODE = 10014
   FRAME_MGS_MOC = -94031
   INS-94030_NA_FOCAL_LENGTH = 3.5
