@@ -214,8 +214,8 @@ namespace Isis {
    */
   void FileTool::open() {
     //Set up the list of filters that are default with this dialog.
-    if (!p_filterList.contains("Isis cubes (*.cub)")) {
-      p_filterList.append("Isis cubes (*.cub)");
+    if (!p_filterList.contains("Isis cubes (*.cub *.tif *.tiff)")) {
+      p_filterList.append("Isis cubes (*.cub *.tif *.tiff)");
       p_filterList.append("All files (*)");
     }
     if (!p_dir.exists()) {
@@ -235,8 +235,8 @@ namespace Isis {
    */
   void FileTool::browse() {
     //Set up the list of filters that are default with this dialog.
-    if (!p_filterList.contains("Isis cubes (*.cub)")) {
-      p_filterList.append("Isis cubes (*.cub)");
+    if (!p_filterList.contains("Isis cubes (*.cub *.tif *.tiff)")) {
+      p_filterList.append("Isis cubes (*.cub *.tif *.tiff)");
       p_filterList.append("All files (*)");
     }
     if (!p_dir.exists()) {
@@ -288,8 +288,8 @@ namespace Isis {
       return;
     }
     //Set up the list of filters that are default with this dialog.
-    if (!p_filterList.contains("Isis cubes (*.cub)")) {
-      p_filterList.append("Isis cubes (*.cub)");
+    if (!p_filterList.contains("Isis cubes (*.cub *.tif *.tiff)")) {
+      p_filterList.append("Isis cubes (*.cub *.tif *.tiff)");
     }
     if (!p_dir.exists()) {
       p_dir = QDir(p_lastDir);
