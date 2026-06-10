@@ -1,9 +1,7 @@
 #include "makeflat.h"
 
-#include <QFile>
-#include <QTextStream>
-
 #include "Cube.h"
+#include "FileList.h"
 #include "Fixtures.h"
 #include "LineManager.h"
 #include "Pvl.h"
@@ -18,6 +16,10 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/makeflat.xml").expanded();
 
 class MakeflatTest : public TempTestingFiles {
 protected:
+  // Creates a cube with periodic DN variation to produce controlled standard deviation.
+  // This pattern (sample-varying, line-repeating) is needed to test makeflat's STDEVTOL
+  // exclusion logic. Existing helpers (createLinearPatternCube, handmos createTestCube)
+  // produce linear or constant patterns that don't achieve the required stdev range.
   void createSyntheticCube(const QString &filename, int samples, int lines, double baseDN, double dnVariation = 0.0) {
     Cube cube;
     cube.setDimensions(samples, lines, 1);
@@ -41,15 +43,11 @@ protected:
 
   QString createFromList(const QStringList &cubeFiles) {
     QString listPath = tempDir.path() + "/fromlist.lis";
-    QFile file(listPath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      throw IException(IException::Io, "Failed to create fromlist file", _FILEINFO_);
-    }
-    QTextStream out(&file);
+    FileList fileList;
     for (const QString &cube : cubeFiles) {
-      out << cube << "\n";
+      fileList.append(cube);
     }
-    file.close();
+    fileList.write(listPath);
     return listPath;
   }
 };
