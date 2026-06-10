@@ -152,7 +152,8 @@ namespace Isis {
     else {
       QFile xmlFile(xmlFileName.expanded());
       if (!xmlFile.open(QIODevice::ReadOnly)) {
-        throw IException(IException::Io, "Could not open file", _FILEINFO_);
+        QString msg = "Could not open label file [" + xmlFileName.expanded() + "].";
+        throw IException(IException::Io, msg, _FILEINFO_);
       }
 
       QString errmsg;

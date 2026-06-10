@@ -792,7 +792,7 @@ Testing error throws
 **ERROR** Unable to retrieve translation group from translation table.
 **ERROR** Unable to find PVL group [NotInTranslationTable].
 
-**ERROR** Could not open label file [DoesNotExist.xml].
+**I/O ERROR** Could not open label file [DoesNotExist.xml].
 
 **ERROR** XML read/parse error in file [/translations/pdsImage.trn] at line [1], column [1], message: Start tag expected.
 
