@@ -110,47 +110,46 @@ namespace Isis {
     if (xmlFileName.expanded().contains("/vsi")) {
       GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(xmlFileName.expanded().toStdString().c_str(), GA_ReadOnly));
       if (!dataset) {
-        if (xmlFileName.expanded().contains("/vsi")) {
-          // Attempt to manually read the label via VSI buffer
-          VSILFILE *fp = VSIFOpenL(xmlFileName.expanded().toUtf8().constData(), "rb");
-          if (fp) {
-            char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
-            size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
-            buffer[nRead] = '\0'; // end sign
-            VSIFCloseL(fp);
-            m_originalLabel.setContent(QString::fromUtf8(buffer), useNamespace);
-            CPLFree(buffer);
-            return;
-          }
-        }
+        // TODO: Testing which dataset needs VSI buffer fallback
+        // if (xmlFileName.expanded().contains("/vsi")) {
+        //   // Attempt to manually read the label via VSI buffer
+        //   VSILFILE *fp = VSIFOpenL(xmlFileName.expanded().toUtf8().constData(), "rb");
+        //   if (fp) {
+        //     char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
+        //     size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
+        //     buffer[nRead] = '\0'; // end sign
+        //     VSIFCloseL(fp);
+        //     m_originalLabel.setContent(QString::fromUtf8(buffer), useNamespace);
+        //     CPLFree(buffer);
+        //     return;
+        //   }
+        // }
         // If it's not a VSI file or VSI open failed, then throw the error
         QString msg = "Failed opening GDALDataset from [" + xmlFileName.name() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
 
-      CPLStringList metadataDomains = CPLStringList(dataset->GetMetadataDomainList(), false);
-      CPLStringList metadata;
       const char* domainPDS4 = "xml:PDS4";
-      if (CSLFindString(metadataDomains.List(), domainPDS4) != -1) { 
-        metadata = CPLStringList(dataset->GetMetadata(domainPDS4), false);
-        if (metadata.Count() > 0 && metadata[0] != nullptr) {
-          const char *metadataXmlString = metadata[0];
-          QString xmlString = QString::fromUtf8(metadataXmlString);
-          if (!m_originalLabel.setContent(xmlString, useNamespace, &errmsg, &errline, &errcol)) {
-            GDALClose(dataset);
-            QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
-              + "] at line [" + toString(errline) + "], column [" + toString(errcol)
-              + "], message: " + errmsg;
-            throw IException(IException::Programmer, msg, _FILEINFO_);
-          }
+      CPLStringList metadata = CPLStringList(dataset->GetMetadata(domainPDS4), false);
+      if (metadata.Count() > 0 && metadata[0] != nullptr) {
+        const char *metadataXmlString = metadata[0];
+        QString xmlString = QString::fromUtf8(metadataXmlString);
+        if (!m_originalLabel.setContent(xmlString, useNamespace, &errmsg, &errline, &errcol)) {
+          GDALClose(dataset);
+          QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
+            + "] at line [" + toString(errline) + "], column [" + toString(errcol)
+            + "], message: " + errmsg;
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
-      } else {
+      }
+      else {
         GDALClose(dataset);
-        QString msg = "Could not find " + QString(domainPDS4) + " in GDALDataset metadata domains list.";
+        QString msg = "Could not find metadata for " + QString(domainPDS4) + " in GDALDataset.";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       } 
       GDALClose(dataset);
-    } else {
+    } 
+    else {
       QFile xmlFile(xmlFileName.expanded());
       if (!xmlFile.open(QIODevice::ReadOnly)) {
         throw IException(IException::Io, "Could not open file", _FILEINFO_);
@@ -175,25 +174,6 @@ namespace Isis {
 
       xmlFile.close();
     }
-    
-  void OriginalXmlLabel::readFromXmlFile(const FileName &xmlFileName) {
-    QFile xmlFile(xmlFileName.expanded());
-    if ( !xmlFile.open(QIODevice::ReadOnly) ) {
-      QString msg = "Could not open label file [" + xmlFileName.expanded() +
-                    "].";
-      throw IException(IException::Io, msg, _FILEINFO_);
-    }
-
-    QDomDocument::ParseResult result = m_originalLabel.setContent(&xmlFile);
-    if ( !bool(result)) {
-      xmlFile.close();
-      QString msg = "XML read/parse error in file [" + xmlFileName.expanded()
-          + "] at line [" + QString::number(result.errorLine) + "], column [" + QString::number(result.errorColumn)
-          + "], message: " + result.errorMessage;
-      throw IException(IException::Unknown, msg, _FILEINFO_);
-    }
-
-    xmlFile.close();
   }
 
 
