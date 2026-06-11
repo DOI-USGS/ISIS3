@@ -1,6 +1,7 @@
 #include "makeflat.h"
 
 #include "Cube.h"
+#include "CubeFixtures.h"
 #include "FileList.h"
 #include "Fixtures.h"
 #include "LineManager.h"
@@ -16,31 +17,6 @@ static QString APP_XML = FileName("$ISISROOT/bin/xml/makeflat.xml").expanded();
 
 class MakeflatTest : public TempTestingFiles {
 protected:
-  // Creates a cube with periodic DN variation to produce controlled standard deviation.
-  // This pattern (sample-varying, line-repeating) is needed to test makeflat's STDEVTOL
-  // exclusion logic. Existing helpers (createLinearPatternCube, handmos createTestCube)
-  // produce linear or constant patterns that don't achieve the required stdev range.
-  void createSyntheticCube(const QString &filename, int samples, int lines, double baseDN, double dnVariation = 0.0) {
-    Cube cube;
-    cube.setDimensions(samples, lines, 1);
-    cube.create(filename);
-
-    LineManager line(cube);
-    for (int i = 1; i <= cube.lineCount(); i++) {
-      line.SetLine(i);
-      for (int j = 0; j < line.size(); j++) {
-        if (dnVariation > 0.0) {
-          double offset = ((j % 100) - 50) * dnVariation / 50.0;
-          line[j] = baseDN + offset;
-        } else {
-          line[j] = baseDN;
-        }
-      }
-      cube.write(line);
-    }
-    cube.close();
-  }
-
   QString createFromList(const QStringList &cubeFiles) {
     QString listPath = tempDir.path() + "/fromlist.lis";
     FileList fileList;
@@ -56,8 +32,10 @@ TEST_F(MakeflatTest, FunctionalTestMakeflatFraming) {
   QString input1 = tempDir.path() + "/framing_input1.cub";
   QString input2 = tempDir.path() + "/framing_input2.cub";
 
-  createSyntheticCube(input1, 500, 50, 800.0, 100.0);
-  createSyntheticCube(input2, 500, 50, 850.0, 100.0);
+  // Linear gradient with sampMult tuned to produce stdev within tolerance
+  // For 500 samples: stdev ≈ sampMult * 144, target stdev ~60
+  createLinearPatternCube(input1, 500, 50, 1, 800.0, 0.0, 0.42, 0.0);
+  createLinearPatternCube(input2, 500, 50, 1, 850.0, 0.0, 0.42, 0.0);
 
   QStringList inputCubes;
   inputCubes << input1 << input2;
@@ -110,8 +88,10 @@ TEST_F(MakeflatTest, FunctionalTestMakeflatLinescan) {
   QString input1 = tempDir.path() + "/linescan_input1.cub";
   QString input2 = tempDir.path() + "/linescan_input2.cub";
 
-  createSyntheticCube(input1, 5000, 100, 1000.0, 50.0);
-  createSyntheticCube(input2, 5000, 100, 1050.0, 50.0);
+  // Linear gradient with sampMult tuned to produce stdev within tolerance
+  // For 5000 samples: stdev ≈ sampMult * 1443, target stdev ~35
+  createLinearPatternCube(input1, 5000, 100, 1, 1000.0, 0.0, 0.024, 0.0);
+  createLinearPatternCube(input2, 5000, 100, 1, 1050.0, 0.0, 0.024, 0.0);
 
   QStringList inputCubes;
   inputCubes << input1 << input2;
@@ -167,9 +147,11 @@ TEST_F(MakeflatTest, FunctionalTestMakeflatPushframe) {
   QString input2 = tempDir.path() + "/pushframe_input2.cub";
   QString input3 = tempDir.path() + "/pushframe_input3.cub";
 
-  createSyntheticCube(input1, 5000, 100, 900.0, 80.0);
-  createSyntheticCube(input2, 5000, 100, 950.0, 80.0);
-  createSyntheticCube(input3, 5000, 100, 1000.0, 270.0);  // High variance (stdev~156), exceeds tolerance of 150
+  // Linear gradient with sampMult tuned: first two within tolerance, third exceeds STDEVTOL=150
+  // For 5000 samples: stdev ≈ sampMult * 1443
+  createLinearPatternCube(input1, 5000, 100, 1, 900.0, 0.0, 0.055, 0.0);   // stdev ~79
+  createLinearPatternCube(input2, 5000, 100, 1, 950.0, 0.0, 0.055, 0.0);   // stdev ~79
+  createLinearPatternCube(input3, 5000, 100, 1, 1000.0, 0.0, 0.108, 0.0);  // stdev ~156, exceeds tolerance
 
   QStringList inputCubes;
   inputCubes << input1 << input2 << input3;
