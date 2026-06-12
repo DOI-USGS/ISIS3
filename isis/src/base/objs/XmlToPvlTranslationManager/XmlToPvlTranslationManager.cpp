@@ -461,8 +461,6 @@ namespace Isis {
    *
    * @param xmlFileName The Xml label file.
    *
-   * @throws IException::Unknown "Could not open label file."
-   * @throws IException::Unknown "XML read/parse error in file."
    */
   void XmlToPvlTranslationManager::parseFile(const FileName &xmlFileName) {
     OriginalXmlLabel xmlLabel;
