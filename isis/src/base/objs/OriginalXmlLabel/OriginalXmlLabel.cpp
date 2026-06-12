@@ -110,21 +110,7 @@ namespace Isis {
     if (xmlFileName.expanded().contains("/vsi")) {
       GDALDataset *dataset = GDALDataset::FromHandle(GDALOpen(xmlFileName.expanded().toStdString().c_str(), GA_ReadOnly));
       if (!dataset) {
-        // TODO: Testing which dataset needs VSI buffer fallback
-        // if (xmlFileName.expanded().contains("/vsi")) {
-        //   // Attempt to manually read the label via VSI buffer
-        //   VSILFILE *fp = VSIFOpenL(xmlFileName.expanded().toUtf8().constData(), "rb");
-        //   if (fp) {
-        //     char *buffer = (char *)CPLMalloc(1024 * 1024); // 1 MB
-        //     size_t nRead = VSIFReadL(buffer, 1, 1024 * 1024 - 1, fp);
-        //     buffer[nRead] = '\0'; // end sign
-        //     VSIFCloseL(fp);
-        //     m_originalLabel.setContent(QString::fromUtf8(buffer), useNamespace);
-        //     CPLFree(buffer);
-        //     return;
-        //   }
-        // }
-        // If it's not a VSI file or VSI open failed, then throw the error
+        // If VSI open failed, then throw the error
         QString msg = "Failed opening GDALDataset from [" + xmlFileName.name() + "]";
         throw IException(IException::Programmer, msg, _FILEINFO_);
       }
