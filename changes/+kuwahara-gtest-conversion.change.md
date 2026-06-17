@@ -1,0 +1,1 @@
+Refactored `kuwahara` to be callable and migrated its legacy Makefile tests to gtest/CTest. The converted tests use synthetic cubes generated at runtime with controlled DN values, eliminating the 56 MB legacy external test-data dependency.
