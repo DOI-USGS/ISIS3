@@ -340,12 +340,12 @@ TEST_F(TempTestingFiles, FunctionalTestKuwaharaEdgePreservation) {
   EXPECT_DOUBLE_EQ(stats->Minimum(), 10.0);
   EXPECT_DOUBLE_EQ(stats->Maximum(), 20.0);
 
-  for (int line = 1; line <= 10; line++) {
+  for (int lineNumber = 1; lineNumber <= 10; lineNumber++) {
     for (int sample = 1; sample <= 10; sample++) {
-      double dn = readPixel(outCube, sample, line);
+      double dn = readPixel(outCube, sample, lineNumber);
       bool flat = (dn == 10.0 || dn == 20.0);
       EXPECT_TRUE(flat) << "blurred value " << dn
-                        << " at sample " << sample << ", line " << line;
+                        << " at sample " << sample << ", line " << lineNumber;
     }
   }
 }
