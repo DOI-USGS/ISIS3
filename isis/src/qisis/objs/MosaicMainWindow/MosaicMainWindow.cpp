@@ -104,7 +104,7 @@ namespace Isis {
     bool projectLoaded = false;
 
     foreach (QString argument, args) {
-      QRegExp cubeName(".*\\.cub$", Qt::CaseInsensitive);
+      QRegExp cubeName(".*\\.(cub|tif|tiff)$", Qt::CaseInsensitive);
       QRegExp cubeListName(".*\\.(lis|txt)$", Qt::CaseInsensitive);
       QRegExp projectName(".*\\.mos$", Qt::CaseInsensitive);
 
@@ -275,7 +275,7 @@ namespace Isis {
    */
   void MosaicMainWindow::open() {
     QStringList filterList;
-    filterList.append("Isis cubes (*.cub)");
+    filterList.append("Isis Cubes (*.cub *.tif *.tiff)");
     filterList.append("All Files (*)");
 
     QDir directory = m_lastOpenedFile.dir();
