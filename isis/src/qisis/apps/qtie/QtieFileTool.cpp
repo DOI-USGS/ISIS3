@@ -86,7 +86,7 @@ namespace Isis {
 
     QString baseFile, matchFile;
     QString dir;
-    QString filter = "Isis Cubes (*.cub);;";
+    QString filter = "Isis Cubes (*.cub *.tif *.tiff);;";
     filter += "Detached labels (*.lbl);;";
     filter += "All (*)";
 
