@@ -145,8 +145,7 @@ jobs:
             cd "${ISIS_VERSION}"
             echo "Uploading documentation to S3..."
             aws s3 sync ./ s3://asc-public-docs/isis-site/${ISIS_VERSION}/ --delete
-            cd ..
-            aws s3 cp s3://asc-public-docs/isis-site/versions.json ./versions.json
+            aws s3 cp s3://asc-public-docs/isis-site/versions.json /home/runner/work/ISIS3/ISIS3/build/docs/versions.json
           else
             echo "Error: docs/${ISIS_VERSION} directory not found!"
             exit 1
