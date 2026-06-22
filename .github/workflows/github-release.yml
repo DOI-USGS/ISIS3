@@ -145,7 +145,7 @@ jobs:
             cd "${ISIS_VERSION}"
             echo "Uploading documentation to S3..."
             aws s3 sync ./ s3://asc-public-docs/isis-site/${ISIS_VERSION}/ --delete
-
+            cd ..
             aws s3 cp s3://asc-public-docs/isis-site/versions.json ./versions.json
           else
             echo "Error: docs/${ISIS_VERSION} directory not found!"
@@ -154,8 +154,9 @@ jobs:
 
       - name: Update versions.json
         shell: python
+        working-directory: /home/runner/work/ISIS3/ISIS3/build/docs
         env:
-          ISIS_VERSION: ${{ env.ISIS_VERSION }}
+          ISIS_VERSION: ${{ needs.build.outputs.isis_version }}
         run: |
           import json
           from packaging.version import parse
@@ -181,7 +182,7 @@ jobs:
 
       - name: Upload updated versions.json to S3
         run: |
-          aws s3 cp ./versions.json s3://asc-public-docs/isis-site/versions.json
+          aws s3 cp /home/runner/work/ISIS3/ISIS3/build/docs/versions.json s3://asc-public-docs/isis-site/versions.json
 
   update-citation:
     name: Update Citation Files

@@ -47,32 +47,49 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
-## [10.0.0_RC3] - 2026-05-11
+## [10.0.0] - 2026-06-22
 
 ### Fixed
 
 - Fixed missing exception throw in the UniversalGroundMap constructor ([#6036](https://github.com/DOI-USGS/ISIS3/issues/6036))
 - Fixes most of the `isiscore` wrapper to handle any `QString const &` argument, and exposes the ISIS `Table` interface. ([#6045](https://github.com/DOI-USGS/ISIS3/issues/6045))
 - Fixed `spiceinit` issue where users would get an error when web=true. ([#6027](https://github.com/DOI-USGS/ISIS3/pull/6027))
-
-
-## [10.0.0_RC2] - 2026-03-30
+- Fixed serial number generation for Chandrayaan-2. ([#5993](https://github.com/DOI-USGS/ISIS3/issues/5993))
+- Fixed ability to correctly load Qmos projects made with isis versions older than 10.0.0 ([#5995](https://github.com/DOI-USGS/ISIS3/issues/5995))
+- Allows for slightly unsquare pixels from projected GDAL products and fixes axes parsing for longitude direction. ([#5999](https://github.com/DOI-USGS/ISIS3/issues/5999))
+- Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks ([#5193](https://github.com/DOI-USGS/ISIS3/issues/5193))
+- Fixed the isisStartup scripts for users outside of USGS systems. ([#5478](https://github.com/DOI-USGS/ISIS3/issues/5478))
+- Fixed embree shapemodel intersection calculation ([#5592](https://github.com/DOI-USGS/ISIS3/issues/5592))
+- Fixed kaguyatc2isis invalid BandBin values ([#5629](https://github.com/DOI-USGS/ISIS3/issues/5629))
+- Fixed Cube::fromIsd to add "LineScanTimes" table from HRSC isds ([#5668](https://github.com/DOI-USGS/ISIS3/issues/5668))
+- Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images ([#5700](https://github.com/DOI-USGS/ISIS3/issues/5700))
+- Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables ([#5701](https://github.com/DOI-USGS/ISIS3/issues/5701))
+- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and ([#5702](https://github.com/DOI-USGS/ISIS3/issues/5702))
+- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection ([#5719](https://github.com/DOI-USGS/ISIS3/issues/5719))
+- Fixed Juno Data Area SPKs causing Spiceinit to fail ([#5724](https://github.com/DOI-USGS/ISIS3/issues/5724))
+- Fixed segfault in SpiceClient when an authentication error was encountered. ([#5735](https://github.com/DOI-USGS/ISIS3/issues/5735))
+- Fixed `getLocalNormal` not reseting the sample and line ([#5752](https://github.com/DOI-USGS/ISIS3/issues/5752))
+- Fixed offset and scale not being applied to gdal 32 bit floating point pixels ([#5753](https://github.com/DOI-USGS/ISIS3/issues/5753))
+- Fixed csminit docs with more details on the `ISD` and `STATE` pameters ([#5790](https://github.com/DOI-USGS/ISIS3/issues/5790))
+- Fixed ISIS Q Applications crashing when opening more than one cube at once. ([#5805](https://github.com/DOI-USGS/ISIS3/issues/5805))
+- Fixed `pointreg` helper function to display deffile to application log ([#5806](https://github.com/DOI-USGS/ISIS3/issues/5806))
+- Fixed bundle serialization on MacOS for IPCE ([#5808](https://github.com/DOI-USGS/ISIS3/issues/5808))
+- Fixed `BundleObservationSolveSettings` to properly read empty solve setting xmls ([#5822](https://github.com/DOI-USGS/ISIS3/issues/5822))
+- Fixed order of observer and target in spiceql call in `ctxcal`. ([#5823](https://github.com/DOI-USGS/ISIS3/issues/5823))
+- Fixed campt reporting when `ALLOWERROR` is set to true ([#5845](https://github.com/DOI-USGS/ISIS3/issues/5845))
+- Fixed SpiceQL 1.2.0 API changes ([#5846](https://github.com/DOI-USGS/ISIS3/issues/5846))
+- Fixed CSM State String blob not being propagated between input and output cubes ([#5847](https://github.com/DOI-USGS/ISIS3/issues/5847))
+- Fixed unnecessary un/distortion checks for pixels near the origin. ([#5861](https://github.com/DOI-USGS/ISIS3/issues/5861))
+- Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor ([#5871](https://github.com/DOI-USGS/ISIS3/issues/5871))
+- Fixed `noseam` to use correct temporary files when running ([#5878](https://github.com/DOI-USGS/ISIS3/issues/5878))
+- Fixed all Q apps not consistently prioritized projction over camera in various tools ([#5896](https://github.com/DOI-USGS/ISIS3/issues/5896))
+- Fixed `footprintinit` to find mapping group (no caps). ([#5920](https://github.com/DOI-USGS/ISIS3/issues/5920))
+- Fixed SpiceClient to handle redirect requests.
+- Fixes the table generation from plot windows in ISIS qapps not capturing all pixels ([#5962](https://github.com/DOI-USGS/ISIS3/issues/5962))
 
 ### Added
 
 - Added projection priority selection to QApps. ([#6000](https://github.com/DOI-USGS/ISIS3/pull/6000))
-
-### Fixed
-
-- Fixed serial number generation for Chandrayaan-2. ([#5993](https://github.com/DOI-USGS/ISIS3/issues/5993))
-- Fixed ability to correctly load Qmos projects made with isis versions older than 10.0.0 ([#5995](https://github.com/DOI-USGS/ISIS3/issues/5995))
-- Allows for slightly unsquare pixels from projected GDAL products and fixes axes parsing for longitude direction. ([#5999](https://github.com/DOI-USGS/ISIS3/issues/5999))
-
-
-## [10.0.0_RC1] - 2026-02-26
-
-### Added
-
 - Added OFFBODY and OFFBODYTRIM parameters to noproj and cam2cam. Added tests and updated documentation. ([#3602](https://github.com/DOI-USGS/ISIS3/issues/3602))
 - Added ale version to history blob. ([#5207](https://github.com/DOI-USGS/ISIS3/issues/5207))
 - Adds PROJ into ISIS, and exposes the capability with a new class called IProj. ([#5317](https://github.com/DOI-USGS/ISIS3/issues/5317))
@@ -113,38 +130,6 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 - Updated GDAL to 3.12 and QT to 6.X ([#5909](https://github.com/DOI-USGS/ISIS3/issues/5909))
 - Update 'UseWebSpice' keyword in preferences to 'UseSpiceQL'.
 - Updated isisimport docs, and included it mission categories that need it.  Linked to other docs on missions. ([#5875](https://github.com/DOI-USGS/ISIS3/issues/5875))
-
-### Fixed
-
-- Fixed `StripPolygonSeeder` and `GridPolygonSeeder` memory leaks ([#5193](https://github.com/DOI-USGS/ISIS3/issues/5193))
-- Fixed the isisStartup scripts for users outside of USGS systems. ([#5478](https://github.com/DOI-USGS/ISIS3/issues/5478))
-- Fixed embree shapemodel intersection calculation ([#5592](https://github.com/DOI-USGS/ISIS3/issues/5592))
-- Fixed kaguyatc2isis invalid BandBin values ([#5629](https://github.com/DOI-USGS/ISIS3/issues/5629))
-- Fixed Cube::fromIsd to add "LineScanTimes" table from HRSC isds ([#5668](https://github.com/DOI-USGS/ISIS3/issues/5668))
-- Fixed jigsaw to default OUTADJUSTMENTH5 option to false and allow this feature to run on read-only images ([#5700](https://github.com/DOI-USGS/ISIS3/issues/5700))
-- Fixed jigsaw save/apply bug by adding back missing metadata to Instrument Position/Pointing tables ([#5701](https://github.com/DOI-USGS/ISIS3/issues/5701))
-- Fixed findFeaturesSegment.py errors from issues [#5725](https://github.com/DOI-USGS/ISIS3/issues/5725) and ([#5702](https://github.com/DOI-USGS/ISIS3/issues/5702))
-- Fixed QView bug that would not allow manual editing of min/max values via the text fields and defaulted to the current min/max type dropdown selection ([#5719](https://github.com/DOI-USGS/ISIS3/issues/5719))
-- Fixed Juno Data Area SPKs causing Spiceinit to fail ([#5724](https://github.com/DOI-USGS/ISIS3/issues/5724))
-- Fixed segfault in SpiceClient when an authentication error was encountered. ([#5735](https://github.com/DOI-USGS/ISIS3/issues/5735))
-- Fixed `getLocalNormal` not reseting the sample and line ([#5752](https://github.com/DOI-USGS/ISIS3/issues/5752))
-- Fixed offset and scale not being applied to gdal 32 bit floating point pixels ([#5753](https://github.com/DOI-USGS/ISIS3/issues/5753))
-- Fixed csminit docs with more details on the `ISD` and `STATE` pameters ([#5790](https://github.com/DOI-USGS/ISIS3/issues/5790))
-- Fixed ISIS Q Applications crashing when opening more than one cube at once. ([#5805](https://github.com/DOI-USGS/ISIS3/issues/5805))
-- Fixed `pointreg` helper function to display deffile to application log ([#5806](https://github.com/DOI-USGS/ISIS3/issues/5806))
-- Fixed bundle serialization on MacOS for IPCE ([#5808](https://github.com/DOI-USGS/ISIS3/issues/5808))
-- Fixed `BundleObservationSolveSettings` to properly read empty solve setting xmls ([#5822](https://github.com/DOI-USGS/ISIS3/issues/5822))
-- Fixed order of observer and target in spiceql call in `ctxcal`. ([#5823](https://github.com/DOI-USGS/ISIS3/issues/5823))
-- Fixed campt reporting when `ALLOWERROR` is set to true ([#5845](https://github.com/DOI-USGS/ISIS3/issues/5845))
-- Fixed SpiceQL 1.2.0 API changes ([#5846](https://github.com/DOI-USGS/ISIS3/issues/5846))
-- Fixed CSM State String blob not being propagated between input and output cubes ([#5847](https://github.com/DOI-USGS/ISIS3/issues/5847))
-- Fixed unnecessary un/distortion checks for pixels near the origin. ([#5861](https://github.com/DOI-USGS/ISIS3/issues/5861))
-- Fixed Chandrayaan-2 TMC2 serial numbers by setting InstrumentId to CH2_TMC_FORE/NADIR/AFT based on the filename sensor ([#5871](https://github.com/DOI-USGS/ISIS3/issues/5871))
-- Fixed `noseam` to use correct temporary files when running ([#5878](https://github.com/DOI-USGS/ISIS3/issues/5878))
-- Fixed all Q apps not consistently prioritized projction over camera in various tools ([#5896](https://github.com/DOI-USGS/ISIS3/issues/5896))
-- Fixed `footprintinit` to find mapping group (no caps). ([#5920](https://github.com/DOI-USGS/ISIS3/issues/5920))
-- Fixed SpiceClient to handle redirect requests.
-- Fixes the table generation from plot windows in ISIS qapps not capturing all pixels ([#5962](https://github.com/DOI-USGS/ISIS3/issues/5962))
 
 ### Removed
 
