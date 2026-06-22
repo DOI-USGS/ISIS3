@@ -10,7 +10,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QString>
 #include <QtMath>
-#include <QFile>
 
 #include "AlphaCube.h"
 #include "Cube.h"
@@ -328,6 +327,34 @@ namespace Isis {
     if (inst.hasKeyword("ExposureDuration")){
       inst.findKeyword("ExposureDuration").setUnits("seconds");
     }
+
+    // The PSA-exported calibrated products (em16_tgo_cas namespace) do not carry
+    // SpacecraftClockStartCount. Their fallback translation table fills only
+    // StartTime. The instrument-team products handled by TgoCassisInstrument.trn
+    // map this keyword from the FSW header, so it is already present for them.
+    // The camera (TgoCassisCamera) and spiceinit require it regardless of the
+    // product, so without it the PSA products fail to ingest. The clock value is
+    // present in the XML as a hex-ASCII em16_tgo_cas:exposuretimestamp field.
+    // Decode it and add the keyword here, so the PSA products work with no manual
+    // editlab step. The translation table alone cannot do this because it cannot
+    // hex-decode. Read the label through OriginalXmlLabel, the same VSI-aware path
+    // the rest of this app uses, so remote (/vsicurl) inputs work too.
+    if (!inst.hasKeyword("SpacecraftClockStartCount")) {
+      // Parse without namespace processing so the prefixed
+      // em16_tgo_cas:exposuretimestamp tag is matched as a literal name.
+      OriginalXmlLabel expLabel;
+      expLabel.readFromXmlFile(inputLabel);
+      QDomDocument expDoc = expLabel.ReturnLabels();
+      QDomNodeList tsNodes = expDoc.elementsByTagName("em16_tgo_cas:exposuretimestamp");
+      if (!tsNodes.isEmpty()) {
+        QString hexAscii = tsNodes.at(0).toElement().text().trimmed();
+        QString clockCount = QString::fromLatin1(QByteArray::fromHex(hexAscii.toLatin1()));
+        if (!clockCount.isEmpty()) {
+          inst.addKeyword(PvlKeyword("SpacecraftClockStartCount", clockCount));
+        }
+      }
+    }
+
     // Translate BandBin group
     FileName bandBinTransFile(missionDir + "TgoCassisBandBin.trn");
     XmlToPvlTranslationManager bandBinXlater(inputLabel, bandBinTransFile.expanded());

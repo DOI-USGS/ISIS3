@@ -537,6 +537,9 @@ TEST(TgoCassis2Isis, TgoCassis2IsisTestPSALabel) {
   EXPECT_EQ(inst["ExposureDuration"][0].toStdString(), "1.018e-003");
   EXPECT_EQ(int(inst["SummingMode"]), 0);
   EXPECT_EQ(inst["Filter"][0].toStdString(), "PAN");
+  // The PSA-exported label has no SpacecraftClockStartCount in its translation
+  // table, so it is decoded from the hex-ASCII em16_tgo_cas:exposuretimestamp.
+  EXPECT_EQ(inst["SpacecraftClockStartCount"][0].toStdString(), "2f0595a0563cfa83");
 
   // Archive Group
   PvlGroup &archive = isisLabel->findGroup("Archive", Pvl::Traverse);

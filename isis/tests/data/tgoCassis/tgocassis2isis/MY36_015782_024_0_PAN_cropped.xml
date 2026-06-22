@@ -262,6 +262,11 @@
      <em16_tgo_cas:stp>164</em16_tgo_cas:stp>
      <em16_tgo_cas:mtp>M041</em16_tgo_cas:mtp>
     </em16_tgo_cas:Producer_Data>
+    <em16_tgo_cas:FSW_Header>
+     <em16_tgo_cas:exposuretimestamp>32663035393561303536336366613833</em16_tgo_cas:exposuretimestamp>
+     <em16_tgo_cas:exposuretimestamp_length>8</em16_tgo_cas:exposuretimestamp_length>
+     <em16_tgo_cas:exposuretimestamp_tag>11</em16_tgo_cas:exposuretimestamp_tag>
+    </em16_tgo_cas:FSW_Header>
    </em16_tgo_cas:Cassis_Data>
   </Mission_Area>
   <Discipline_Area>
