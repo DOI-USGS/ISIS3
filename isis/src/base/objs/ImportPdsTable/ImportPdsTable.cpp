@@ -16,6 +16,8 @@ find files of those names at the top level of this repository. **/
 #include <QScopedPointer>
 #include <QString>
 
+#include "cpl_vsi.h"
+
 #include "EndianSwapper.h"
 #include "FileName.h"
 #include "IString.h"
@@ -537,17 +539,29 @@ namespace Isis {
     //  Vet the filename.  Many PDS files record the filename in uppercase and
     //  in practice, the filename is in lowercase.  Do this check here.
     QString tempTblFile(pdsTableFile);
-    TextFile tfile(tempTblFile);
-    QString tline;
+
+    // Open the file using GDAL's VSI API to support remote URLs (e.g., /vsicurl/https://...)
+    VSILFILE *fp = VSIFOpenL(tempTblFile.toLatin1().data(), "rb");
+    if (fp == nullptr) {
+      QString msg = "Unable to open PDS table file [" + tempTblFile + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
+
     m_rows.clear();
     int irow(0);
-    while (tfile.GetLine(tline, false)) {
+
+    // Read the file line by line
+    const char *line = nullptr;
+    while ((line = CPLReadLineL(fp)) != nullptr) {
       if (irow >= m_trows) break;
 
+      QString tline = QString::fromUtf8(line);
       (void) processRow(irow, tline);
 
       irow++;
     }
+
+    VSIFCloseL(fp);
     return;
   }
 
