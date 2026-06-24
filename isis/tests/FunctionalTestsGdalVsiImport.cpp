@@ -113,7 +113,10 @@ TEST(GdalVsiImportTest, IsisImportRemoteS3Vsicurl) {
   QString cubeFileName = prefix.path() + "/isisimport_s3.cub";
   QString s3Url = "/vsicurl/" + S3_TEST_DATA_URL + "V13_084840_0996_XN_80S159W.IMG";
 
-  QVector<QString> args = {"from=" + s3Url, "to=" + cubeFileName};
+  // Explicitly specify template to avoid auto-detection issues
+  QString templateFile = FileName("$ISISROOT/appdata/import/PDS3/MroCTX.tpl").expanded();
+
+  QVector<QString> args = {"from=" + s3Url, "to=" + cubeFileName, "template=" + templateFile};
   UserInterface options(FileName("$ISISROOT/bin/xml/isisimport.xml").expanded(), args);
 
   try {
