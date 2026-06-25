@@ -67,10 +67,14 @@ TEST(GdalVsiImportTest, Lo2isisLocalFile) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 151);
+  EXPECT_EQ(cube.lineCount(), 5);
   EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -97,10 +101,14 @@ TEST(GdalVsiImportTest, IsisImportLocalFile) {
 
   Cube cube(cubeFileName);
 
-  // Verify cube was created successfully
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
-  EXPECT_GT(cube.bandCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 151);
+  EXPECT_EQ(cube.lineCount(), 5);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 }
 
 
@@ -129,10 +137,15 @@ TEST(GdalVsiImportTest, IsisImportRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify cube was created successfully
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
-  EXPECT_GT(cube.bandCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 5000);
+  EXPECT_EQ(cube.lineCount(), 7168);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
+
   EXPECT_TRUE(isisLabel->hasObject("IsisCube"));
 }
 
@@ -155,10 +168,14 @@ TEST(GdalVsiImportTest, Hi2isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 512);
+  EXPECT_EQ(cube.lineCount(), 20000);
   EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -192,11 +209,19 @@ TEST(GdalVsiImportTest, Marci2isisRemoteS3Vsicurl) {
   Pvl *evenLabel = cubeEven.label();
   Pvl *oddLabel = cubeOdd.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cubeEven.sampleCount(), 0);
-  EXPECT_GT(cubeEven.lineCount(), 0);
-  EXPECT_GT(cubeOdd.sampleCount(), 0);
-  EXPECT_GT(cubeOdd.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cubeEven.sampleCount(), 1024);
+  EXPECT_EQ(cubeEven.lineCount(), 21280);
+  EXPECT_EQ(cubeEven.bandCount(), 5);
+  EXPECT_EQ(cubeOdd.sampleCount(), 1024);
+  EXPECT_EQ(cubeOdd.lineCount(), 21280);
+  EXPECT_EQ(cubeOdd.bandCount(), 5);
+
+  // Verify cubes have valid pixel data
+  std::unique_ptr<Histogram> histEven (cubeEven.histogram());
+  EXPECT_GT(histEven->ValidPixels(), 0) << "Even cube should contain valid pixel data";
+  std::unique_ptr<Histogram> histOdd (cubeOdd.histogram());
+  EXPECT_GT(histOdd->ValidPixels(), 0) << "Odd cube should contain valid pixel data";
 
   // Verify Instrument groups
   PvlGroup &instEven = evenLabel->findGroup("Instrument", Pvl::Traverse);
@@ -230,10 +255,15 @@ TEST(GdalVsiImportTest, Pds2isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
-  EXPECT_GT(cube.bandCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 1562);
+  EXPECT_EQ(cube.lineCount(), 2127);
+  EXPECT_EQ(cube.bandCount(), 5);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
+
   EXPECT_TRUE(isisLabel->hasObject("IsisCube"));
 }
 
@@ -256,10 +286,14 @@ TEST(GdalVsiImportTest, Chan1m32isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
-  EXPECT_GT(cube.bandCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 304);
+  EXPECT_EQ(cube.lineCount(), 1182);
+  EXPECT_EQ(cube.bandCount(), 85);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -296,10 +330,14 @@ TEST(GdalVsiImportTest, Mroctx2isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 4080);
+  EXPECT_EQ(cube.lineCount(), 4096);
   EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -330,9 +368,14 @@ TEST(GdalVsiImportTest, TgoCassis2isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 1408);
+  EXPECT_EQ(cube.lineCount(), 256);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -364,9 +407,14 @@ TEST(GdalVsiImportTest, Mrf2isisRemoteS3Vsicurl) {
   Cube cube(cubeFileName);
   Pvl *isisLabel = cube.label();
 
-  // Verify basic cube properties
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 266);
+  EXPECT_EQ(cube.lineCount(), 5373);
+  EXPECT_EQ(cube.bandCount(), 4);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   // Verify Instrument group
   PvlGroup &inst = isisLabel->findGroup("Instrument", Pvl::Traverse);
@@ -399,17 +447,30 @@ TEST(GdalVsiImportTest, Vims2isisRemoteS3Vsicurl) {
   Cube visCube(visCubeFileName);
   Pvl *visLabel = visCube.label();
 
-  EXPECT_GT(visCube.sampleCount(), 0);
-  EXPECT_GT(visCube.lineCount(), 0);
+  // Verify VIS cube dimensions
+  EXPECT_EQ(visCube.sampleCount(), 64);
+  EXPECT_EQ(visCube.lineCount(), 64);
+  EXPECT_EQ(visCube.bandCount(), 96);
 
   PvlGroup &visInst = visLabel->findGroup("Instrument", Pvl::Traverse);
   EXPECT_TRUE(visInst.hasKeyword("InstrumentId"));
   EXPECT_EQ(visInst["InstrumentId"][0].toStdString(), "VIMS");
 
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> visHist (visCube.histogram());
+  EXPECT_GT(visHist->ValidPixels(), 0) << "VIS cube should contain valid pixel data";
+
   // Verify IR output cube
   Cube irCube(irCubeFileName);
-  EXPECT_GT(irCube.sampleCount(), 0);
-  EXPECT_GT(irCube.lineCount(), 0);
+
+  // Verify IR cube dimensions
+  EXPECT_EQ(irCube.sampleCount(), 64);
+  EXPECT_EQ(irCube.lineCount(), 64);
+  EXPECT_EQ(irCube.bandCount(), 256);
+
+  // Verify IR cube has valid pixel data
+  std::unique_ptr<Histogram> irHist (irCube.histogram());
+  EXPECT_GT(irHist->ValidPixels(), 0) << "IR cube should contain valid pixel data";
 }
 
 
@@ -450,8 +511,14 @@ TEST(GdalVsiImportTest, Junocam2isisRemoteS3Vsicurl) {
   Cube cube(firstCube);
   Pvl *label = cube.label();
 
-  EXPECT_GT(cube.sampleCount(), 0);
-  EXPECT_GT(cube.lineCount(), 0);
+  // Verify cube dimensions
+  EXPECT_EQ(cube.sampleCount(), 1648);
+  EXPECT_EQ(cube.lineCount(), 128);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Verify cube has valid pixel data
+  std::unique_ptr<Histogram> hist (cube.histogram());
+  EXPECT_GT(hist->ValidPixels(), 0) << "Cube should contain valid pixel data";
 
   PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
   EXPECT_TRUE(inst.hasKeyword("InstrumentId"));

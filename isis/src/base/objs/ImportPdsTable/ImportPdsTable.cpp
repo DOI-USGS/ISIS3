@@ -550,15 +550,22 @@ namespace Isis {
     m_rows.clear();
     int irow(0);
 
-    // Read the file line by line
-    const char *line = nullptr;
-    while ((line = CPLReadLineL(fp)) != nullptr) {
-      if (irow >= m_trows) break;
+    try {
+      // Read the file line by line
+      const char *line = nullptr;
+      while ((line = CPLReadLineL(fp)) != nullptr) {
+        if (irow >= m_trows) break;
 
-      QString tline = QString::fromUtf8(line);
-      (void) processRow(irow, tline);
+        QString tline = QString::fromUtf8(line);
+        (void) processRow(irow, tline);
 
-      irow++;
+        irow++;
+      }
+    }
+    catch (...) {
+      // Ensure file is closed even if an exception occurs
+      VSIFCloseL(fp);
+      throw;
     }
 
     VSIFCloseL(fp);
