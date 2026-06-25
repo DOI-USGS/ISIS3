@@ -6,15 +6,13 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
-#include "Isis.h"
+#ifndef maplab_h
+#define maplab_h
 
-#include "maplab.h"
+#include "UserInterface.h"
 
-#include "Application.h"
-
-using namespace Isis;
-
-void IsisMain() {
-  UserInterface &ui = Application::GetUserInterface();
-  maplab(ui);
+namespace Isis {
+  extern void maplab(UserInterface &ui);
 }
+
+#endif
