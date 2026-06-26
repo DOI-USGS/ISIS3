@@ -435,12 +435,3 @@ TEST_F(TempTestingFiles, FunctionalTestKuwaharaCubeOverloadEquivalence) {
     }
   }
 }
-
-// Note on invalid box dimensions (even, zero, or negative SAMPLES/LINES):
-// the kuwahara.xml SAMPLES and LINES parameters declare <odd/> and a minimum
-// of 1. These constraints are enforced by Application::VerifyAll() in the
-// normal IsisMain command-line flow, not by the UserInterface(xml, args)
-// constructor used for in-process callable tests, so they cannot be exercised
-// through the direct-call path. The constraint enforcement is generic
-// UserInterface/Application infrastructure (covered by their own unit tests)
-// rather than kuwahara-specific behavior.
