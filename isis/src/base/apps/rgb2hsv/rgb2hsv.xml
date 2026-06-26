@@ -311,7 +311,7 @@
         </description>
         <minimum inclusive = "yes">0.0</minimum>
         <lessThan>
-          <item>RMAX</item>
+          <item>BMAX</item>
         </lessThan>
       </parameter>
 
@@ -390,3 +390,4 @@
     </example>
   </examples>
 </application>
+
