@@ -118,3 +118,6 @@ isis/tests/data/isisimport/pds4.xml
 
 # Ignore the local copy of kakadu
 recipe/kakadu/kakadu_7_9.zip
+
+# Claude Code local settings
+.claude/settings.local.json
