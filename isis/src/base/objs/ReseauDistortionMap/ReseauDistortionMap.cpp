@@ -88,14 +88,31 @@ namespace Isis {
     double focalLine = dy / p_pixelPitch +
                        p_camera->FocalPlaneMap()->DetectorLineOrigin();
 
-    // Find distance from input point to all nominal reseaus
+    // The local affine fit is anchored at a query point clamped to the distorted
+    // image box. Inside the image the query equals the input point, so the result
+    // is identical to before. Outside the image the query slides onto the nearest
+    // box edge, so the five closest reseaus always form a two dimensional
+    // neighborhood (never colinear) and yield a well conditioned affine. That
+    // affine is then evaluated at the true input point below, which extrapolates
+    // the distortion smoothly and linearly past the image edges. This lets ground
+    // points that project just off the sensor still return a usable focal plane
+    // position, as needed by bundle adjustment and map projection, instead of a
+    // hard failure at the image boundary.
+    double querySamp = focalSamp;
+    double queryLine = focalLine;
+    if(querySamp < 0.5) querySamp = 0.5;
+    if(querySamp > p_distortedSamps + 0.5) querySamp = p_distortedSamps + 0.5;
+    if(queryLine < 0.5) queryLine = 0.5;
+    if(queryLine > p_distortedLines + 0.5) queryLine = p_distortedLines + 0.5;
+
+    // Find distance from the query point to all nominal reseaus
     std::vector<double> distances(p_numRes, 0.0);
     double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {
-      sdiffsq = (focalSamp - p_rsamps[i]) * (focalSamp - p_rsamps[i]);
-      ldiffsq = (focalLine - p_rlines[i]) * (focalLine - p_rlines[i]);
+      sdiffsq = (querySamp - p_rsamps[i]) * (querySamp - p_rsamps[i]);
+      ldiffsq = (queryLine - p_rlines[i]) * (queryLine - p_rlines[i]);
       distances[i]  =  ldiffsq + sdiffsq;
     }
 
@@ -154,16 +171,15 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
+      // Evaluate the fitted affine at the true input point. Inside the image this
+      // is the usual interpolation. Outside, since the query was clamped to the
+      // box edge while the evaluation point is the true (off image) location, the
+      // affine is extrapolated smoothly rather than rejected.
       known[1] = focalSamp;
       known[2] = focalLine;
 
-      // Test to make sure the point is inside of the image
       double undistortedFocalSamp = lsqX.Evaluate(known);
       double undistortedFocalLine = lsqY.Evaluate(known);
-      if(undistortedFocalSamp < 0.5) return false;
-      if(undistortedFocalLine < 0.5) return false;
-      if(undistortedFocalSamp > p_undistortedSamps + 0.5) return false;
-      if(undistortedFocalLine > p_undistortedLines + 0.5) return false;
 
       // Convert undistorted sample, line position to an x,y position
       p_undistortedFocalPlaneX = (undistortedFocalSamp - p_undistortedSamps
@@ -199,16 +215,29 @@ namespace Isis {
     double undistortedFocalSamp = ux / p_pixelPitch + p_undistortedSamps / 2.0;
     double undistortedFocalLine = uy / p_pixelPitch + p_undistortedLines / 2.0;
 
-    // Find distance from input point to all nominal reseaus
+    // Clamp a query point to the undistorted image box. Inside the image the
+    // query equals the input point, so the result is unchanged. Outside, the
+    // query slides onto the nearest box edge so the five closest reseaus form a
+    // two dimensional neighborhood and the fitted affine is well conditioned. It
+    // is evaluated at the true input point below, extrapolating smoothly past the
+    // image edges rather than rejecting the point. See SetFocalPlane for details.
+    double querySamp = undistortedFocalSamp;
+    double queryLine = undistortedFocalLine;
+    if(querySamp < 0.5) querySamp = 0.5;
+    if(querySamp > p_undistortedSamps + 0.5) querySamp = p_undistortedSamps + 0.5;
+    if(queryLine < 0.5) queryLine = 0.5;
+    if(queryLine > p_undistortedLines + 0.5) queryLine = p_undistortedLines + 0.5;
+
+    // Find distance from the query point to all nominal reseaus
     std::vector<double> distances(p_numRes, 0.0);
     double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {
-      sdiffsq = (undistortedFocalSamp - p_msamps[i]) *
-                (undistortedFocalSamp - p_msamps[i]);
-      ldiffsq = (undistortedFocalLine - p_mlines[i]) *
-                (undistortedFocalLine - p_mlines[i]);
+      sdiffsq = (querySamp - p_msamps[i]) *
+                (querySamp - p_msamps[i]);
+      ldiffsq = (queryLine - p_mlines[i]) *
+                (queryLine - p_mlines[i]);
       distances[i]  =  ldiffsq + sdiffsq;
     }
 
@@ -266,16 +295,15 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
+      // Evaluate the fitted affine at the true input point. Inside the image this
+      // is the usual interpolation. Outside, the query was clamped to the box edge
+      // while the evaluation point is the true (off image) location, so the affine
+      // is extrapolated smoothly rather than rejected.
       known[1] = undistortedFocalSamp;
       known[2] = undistortedFocalLine;
 
-      // Test points to make sure they are in the image
       double distortedFocalSamp = lsqX.Evaluate(known);
       double distortedFocalLine = lsqY.Evaluate(known);
-      if(distortedFocalSamp < 0.5) return false;
-      if(distortedFocalLine < 0.5) return false;
-      if(distortedFocalSamp > p_undistortedSamps + 0.5) return false;
-      if(distortedFocalLine > p_undistortedLines + 0.5) return false;
 
       // Convert distorted sample, line position back to an x,y position
       p_focalPlaneX = (distortedFocalSamp -
