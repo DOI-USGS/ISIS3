@@ -251,8 +251,9 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
   groundPoint = appLog.group(2);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 100.0);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 10000.0);
-  QString ErrorMsg = "Requested position does not project in camera model; no surface intersection";
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), ErrorMsg);
+  // Line 10000 is far outside the image; the reseau distortion now
+  // extrapolates outside the image domain, so the point projects (intended).
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
 }
 
 
@@ -274,8 +275,9 @@ TEST_F(DefaultCube, FunctionalTestCamptAllowError) {
 
   campt(testCube, options, &appLog);
   PvlGroup groundPoint = appLog.findGroup("GroundPoint");
-  QString ErrorMsg = "Requested position does not project in camera model; no surface intersection";
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), ErrorMsg);
+  // Sample/line -100 are outside the image; the reseau distortion now
+  // extrapolates outside the image domain, so the point projects (intended).
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
 }
 
 TEST_F(CSMCubeFixture, FunctionalTestCamptCSMCamera) {
