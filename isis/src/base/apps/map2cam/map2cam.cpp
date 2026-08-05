@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "IException.h"
 #include "ProcessRubberSheet.h"
 #include "TProjection.h"
 #include "UserInterface.h"
@@ -23,6 +24,16 @@ namespace Isis{
     QString fname = ui.GetCubeName("MATCH");
     Isis::CubeAttributeInput &inputAtt = ui.GetInputAttribute("MATCH");
     mcube = p.SetInputCube(fname, inputAtt);
+
+    // Require a single-band MATCH
+    if (mcube->bandCount() > 1) {
+      QString msg = "The MATCH cube [" + fname + "] has ["
+                    + toString(mcube->bandCount()) + "] bands. map2cam reprojects "
+                    "every band of the FROM cube into the geometry of a single "
+                    "MATCH band, so the MATCH cube must have exactly one band.";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
     outcam = mcube->camera();
 
     // Open the input projection cube and get the projection information
@@ -49,7 +60,7 @@ namespace Isis{
     rub.SetOutputCube(fname, outputAtt,
                       transform->OutputSamples(),
                       transform->OutputLines(),
-                      mcube->bandCount());
+                      icube->bandCount());
     rub.PropagateLabels(match.expanded());
     rub.PropagateTables(match.expanded());
 
@@ -127,6 +138,8 @@ namespace Isis{
   }
 
   void BandChange(const int band) {
-    outcam->SetBand(band);
+    // Clamp the requested band to the MATCH band range
+    int cameraBand = (band <= mcube->bandCount()) ? band : mcube->bandCount();
+    outcam->SetBand(cameraBand);
   }
 }
