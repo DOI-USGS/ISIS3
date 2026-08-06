@@ -88,16 +88,10 @@ namespace Isis {
     double focalLine = dy / p_pixelPitch +
                        p_camera->FocalPlaneMap()->DetectorLineOrigin();
 
-    // The local affine fit is anchored at a query point clamped to the distorted
-    // image box. Inside the image the query equals the input point, so the result
-    // is identical to before. Outside the image the query slides onto the nearest
-    // box edge, so the five closest reseaus always form a two dimensional
-    // neighborhood (never colinear) and yield a well conditioned affine. That
-    // affine is then evaluated at the true input point below, which extrapolates
-    // the distortion smoothly and linearly past the image edges. This lets ground
-    // points that project just off the sensor still return a usable focal plane
-    // position, as needed by bundle adjustment and map projection, instead of a
-    // hard failure at the image boundary.
+    // Anchor the local affine fit at a query point clamped to the image box, then
+    // evaluate that fit at the true point. Inside the box this is unchanged.
+    // Outside, the fit stays well conditioned and extrapolates the distortion
+    // smoothly past the edges instead of rejecting the point.
     double querySamp = focalSamp;
     double queryLine = focalLine;
     if(querySamp < 0.5) querySamp = 0.5;
@@ -171,10 +165,8 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
-      // Evaluate the fitted affine at the true input point. Inside the image this
-      // is the usual interpolation. Outside, since the query was clamped to the
-      // box edge while the evaluation point is the true (off image) location, the
-      // affine is extrapolated smoothly rather than rejected.
+      // Evaluate the fit at the true input point (interpolation inside the box,
+      // smooth extrapolation outside).
       known[1] = focalSamp;
       known[2] = focalLine;
 
@@ -215,12 +207,9 @@ namespace Isis {
     double undistortedFocalSamp = ux / p_pixelPitch + p_undistortedSamps / 2.0;
     double undistortedFocalLine = uy / p_pixelPitch + p_undistortedLines / 2.0;
 
-    // Clamp a query point to the undistorted image box. Inside the image the
-    // query equals the input point, so the result is unchanged. Outside, the
-    // query slides onto the nearest box edge so the five closest reseaus form a
-    // two dimensional neighborhood and the fitted affine is well conditioned. It
-    // is evaluated at the true input point below, extrapolating smoothly past the
-    // image edges rather than rejecting the point. See SetFocalPlane for details.
+    // Clamp a query point to the image box for the fit, then evaluate at the true
+    // point, extrapolating smoothly outside rather than rejecting it. See
+    // SetFocalPlane for details.
     double querySamp = undistortedFocalSamp;
     double queryLine = undistortedFocalLine;
     if(querySamp < 0.5) querySamp = 0.5;
@@ -295,10 +284,8 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
-      // Evaluate the fitted affine at the true input point. Inside the image this
-      // is the usual interpolation. Outside, the query was clamped to the box edge
-      // while the evaluation point is the true (off image) location, so the affine
-      // is extrapolated smoothly rather than rejected.
+      // Evaluate the fit at the true input point (interpolation inside the box,
+      // smooth extrapolation outside).
       known[1] = undistortedFocalSamp;
       known[2] = undistortedFocalLine;
 
