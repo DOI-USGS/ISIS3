@@ -1423,6 +1423,12 @@ namespace Isis {
       m_multiplier = (max - min) / (x2 - x1);
       m_base = min - m_multiplier * x1;
     }
+    else if (m_pixelType == Real) {
+      x1 = VALID_MIN4;
+      x2 = VALID_MAX4;
+      m_multiplier = (max - min) / (x2 - x1);
+      m_base = min - m_multiplier * x1;
+    }
   }
 
 

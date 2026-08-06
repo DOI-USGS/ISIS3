@@ -1361,13 +1361,21 @@ namespace Isis {
 
             double &bufferVal = buffersDoubleBuf[bufferIndex];
 
-            if(m_pixelType == Real) {
+            if (m_pixelType == Double) {
+              double raw = ((double *)chunkBuf)[chunkIndex];
+              if(m_byteSwapper)
+                raw = m_byteSwapper->Double(&raw);
+
+              bufferVal = (double)raw;
+            }
+
+            else if(m_pixelType == Real) {
               float raw = ((float *)chunkBuf)[chunkIndex];
               if(m_byteSwapper)
                 raw = m_byteSwapper->Float(&raw);
 
               if(raw >= VALID_MIN4) {
-                bufferVal = (double) raw;
+                bufferVal = ((double)raw) * m_multiplier + m_base;
               }
               else {
                 if(raw == NULL4)
@@ -1412,7 +1420,6 @@ namespace Isis {
 
               ((short *)buffersRawBuf)[bufferIndex] = raw;
             }
-
 
             else if(m_pixelType == UnsignedWord) {
               unsigned short raw = ((unsigned short *)chunkBuf)[chunkIndex];
@@ -1562,7 +1569,13 @@ namespace Isis {
 
             double bufferVal = buffersDoubleBuf[bufferIndex];
 
-            if(m_pixelType == Real) {
+            if (m_pixelType == Double) {
+              double raw = bufferVal;
+              ((double *)chunkBuf)[chunkIndex] =
+                  m_byteSwapper ? m_byteSwapper->Double(&raw) : raw;
+            }
+
+            else if(m_pixelType == Real) {
               float raw = 0;
 
               if(bufferVal >= VALID_MIN8) {
@@ -1689,7 +1702,6 @@ namespace Isis {
 
             }
 
-
             else if(m_pixelType == UnsignedWord) {
               unsigned short raw;
 
@@ -1734,6 +1746,7 @@ namespace Isis {
               ((unsigned short *)chunkBuf)[chunkIndex] =
                   m_byteSwapper ? m_byteSwapper->UnsignedShortInt(&raw) : raw;
             }
+
             else if(m_pixelType == UnsignedByte) {
               unsigned char raw;
 
