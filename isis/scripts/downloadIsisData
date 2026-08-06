@@ -13,11 +13,12 @@ from os import path
 from collections import OrderedDict
 from pathlib import Path
 import sys
-import re
 
-# priority is: lowest index is highest priority 
-filter_list = [
-        '+ calibration/**', # we generally want everything in calibration 
+# priority is: lowest index is highest priority
+
+# de-centralized upstream kernel mirrors carry a lot of data ISIS does not need
+KERNEL_FILTERS = [
+        '+ calibration/**', # we generally want everything in calibration
         '- source/',
         '- /a_older_versions/',
         '- /former_versions/',
@@ -31,12 +32,12 @@ filter_list = [
         '- ck/save/',
         '- spk/SAVE_SCS_2017-11-22/',
         '- spk/spk_psp_rec*',
-        '- release*/', 
+        '- release*/',
         '- Archive/',
         '- ek/',
         '- *.lbl',
         '- *.txt',
-        '- *.log', 
+        '- *.log',
         '- *.temp',
         '- *.history',
         '- misc/',
@@ -48,6 +49,28 @@ filter_list = [
         '- old/**',
         '- SpecialProducts/**'
     ]
+
+TESTDATA_FILTERS = [
+        '- print.prt',
+        '- ~?'
+    ]
+
+CURATED_FILTERS = [
+        '- *.log',
+        '- *.temp',
+        '- *.history'
+    ]
+
+FILTER_MAP = {
+        'isistestdata': TESTDATA_FILTERS,
+        'base': CURATED_FILTERS,
+        'legacybase': CURATED_FILTERS,
+        'control': CURATED_FILTERS
+    }
+
+
+def filters_for(mission_name):
+    return list(FILTER_MAP.get(mission_name, KERNEL_FILTERS))
 
 def find_conf():
     local_path = Path("rclone.conf")
@@ -89,8 +112,6 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
             # this is probably a config file on disk so pass it through
             config_path = config
 
-            for arg in extra_args:
-                arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
             command_with_args = ["rclone", command, f'--config={config_path}', *extra_args]
             log.debug("Invoking : %s", " ".join(command_with_args))
             return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
@@ -105,8 +126,6 @@ def rclone(command, config=None, extra_args=[], redirect_stdout=True, redirect_s
 
                 f.write(config.encode())
 
-                for arg in extra_args:
-                    arg = re.sub(r'--filter=- ([^ ]+)', r'--filter="- \1"', arg)
                 command_with_args = ["rclone", command, f"--config={config_path}", *extra_args]
                 return call_subprocess(command_with_args, redirect_stdout, redirect_stderr)
     except ProcessLookupError as not_found_e:
@@ -138,26 +157,23 @@ def create_rclone_arguments(destination, mission_name, parsedArgs, rclone_kwargs
 
     destination = os.path.join(destination, str(mission_dir_name))
 
-    if args.filter: 
-        filters = [f"- {arg}" for arg in args.filters]
-        filter_list.extend(filters)    
+    filter_list = filters_for(mission_name)
+
+    if args.filter:
+        filter_list.extend(f"- {arg}" for arg in args.filter)
 
     # Check for additional include and exclude flags
     if args.include:
-        includes = [f"+ {arg}" for arg in args.include]
-        filter_list.extend(includes)
+        filter_list.extend(f"+ {arg}" for arg in args.include)
 
-    if args.exclude: 
-        excludes = [f"- {arg}" for arg in args.exclude]
-        filter_list.extend(excludes)    
+    if args.exclude:
+        filter_list.extend(f"- {arg}" for arg in args.exclude)
 
     if args.no_kernels:
-        excludes = [f"- {arg}" for arg in ['ck/**','ek/**','fk/**','ik/**','iak/**','lsk/**','mk/**','pck/**','sclk/**','spk/**','tspk/**','dsk/**']]
-        filter_list.extend(excludes)
-        
+        filter_list.extend(f"- {arg}" for arg in ['ck/**','ek/**','fk/**','ik/**','iak/**','lsk/**','mk/**','pck/**','sclk/**','spk/**','tspk/**','dsk/**'])
 
-    # we need to add this to the end  
-    if args.include: 
+    # we need to add this to the end
+    if args.include:
         filter_list.append("- *")
 
     filter_args = [f'--filter={item}' for item in filter_list]
@@ -211,13 +227,14 @@ def main(mission, dest, cfg_path, parsedArgs, kwargs):
 
     if(mission.upper() == "ALL"):
         supported_missions.remove("legacybase")
+        # test data is opt-in, it is ~19 GiB
         supported_missions.remove("isistestdata")
         for mission in supported_missions:
-            args = create_rclone_arguments(dest, mission, parsedArgs, kwargs)
-            rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+            rclone_args = create_rclone_arguments(dest, mission, parsedArgs, kwargs)
+            rclone(command=parsedArgs.command, extra_args=rclone_args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
     else:
-        args = create_rclone_arguments(dest, mission,  parsedArgs, kwargs)
-        rclone(command=parsedArgs.command, extra_args=args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
+        rclone_args = create_rclone_arguments(dest, mission,  parsedArgs, kwargs)
+        rclone(command=parsedArgs.command, extra_args=rclone_args, config=cfg_path, redirect_stdout=False, redirect_stderr=False)
 
 if __name__ == '__main__':
     usageString = "usage: downloadIsisData mission dest [-h] [-v] [-n NUM_TRANSFERS] [--config CONFIG] [rclone flags]"
@@ -240,7 +257,10 @@ if __name__ == '__main__':
         $ downloadIsisData all $ISISDATA --dry-run --no-kernels -vv
         
         # download only cks and fks
-        $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}" 
+        $ downloadIsisData all $ISISDATA --include="{ck/**,fk/**}"
+
+        # download app test data, not included in "all" as it is ~19 GiB
+        $ downloadIsisData isistestdata $ISISTESTDATA
     ''')
     parser = argparse.ArgumentParser(description = helpString,formatter_class=argparse.RawDescriptionHelpFormatter, usage=usageString)
     parser.add_argument('mission', help='mission for files to be downloaded. Use "all" to download everything, "legacybase" to download base data for ISIS<4.1.0.')
