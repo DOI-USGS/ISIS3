@@ -94,6 +94,9 @@
           using the MOLA base as the FROM file and a MOC Wide Angle Red cube
           as the MATCH, will have labels which indicate geometry for the MOC
           WA red camera but the pixels will contain MOLA elevations.
+          The MATCH cube must be single-band. All bands of the FROM cube are
+          projected into the geometry of this single band, producing an output
+          with the same number of bands as the FROM cube.
         </description>
         <filter>
           *.cub

@@ -5,6 +5,7 @@
 
 #include "Cube.h"
 #include "CubeAttribute.h"
+#include "IException.h"
 #include "PixelType.h"
 #include "Pvl.h"
 #include "PvlGroup.h"
@@ -29,4 +30,20 @@ TEST_F(DefaultCube, FunctionalTestMap2camTest) {
 
   ASSERT_TRUE(ocube.label()->findObject("IsisCube").hasGroup("Kernels"));
   ASSERT_FALSE(ocube.label()->findObject("IsisCube").hasGroup("Mapping"));
+}
+
+TEST_F(DefaultCube, FunctionalTestMap2camMultiBandMatchError) {
+  // a multi-band MATCH cube is not supported and should produce a user errorExpand commentComment on line R40Resolved
+  resizeCube(testCube->sampleCount(), testCube->lineCount(), 3);
+
+  QVector<QString> args = {"from="+projTestCube->fileName(), "match="+testCube->fileName(), "to="+tempDir.path()+"/level1.cub"};
+  UserInterface ui(APP_XML, args);
+
+  try {
+    map2cam_f(ui);
+    FAIL() << "Expected an exception for a multi-band MATCH cube";
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), testing::HasSubstr("MATCH cube must have exactly one band"));
+  }
 }
