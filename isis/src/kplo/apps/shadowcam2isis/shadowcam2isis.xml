@@ -12,9 +12,12 @@
   </description>
 
   <history>
-      <change name="Victor Silva" date="2022-06-25">
-          Original Version
-      </change>
+    <change name="Victor Silva" date="2022-06-25">
+        Original Version
+    </change>
+    <change name="Jacob Cain" date="2026-08-06">
+        Added examples, clarified KEEPSPECIALPIXEL description.
+    </change>
   </history>
 
   <category>
