@@ -6,6 +6,11 @@ find files of those names at the top level of this repository. **/
 
 /* SPDX-License-Identifier: CC0-1.0 */
 
+#include <algorithm>
+#include <climits>
+#include <cmath>
+#include <vector>
+
 #include <QtGlobal>
 #include <QString>
 #include <QSharedPointer>
@@ -75,8 +80,13 @@ cv::Size GenericTransform::getSize(const cv::Mat &image) const {
 
 /** Transform the image matrix using the matrix and size constraints */
 cv::Mat GenericTransform::render(const cv::Mat &image) const {
+  cv::Size dstSize = getSize(image);
+  if ( isTileable(image.size(), dstSize) ) {
+    return ( renderTiled(image, dstSize) );
+  }
+
   cv::Mat result;
-  warpPerspective(image, result, getMatrix(), getSize(image),
+  warpPerspective(image, result, getMatrix(), dstSize,
                   cv::INTER_LINEAR);
 #if 0
   // Gots to be run in the GUI in order for this to work!!
@@ -91,6 +101,104 @@ cv::Mat GenericTransform::render(const cv::Mat &image) const {
 #endif
   return ( result );
 }
+
+
+/**
+ * @brief Determine if a warp must be rendered in tiles
+ *
+ * OpenCV's warpPerspective asserts that all source and destination dimensions
+ * are less than SHRT_MAX. Warps that exceed this must be rendered a tile at a
+ * time.
+ *
+ * @param srcSize Size of the source image
+ * @param dstSize Size of the desired output image
+ *
+ * @return bool True if the warp exceeds the OpenCV size limit
+ */
+bool GenericTransform::isTileable(const cv::Size &srcSize,
+                                  const cv::Size &dstSize) {
+  return ( (srcSize.width  >= SHRT_MAX) || (srcSize.height >= SHRT_MAX) ||
+           (dstSize.width  >= SHRT_MAX) || (dstSize.height >= SHRT_MAX) );
+}
+
+
+/**
+ * @brief Render a warp too large for OpenCV as a set of independent tiles
+ *
+ * Each destination tile is warped from only the source region that maps into
+ * it, so no single warpPerspective call exceeds the OpenCV size limit. The
+ * result is identical to a single warp of the full image.
+ *
+ * @param image   Image to transform
+ * @param dstSize Size of the desired output image
+ *
+ * @return cv::Mat The transformed image
+ */
+cv::Mat GenericTransform::renderTiled(const cv::Mat &image,
+                                      const cv::Size &dstSize) const {
+  cv::Mat result = cv::Mat::zeros(dstSize, image.type());
+
+  std::vector<cv::Rect> tiles;
+  for (int y = 0 ; y < dstSize.height ; y += m_tileSize) {
+    for (int x = 0 ; x < dstSize.width ; x += m_tileSize) {
+      tiles.push_back(cv::Rect(x, y,
+                               std::min(m_tileSize, dstSize.width  - x),
+                               std::min(m_tileSize, dstSize.height - y)));
+    }
+  }
+
+  // Tiles write to disjoint regions of a preallocated result, so no locking
+  cv::parallel_for_(cv::Range(0, (int) tiles.size()),
+                    [&](const cv::Range &range) {
+    for (int i = range.start ; i < range.end ; i++) {
+      renderTile(image, result, tiles[i]);
+    }
+  });
+
+  return ( result );
+}
+
+
+/**
+ * @brief Warp the source region that maps into a single destination tile
+ *
+ * @param image  Image to transform
+ * @param result Preallocated output image the tile is written to
+ * @param tile   Region of the output image to render
+ */
+void GenericTransform::renderTile(const cv::Mat &image, cv::Mat &result,
+                                  const cv::Rect &tile) const {
+  std::vector<cv::Point2f> dst, src;
+  dst.push_back(cv::Point2f(tile.x, tile.y));
+  dst.push_back(cv::Point2f(tile.x + tile.width, tile.y));
+  dst.push_back(cv::Point2f(tile.x + tile.width, tile.y + tile.height));
+  dst.push_back(cv::Point2f(tile.x, tile.y + tile.height));
+  perspectiveTransform(dst, src, getInverse());
+
+  float xmin(src[0].x), xmax(src[0].x), ymin(src[0].y), ymax(src[0].y);
+  for (unsigned int i = 1 ; i < src.size() ; i++) {
+    xmin = std::min(xmin, src[i].x);
+    xmax = std::max(xmax, src[i].x);
+    ymin = std::min(ymin, src[i].y);
+    ymax = std::max(ymax, src[i].y);
+  }
+
+  // Pad for the interpolation kernel and clamp to the source image
+  const int pad = 2;
+  int x0 = std::max((int) std::floor(xmin) - pad, 0);
+  int y0 = std::max((int) std::floor(ymin) - pad, 0);
+  int x1 = std::min((int) std::ceil(xmax)  + pad, image.cols);
+  int y1 = std::min((int) std::ceil(ymax)  + pad, image.rows);
+  if ( (x1 <= x0) || (y1 <= y0) )  return;
+
+  cv::Mat tmatrix = ImageTransform::translation(-tile.x, -tile.y) *
+                    getMatrix() * ImageTransform::translation(x0, y0);
+
+  cv::Mat tileResult = result(tile);
+  warpPerspective(image(cv::Rect(x0, y0, x1-x0, y1-y0)), tileResult, tmatrix,
+                  tile.size(), cv::INTER_LINEAR);
+}
+
 
 /**
  * @brief Compute the forward transform of a point
