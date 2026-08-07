@@ -29,4 +29,8 @@ TEST_F(DefaultCube, FunctionalTestMap2camTest) {
 
   ASSERT_TRUE(ocube.label()->findObject("IsisCube").hasGroup("Kernels"));
   ASSERT_FALSE(ocube.label()->findObject("IsisCube").hasGroup("Mapping"));
+
+  // test multi-band
+  ASSERT_GT(projTestCube->bandCount(), 1);
+  EXPECT_EQ(ocube.bandCount(), projTestCube->bandCount());
 }
