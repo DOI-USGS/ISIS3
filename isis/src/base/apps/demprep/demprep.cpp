@@ -60,15 +60,27 @@ namespace Isis{
       throw IException(IException::User, message, _FILEINFO_);
     }
 
+    double datum_radius_base = 0.0;
+    if ( ui.WasEntered("SPHERICALDATUMRADIUS") ) {
+      if (icube->base() != 0.0 || icube->multiplier() != 1.0) {
+        QString msg = "The input file [" + ui.GetCubeName("TO") + "] has a none zero base value "
+                      "[" + QString::number(icube->base()) + "]. Updating base to a new Radius will create inaccurate DNs. "
+                      "It's likely that the input data should be reprocessed to have a base of 0.0 and "
+                      "a multiplyer of 1.0";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      datum_radius_base = ui.GetDouble("SPHERICALDATUMRADIUS");
+    }
+
     if(!proj->IsEquatorialCylindrical()) {
       CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
       ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(GetStats);
 
-      PvlGroup demRange("Results");
-      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum()), "meters");
-      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum()), "meters");
-      Application::Log(demRange);
+      PvlGroup demRange("Input Results");
+      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum() + datum_radius_base), "meters");
+      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum() + datum_radius_base), "meters");
+      Application::AppendAndLog(demRange, log);
 
       // Store min/max radii values in new ShapeModelStatistics table
       QString shp_name = "ShapeModelStatistics";
@@ -81,9 +93,9 @@ namespace Isis{
 
       Table table(shp_name,record);
 
-      record[0] = Distance(inCubeStats.Minimum(),
+      record[0] = Distance(inCubeStats.Minimum() + datum_radius_base,
                            Distance::Meters).kilometers();
-      record[1] = Distance(inCubeStats.Maximum(),
+      record[1] = Distance(inCubeStats.Maximum() + datum_radius_base,
                            Distance::Meters).kilometers();
       table += record;
 
@@ -248,6 +260,7 @@ namespace Isis{
 
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+
     // Make sure everything is propagated and closed
     p.EndProcess();
 
@@ -263,10 +276,17 @@ namespace Isis{
     // Update mapping grp
     ocube->putGroup(mapgrp);
 
-    PvlGroup demRange("Results");
-    demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum()), "meters");
-    demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum()), "meters");
-    Application::Log(demRange);
+    if (ui.WasEntered("SPHERICALDATUMRADIUS")) {
+      PvlObject &ocore = ocube->label()->findObject("IsisCube").findObject("Core");
+      PvlGroup &pixelGroup = ocore.findGroup("Pixels");
+      pixelGroup.findKeyword("Base")[0] = QString::number(datum_radius_base);
+      pixelGroup.findKeyword("Multiplier")[0] = "1.0";
+    }
+    
+    PvlGroup demRange("Output Results");
+    demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum() + datum_radius_base), "meters");
+    demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum() + datum_radius_base), "meters");
+    Application::AppendAndLog(demRange, log);
 
     // Store min/max radii values in new ShapeModelStatistics table
     QString shp_name = "ShapeModelStatistics";
@@ -279,9 +299,9 @@ namespace Isis{
 
     Table table(shp_name,record);
 
-    record[0] = Distance(outCubeStats.Minimum(),
+    record[0] = Distance(outCubeStats.Minimum() + datum_radius_base,
                          Distance::Meters).kilometers();
-    record[1] = Distance(outCubeStats.Maximum(),
+    record[1] = Distance(outCubeStats.Maximum() + datum_radius_base,
                          Distance::Meters).kilometers();
     table += record;
 
@@ -313,14 +333,12 @@ namespace Isis{
       for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
         int inputIndex = outputIndex - leftPad;
         if(inputIndex < 0) {
-          inputLineStats.AddData(in[inputIndex + inputSize]);
+          inputIndex += inputSize;
         }
-        else if(inputIndex < inputSize) {
-          inputLineStats.AddData(in[inputIndex]);
+        else if(inputIndex >= inputSize) {
+          inputIndex -= inputSize;
         }
-        else {
-          inputLineStats.AddData(in[inputIndex - inputSize]);
-        }
+        inputLineStats.AddData(in[inputIndex]);
       }
     }
 
@@ -329,27 +347,17 @@ namespace Isis{
       double average = inputLineStats.Average(); //may be Isis::NULL8
       for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
         int inputIndex = outputIndex - leftPad;
+        if(inputIndex < 0) {
+          inputIndex += inputSize;
+        }
+        else if(inputIndex >= inputSize) {
+          inputIndex -= inputSize;
+        }
         if (average == Isis::NULL8) {
-          if(inputIndex < 0) {
-            outMan[outputIndex] = in[inputIndex + inputSize];
-          }
-          else if(inputIndex < inputSize) {
-            outMan[outputIndex] = in[inputIndex];
-          }
-          else {
-            outMan[outputIndex] = in[inputIndex - inputSize];
-          }
+          outMan[outputIndex] = in[inputIndex];
         }
         else {
-          if(inputIndex < 0) {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
-          }
-          else if(inputIndex < inputSize) {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex];
-          }
-          else {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
-          }
+          outMan[outputIndex] = 2.0 * average - in[inputIndex];
         }
       }
       outMan.SetLine(1);

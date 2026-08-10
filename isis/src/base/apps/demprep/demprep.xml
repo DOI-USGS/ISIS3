@@ -95,5 +95,11 @@
         </filter>
       </parameter>
     </group>
+    <group name="Height Parameters">
+      <parameter name="SPHERICALDATUMRADIUS">
+        <type>double</type>
+        <default><item>0.0</item></default>
+      </parameter>
+    </group>
   </groups>
 </application>
