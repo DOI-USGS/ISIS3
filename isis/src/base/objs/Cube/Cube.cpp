@@ -312,10 +312,7 @@ namespace Isis {
       }
 
       if (newFileAttributes.propagateMinimumMaximum()) {
-        if(result->pixelType() == Isis::Real) {
-          result->setBaseMultiplier(0.0, 1.0);
-        }
-        else if(result->pixelType() >= pixelType()) {
+        if(result->pixelType() >= pixelType()) {
           result->setBaseMultiplier(base(), multiplier());
         }
         else {
