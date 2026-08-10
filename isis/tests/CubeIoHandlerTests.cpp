@@ -152,6 +152,20 @@ TEST_P(IsisDNTypeGenerator, CubeIoTestsReadWrite) {
         EXPECT_EQ(brickDoubleBuff[3], NULL8);
         EXPECT_EQ(brickDoubleBuff[4], NULL8);
     }
+    else if (pixelType == UnsignedWord) {
+        EXPECT_EQ(brickDoubleBuff[0], 65534);
+        EXPECT_EQ(brickDoubleBuff[1], 65535);
+        EXPECT_EQ(brickDoubleBuff[2], LOW_INSTR_SAT8);
+        EXPECT_EQ(brickDoubleBuff[3], LOW_REPR_SAT8);
+        EXPECT_EQ(brickDoubleBuff[4], NULL8);
+    }
+    else if (pixelType == UnsignedInteger) {
+        EXPECT_EQ(brickDoubleBuff[0], 4294967294);
+        EXPECT_EQ(brickDoubleBuff[1], 4294967295);
+        EXPECT_EQ(brickDoubleBuff[2], LOW_INSTR_SAT8);
+        EXPECT_EQ(brickDoubleBuff[3], LOW_REPR_SAT8);
+        EXPECT_EQ(brickDoubleBuff[4], NULL8);
+    }
     else {
         EXPECT_EQ(brickDoubleBuff[0], HIGH_INSTR_SAT8);
         EXPECT_EQ(brickDoubleBuff[1], HIGH_REPR_SAT8);
