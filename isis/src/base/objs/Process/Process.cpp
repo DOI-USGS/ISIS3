@@ -355,13 +355,8 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
       }
 
       if(att.propagateMinimumMaximum()) {
-        if(cube->pixelType() == Isis::Real) {
+        if(InputCubes.size() == 0) {
           cube->setBaseMultiplier(0.0, 1.0);
-        }
-        else if(InputCubes.size() == 0) {
-          QString msg = "You told me to propagate base/multiplier from input to output";
-          msg += " cube but there are no input cubes loaded";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         else if(cube->pixelType() >= InputCubes[0]->pixelType()) {
           double base = InputCubes[0]->base();

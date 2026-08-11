@@ -760,7 +760,8 @@ namespace Isis {
     setLabelsAttached(att.labelAttachment());
     if (!att.propagatePixelType())
       setPixelType(att.pixelType());
-    setMinMax(att.minimum(), att.maximum());
+    if (!att.propagateMinimumMaximum())
+      setMinMax(att.minimum(), att.maximum());
 
     // Allocate the cube
     create(cubeFileName);
@@ -1421,10 +1422,14 @@ namespace Isis {
       m_base = min - m_multiplier * x1;
     }
     else if (m_pixelType == Real) {
-      x1 = VALID_MIN4;
-      x2 = VALID_MAX4;
-      m_multiplier = (max - min) / (x2 - x1);
-      m_base = min - m_multiplier * x1;
+      // Apply this conversion to ensure the MIN and MAX do not
+      // retain floating point error
+      x1 = Isis::toDouble(Isis::toString(Isis::VALID_MIN4));
+      x2 = Isis::toDouble(Isis::toString(Isis::VALID_MAX4));
+      if (min < x1 || max > x2) {
+        m_multiplier = (max - min) / (x2 - x1);
+        m_base = min - m_multiplier * x1;
+      }
     }
   }
 
