@@ -73,24 +73,15 @@ TEST_F(Dsk2isisDefault, FunctionalTestDsk2isisGridMethod) {
   QString dskFile = testDataPath("hay_a_amica_5_itokawashape_v1_0_64q.bds");
   QString outputCube = tempDir.path() + "/dsk_grid_output.cub";
 
-  // Run dsk2isis as subprocess to avoid NAIF global state issues
-  QString dsk2isisApp = FileName("$ISISROOT/bin/dsk2isis").expanded();
-  QStringList args;
-  args << "from=" + dskFile
-       << "map=" + mapFile
-       << "to=" + outputCube
-       << "method=GRID";
+  QVector<QString> args = {"from="+dskFile, "map=" + mapFile, "to="+outputCube, "method=GRID"};
 
-  QProcess dsk2isis;
-  dsk2isis.setProgram(dsk2isisApp);
-  dsk2isis.setArguments(args);
-  dsk2isis.start();
-  bool finished = dsk2isis.waitForFinished(60000); // 60 second timeout
-
-  ASSERT_TRUE(finished) << "dsk2isis did not finish within timeout";
-  EXPECT_EQ(dsk2isis.exitCode(), 0) << "dsk2isis failed with exit code: " << dsk2isis.exitCode()
-                                     << "\nStderr: " << dsk2isis.readAllStandardError().toStdString();
-
+  UserInterface options(APP_XML, args);
+  try {
+    dsk2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to convert dsk to dem: " <<e.toString().toStdString().c_str() << std::endl;
+  }
   // Verify output cube was created and has expected properties
   Cube output(outputCube);
   EXPECT_GT(output.sampleCount(), 0);
