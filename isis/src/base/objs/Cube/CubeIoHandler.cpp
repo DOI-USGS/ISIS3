@@ -1367,6 +1367,8 @@ namespace Isis {
                 raw = m_byteSwapper->Double(&raw);
 
               bufferVal = (double)raw;
+
+              ((double *)buffersRawBuf)[bufferIndex] = raw;
             }
 
             else if(m_pixelType == Real) {
