@@ -313,7 +313,7 @@ namespace Isis {
 
       if (newFileAttributes.propagateMinimumMaximum()) {
         if(result->pixelType() > pixelType()) {
-          // If we are an integer type, directly apply the base and multiplier
+          // If we are translating between integer types, directly apply the base and multiplier
           if (isIntegerType(result->pixelType())) {
             result->setBaseMultiplier(base(), multiplier());
           }
