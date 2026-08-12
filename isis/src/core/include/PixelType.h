@@ -38,6 +38,16 @@ namespace Isis {
     Double
   };
 
+  inline bool isIntegerType(Isis::PixelType pixelType) {
+    if(pixelType == Isis::UnsignedByte) return true;
+    if(pixelType == Isis::SignedByte) return true;
+    if(pixelType == Isis::UnsignedWord) return true;
+    if(pixelType == Isis::SignedWord) return true;
+    if(pixelType == Isis::UnsignedInteger) return true;
+    if(pixelType == Isis::SignedInteger) return true;
+    return false;
+  }
+
   /**
    * Returns the number of bytes of the specified PixelType
    *

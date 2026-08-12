@@ -358,12 +358,26 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
         if(InputCubes.size() == 0) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
-        else if(cube->pixelType() >= InputCubes[0]->pixelType()) {
+        else if(cube->pixelType() > InputCubes[0]->pixelType()) {
+          // If we are an integer type, directly apply the base and multiplier
+          if (isIntegerType(cube->pixelType())) {
+            double base = InputCubes[0]->base();
+            double mult = InputCubes[0]->multiplier();
+            cube->setBaseMultiplier(base, mult);
+          }
+          // Going from integer type to float32/64, make the assumption that
+          // float32/64 can handle the data with the default base and multiplier
+          else {
+            cube->setBaseMultiplier(0.0, 1.0);
+          }
+        }
+        else if (cube->pixelType() == InputCubes[0]->pixelType()) {
           double base = InputCubes[0]->base();
           double mult = InputCubes[0]->multiplier();
           cube->setBaseMultiplier(base, mult);
         }
-        else if((cube->pixelType() != Isis::Real) &&
+        else if((cube->pixelType() != Isis::Double) &&
+                (cube->pixelType() != Isis::Real) &&
                 (cube->pixelType() != Isis::UnsignedByte) &&
                 (cube->pixelType() != Isis::UnsignedWord) &&
                 (cube->pixelType() != Isis::SignedWord) &&

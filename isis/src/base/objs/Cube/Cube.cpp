@@ -312,8 +312,19 @@ namespace Isis {
       }
 
       if (newFileAttributes.propagateMinimumMaximum()) {
-        if(result->pixelType() >= pixelType()) {
-          result->setBaseMultiplier(base(), multiplier());
+        if(result->pixelType() > pixelType()) {
+          // If we are an integer type, directly apply the base and multiplier
+          if (isIntegerType(result->pixelType())) {
+            result->setBaseMultiplier(base(), multiplier());
+          }
+          // Going from integer to float32/64 or float32 to float64, make the assumption that
+          // float32/64 can handle the data with the default base and multiplier
+          else {
+            result->setBaseMultiplier(0.0, 1.0);
+          }
+        }
+        else if (result->pixelType() == pixelType()) {
+            result->setBaseMultiplier(base(), multiplier());
         }
         else {
           QString msg =
