@@ -312,19 +312,15 @@ namespace Isis {
       }
 
       if (newFileAttributes.propagateMinimumMaximum()) {
-        if(result->pixelType() > pixelType()) {
-          // If we are translating between integer types, directly apply the base and multiplier
-          if (isIntegerType(result->pixelType())) {
-            result->setBaseMultiplier(base(), multiplier());
-          }
-          // Going from integer to float32/64 or float32 to float64, make the assumption that
-          // float32/64 can handle the data with the default base and multiplier
-          else {
+        // For new cubes created as float32 or float64, make the assumption that
+        // float32/64 can handle the data with the default base and multiplier
+        // Even if the data being copied has a base and multiplier (legacy behavior)
+        if (!isIntegerType(result->pixelType())) {
             result->setBaseMultiplier(0.0, 1.0);
-          }
         }
-        else if (result->pixelType() == pixelType()) {
-            result->setBaseMultiplier(base(), multiplier());
+        // If we are translating between integer types, directly apply the base and multiplier
+        else if(result->pixelType() >= pixelType()) {
+          result->setBaseMultiplier(base(), multiplier());
         }
         else {
           QString msg =

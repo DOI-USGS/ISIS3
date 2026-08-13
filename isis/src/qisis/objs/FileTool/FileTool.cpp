@@ -569,18 +569,23 @@ namespace Isis {
       }
 
       if (outAtt.propagateMinimumMaximum()) {
-        if (ocube->pixelType() == Real) {
-          ocube->setBaseMultiplier(0.0, 1.0);
+        // For new cubes created as float32 or float64, make the assumption that
+        // float32/64 can handle the data with the default base and multiplier
+        // Even if the data being copied has a base and multiplier (legacy behavior)
+        if (!isIntegerType(ocube->pixelType())) {
+            ocube->setBaseMultiplier(0.0, 1.0);
         }
-        else if (ocube->pixelType() >= icube->pixelType()) {
+        // If we are translating between integer types, directly apply the base and multiplier
+        else if(ocube->pixelType() >= icube->pixelType()) {
           double base = icube->base();
           double mult = icube->multiplier();
           ocube->setBaseMultiplier(base, mult);
         }
-        else if ((ocube->pixelType() != Real) &&
-                (ocube->pixelType() != UnsignedByte) &&
-                (ocube->pixelType() != SignedWord) &&
-                (ocube->pixelType() != UnsignedWord) &&
+        else if((ocube->pixelType() != Isis::Double) &&
+                (ocube->pixelType() != Isis::Real) &&
+                (ocube->pixelType() != Isis::UnsignedByte) &&
+                (ocube->pixelType() != Isis::SignedWord) &&
+                (ocube->pixelType() != Isis::UnsignedWord) &&
                 (ocube->pixelType() != Isis::UnsignedInteger) &&
                 (ocube->pixelType() != Isis::SignedInteger)) {
           QString msg = "Looks like your refactoring to add different pixel types";

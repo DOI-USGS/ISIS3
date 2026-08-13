@@ -1377,7 +1377,7 @@ namespace Isis {
                 raw = m_byteSwapper->Float(&raw);
 
               if(raw >= VALID_MIN4) {
-                bufferVal = ((double)raw) * m_multiplier + m_base;
+                bufferVal = (double)(raw * m_multiplier + m_base);
               }
               else {
                 if(raw == NULL4)

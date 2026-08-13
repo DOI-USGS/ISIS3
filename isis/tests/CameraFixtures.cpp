@@ -143,6 +143,7 @@ namespace Isis {
     LineManager line(*demCube);
     double pixelValue;
     double base = demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"];
+    demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"] = toString((int)0);
     double xPos = 0.0;
 
     for(line.begin(); !line.end(); line++) {
