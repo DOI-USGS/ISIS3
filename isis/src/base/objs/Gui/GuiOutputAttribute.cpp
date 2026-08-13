@@ -109,7 +109,7 @@ namespace Isis {
     gridLayout->addWidget(p_signedInteger, 4, 0);
     gridLayout->addWidget(p_unsignedInteger, 5, 0);
     gridLayout->addWidget(p_real, 6, 0);
-    gridLayout->addWidget(p_real, 7, 0);
+    gridLayout->addWidget(p_double, 7, 0);
     gridLayout->addWidget(minLabel, 0, 1);
     gridLayout->addWidget(p_minEdit, 1, 1);
     gridLayout->addWidget(maxLabel, 2, 1);
