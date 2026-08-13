@@ -54,6 +54,7 @@ namespace Isis {
       QRadioButton *p_signedInteger;
       QRadioButton *p_unsignedInteger;
       QRadioButton *p_real;
+      QRadioButton *p_double;
       QLineEdit *p_minEdit;
       QLineEdit *p_maxEdit;
       QRadioButton *p_attached;
