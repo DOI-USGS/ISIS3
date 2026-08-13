@@ -954,14 +954,14 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
   else if (spacecraftName == "OSIRIS-REX") {
     /* MapCam and PolyCam ISIS-to-SS Matrix swaps X and Y, inverts Z */
     isisFocalPlane2SocetPlate[1][0] =  1.0;  // +Xisis => +Yss
-    isisFocalPlane2SocetPlate[0][1] = -1.0;  // +Yisis => +Xss
+    isisFocalPlane2SocetPlate[0][1] =  1.0;  // +Yisis => +Xss
     isisFocalPlane2SocetPlate[2][2] = -1.0;  // +Zisis => -Zss
   }
 
   else if (spacecraftName == "TRACE GAS ORBITER")	{										// ADDED LINES FOR CaSSIS
-      isisFocalPlane2SocetPlate[0][0] =  1;
-      isisFocalPlane2SocetPlate[1][1] =  -1;
-      isisFocalPlane2SocetPlate[2][2] =  -1;
+    isisFocalPlane2SocetPlate[0][0] =  1;
+    isisFocalPlane2SocetPlate[1][1] =  -1;
+    isisFocalPlane2SocetPlate[2][2] =  -1;
   }          //  test Rx180
 																						
 
