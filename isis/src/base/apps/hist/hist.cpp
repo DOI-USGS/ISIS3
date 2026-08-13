@@ -55,7 +55,8 @@ namespace Isis {
                  icube->pixelType() == UnsignedWord ||
                  icube->pixelType() == UnsignedInteger ||
                  icube->pixelType() == SignedInteger ||
-                 icube->pixelType() == Real) {
+                 icube->pixelType() == Real || 
+                 icube->pixelType() == Double ) {
           nbins = 65536;
         }
         else {
