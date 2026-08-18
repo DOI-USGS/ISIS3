@@ -29,6 +29,11 @@ namespace Isis {
 
   void ImageIoHandler::clearCache(bool blockForWriteCache) const {}
 
+  void ImageIoHandler::setBaseMultiplier(double base, double mult) {
+    m_base = base;
+    m_multiplier = mult;
+  }
+
   /**
    * This changes the virtual band list.
    *

@@ -107,8 +107,7 @@ namespace Isis {
       QString byteOrderStr = pixelGroup.findKeyword("ByteOrder")[0];
       m_byteSwapper = new EndianSwapper(
           byteOrderStr.toUpper());
-      m_base = pixelGroup.findKeyword("Base");
-      m_multiplier = pixelGroup.findKeyword("Multiplier");
+      setBaseMultiplier(pixelGroup.findKeyword("Base"), pixelGroup.findKeyword("Multiplier"));
       m_pixelType = PixelTypeEnumeration(pixelGroup.findKeyword("Type"));
 
       // If the byte swapper isn't going to do anything, then get rid of it

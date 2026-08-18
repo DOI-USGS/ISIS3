@@ -55,8 +55,7 @@ namespace Isis {
     }
 
     GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
-    m_offset = band->GetOffset();
-    m_scale = band->GetScale();
+    setBaseMultiplier(band->GetOffset(), band->GetScale());
     int *pbSuccess = new int;
     m_gdalNoDataValue = band->GetNoDataValue(pbSuccess);
     if (!pbSuccess) {
@@ -279,7 +278,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MIN4) {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
       }
       else {
         if(raw == NULL4)
@@ -308,7 +307,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MINI4) {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
       }
       else {
         if (raw == NULLI4)
@@ -336,7 +335,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MINUI4) {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
         if (raw >= VALID_MAXUI4) {
           if(raw == HIGH_INSTR_SATUI4)
             bufferVal = HIGH_INSTR_SAT8;
@@ -368,7 +367,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MIN2) {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
       }
       else {
         if(raw == NULL2)
@@ -397,7 +396,7 @@ namespace Isis {
       }
 
       if(raw >= VALID_MINU2) {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
         if (raw > VALID_MAXU2) {
           if(raw == HIGH_INSTR_SATU2)
             bufferVal = HIGH_INSTR_SAT8;
@@ -433,7 +432,7 @@ namespace Isis {
         bufferVal = HIGH_REPR_SAT8;
       }
       else {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
       }
 
       ((signed char *)rawBuff)[idx] = raw;
@@ -452,7 +451,7 @@ namespace Isis {
         bufferVal = HIGH_REPR_SAT8;
       }
       else {
-        bufferVal = (double) raw * m_scale + m_offset;
+        bufferVal = (double) raw * m_multiplier + m_base;
       }
 
       ((unsigned char *)rawBuff)[idx] = raw;
@@ -470,8 +469,8 @@ namespace Isis {
       float raw = 0;
 
       if(bufferVal >= VALID_MIN8) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
 
         if(filePixelValueDbl < (double) VALID_MIN4) {
           raw = LOW_REPR_SAT4;
@@ -518,8 +517,8 @@ namespace Isis {
       int raw;
 
       if(bufferVal >= VALID_MINI4) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MINI4 - 0.5) {
           raw = LOW_REPR_SATI4;
           isSpecial = true;
@@ -577,8 +576,8 @@ namespace Isis {
       unsigned int raw;
 
       if(bufferVal >= VALID_MINUI4) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MINUI4 - 0.5) {
           raw = LOW_REPR_SATUI4;
           isSpecial = true;
@@ -636,8 +635,8 @@ namespace Isis {
       short raw;
 
       if(bufferVal >= VALID_MIN8) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MIN2 - 0.5) {
           raw = LOW_REPR_SAT2;
           isSpecial = true;
@@ -695,8 +694,8 @@ namespace Isis {
       unsigned short raw;
 
       if(bufferVal >= VALID_MIN8) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MINU2 - 0.5) {
           raw = LOW_REPR_SATU2;
           isSpecial = true;
@@ -754,8 +753,8 @@ namespace Isis {
      signed char raw;
 
       if(bufferVal >= VALID_MIN8) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MINS1 - 0.5) {
           raw = LOW_REPR_SATS1;
           isSpecial = true;
@@ -812,8 +811,8 @@ namespace Isis {
       unsigned char raw;
 
       if(bufferVal >= VALID_MIN8) {
-        double filePixelValueDbl = (bufferVal - m_offset) /
-            m_scale;
+        double filePixelValueDbl = (bufferVal - m_base) /
+            m_multiplier;
         if(filePixelValueDbl < VALID_MIN1 - 0.5) {
           raw = LOW_REPR_SAT1;
           isSpecial = true;

@@ -16,7 +16,7 @@ using namespace std;
 namespace Isis{
 
   void DoWrap(Buffer &in);
-  void GetStats(Buffer &in, Buffer &out);
+  void GetStats(Buffer &in);
 
   Cube *ocube;
 
@@ -247,6 +247,10 @@ namespace Isis{
     int nl = inl + topPad + bottomPad;
     int nb = inb;
 
+    // We need to create the output file
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+
     double upperLeftCorner = mapgrp["UpperLeftCornerX"];
     upperLeftCorner -= leftPad * proj->Resolution();
     mapgrp.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftCorner), "meters"),
@@ -257,24 +261,19 @@ namespace Isis{
     mapgrp.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
                       Pvl::Replace);
 
-
-    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+    // Update mapping grp
+    ocube->putGroup(mapgrp);
 
     // Make sure everything is propagated and closed
     p.EndProcess();
-
-    // Now we'll really be processing our input cube
-    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
     // We need to create the output file
     ocube = new Cube();
     ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
+    // Now we'll really be processing our input cube
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     p.StartProcess(DoWrap);
-
-    // Update mapping grp
-    ocube->putGroup(mapgrp);
 
     if (ui.WasEntered("SPHERICALDATUMRADIUS")) {
       PvlObject &ocore = ocube->label()->findObject("IsisCube").findObject("Core");
@@ -308,15 +307,15 @@ namespace Isis{
     ocube->write(table);
 
     p.EndProcess();
+    if (datum_radius_base != 0) {
+      ocube->setBaseMultiplier(datum_radius_base, 1.0);
+    }
     ocube->close();
     delete ocube;
   }
 
-  void GetStats(Buffer &in, Buffer &out) {
+  void GetStats(Buffer &in) {
     inCubeStats.AddData(&in[0], in.size());
-    for (int i=0; i<in.size(); i++) {
-      out[i] = in[i];
-    }
   }
 
   void DoWrap(Buffer &in) {

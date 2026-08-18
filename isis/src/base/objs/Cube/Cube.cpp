@@ -1387,9 +1387,22 @@ namespace Isis {
    * @param mult Multiplicative constant.
    */
   void Cube::setBaseMultiplier(double base, double mult) {
-    openCheck();
     m_base = base;
     m_multiplier = mult;
+
+    if (isOpen()) {
+      if (isReadWrite()) {
+        Pvl &cubeLabel = *label();
+        PvlGroup &pixels = cubeLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels");
+        pixels["base"] = toString(base);
+        pixels["multiplier"] = toString(mult);
+        m_ioHandler->setBaseMultiplier(base, mult);
+      }
+      else {
+        QString msg = "Cube opened in Read Mode, cannot set Base and Multiplier";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
   }
 
 
