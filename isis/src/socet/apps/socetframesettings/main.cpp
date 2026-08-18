@@ -441,13 +441,9 @@ void IsisMain() {
     toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
   }
 
-  // Furthermore, if this is a Messenger image, get the needed keywords values needed for the       // ADDED SECTION FOR CASSIS OFF-AXIS KEYWORDS
-  // USGSAstro FrameOffAxis *support* file, and add them to the output settings file.
-  // During frame import in SOCET Set, these values will be ignored, but then later accessed by
-  // the USGSAstro import_frame SOCET Set program.
-  //
-  // Note: Summed Messenger images are handled in the FrameOffAxis sensor model, so no need to
-  // account for enlarging Messenger images in the "socet2isis" scripts
+  // For TGO CaSSIS, write the keywords needed by the USGSAstro FrameOffAxis support file.
+  // SOCET Set ignores these during frame import, but the USGSAstro import_frame program
+  // reads them.
 
   if (spacecraftName == "TRACE GAS ORBITER") {
     double originalHalfLines = numLines / 2.0;
@@ -958,11 +954,11 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
     isisFocalPlane2SocetPlate[2][2] = -1.0;  // +Zisis => -Zss
   }
 
-  else if (spacecraftName == "TRACE GAS ORBITER")	{										// ADDED LINES FOR CaSSIS
+  else if (spacecraftName == "TRACE GAS ORBITER")	{
     isisFocalPlane2SocetPlate[0][0] =  1;
     isisFocalPlane2SocetPlate[1][1] =  -1;
     isisFocalPlane2SocetPlate[2][2] =  -1;
-  }          //  test Rx180
+  }
 																						
 
   // Confirm that matrix is now a rotation matrix
