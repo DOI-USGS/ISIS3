@@ -50,7 +50,7 @@ namespace Isis {
       QWidget *parent) : QFileDialog(parent) {
 
     setAcceptMode(AcceptSave);
-    setNameFilter("Control Network files (*.net *.bin);;All files (*)");
+    setNameFilter("Control Network files (*.net *.bin *.parquet);;All files (*)");
     QGridLayout *mainLayout = qobject_cast< QGridLayout * >(layout());
 
     if (mainLayout)
@@ -460,7 +460,7 @@ namespace Isis {
   void CnetEditorWindow::openNet() {
     QString filename = QFileDialog::getOpenFileName(this,
         tr("Open a control net file"), ".",
-        tr("Control Network files (*.net *.bin);;All files (*)"));
+        tr("Control Network files (*.net *.bin *.parquet);;All files (*)"));
 
     if (!filename.isEmpty())
       load(filename);
@@ -560,6 +560,11 @@ namespace Isis {
 
 
   void CnetEditorWindow::save() {
+
+    // Parquet output is binary only; Write() rejects Pvl to a Parquet file
+    if (curFile->endsWith(".parquet", Qt::CaseInsensitive)) {
+      saveAsPvl = false;
+    }
 
     if (saveFilteredNetwork) {
       QString newCubeListFileName;
@@ -726,7 +731,14 @@ namespace Isis {
       editorWidget->connectionFilterWidget());
 
     setFileState(HasFile, *curFile);
-    saveAsPvl = !Pvl(*curFile).hasObject("ProtoBuffer");
+
+    // Parquet is binary and cannot be parsed as Pvl
+    if (curFile->endsWith(".parquet", Qt::CaseInsensitive)) {
+      saveAsPvl = false;
+    }
+    else {
+      saveAsPvl = !Pvl(*curFile).hasObject("ProtoBuffer");
+    }
   }
 
 

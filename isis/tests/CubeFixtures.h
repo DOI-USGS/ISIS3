@@ -22,7 +22,7 @@ namespace Isis {
 
   class SmallCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -31,7 +31,7 @@ namespace Isis {
 
   class LargeCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -40,7 +40,7 @@ namespace Isis {
 
   class SpecialSmallCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -48,9 +48,9 @@ namespace Isis {
 
   class SmallGapCube : public TempTestingFiles {
     protected:
-      Cube *horzCube;
-      Cube *vertCube;
-      Cube *bandCube;
+      Cube *horzCube = nullptr;
+      Cube *vertCube = nullptr;
+      Cube *bandCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -59,7 +59,7 @@ namespace Isis {
 
   class NullPixelCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
       void SetUp() override;
       void TearDown() override;
   };
@@ -77,8 +77,8 @@ namespace Isis {
     protected:
 
       // pixtures of Saturn's rings
-      Cube *ring1;
-      Cube *ring2;
+      Cube *ring1 = nullptr;
+      Cube *ring2 = nullptr;
       FileList cubeFileList;
       QString cubeListPath;
 

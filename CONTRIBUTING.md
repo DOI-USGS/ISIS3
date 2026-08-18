@@ -49,3 +49,12 @@ Every pull request making changes to ISIS's source needs a [changelog entry](htt
 
 When making a contribution for the first time, please add your name to the `.zenodo.json file.` We strongly recommend adding your affiliation and ORCiD to the `zenodo.json` file. These additions only have to happen once.
 
+# Documentation and llms.txt
+
+The docs site publishes `llms.txt` and `llms-full.txt` at its root, following the
+[llms.txt standard](https://llmstxt.org), so LLMs can discover and ingest the application manuals.
+Both files are generated from the per-application XML files by `isis/scripts/build_llms_txt.py`, so
+editing an app's XML is all that is needed to update them. Run `ninja llmsdocs` to regenerate them
+without a full doc build (this also works on Arm, where `ninja docs` is unavailable), and
+`pytest isis/pytests/test_build_llms_txt.py` to test the generator.
+

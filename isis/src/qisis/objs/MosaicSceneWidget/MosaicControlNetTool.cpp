@@ -573,7 +573,7 @@ namespace Isis {
       QString netFile = FileDialog::getOpenFileName(getWidget(),
                         "Select Control Net. File",
                         QDir::current().dirName() + "/",
-                        "Control Networks (*.net);;All Files (*.*)");
+                        "Control Networks (*.net *.parquet);;All Files (*.*)");
 
       //--------------------------------------------------------------
       // if the file is not empty attempt to load in the control points

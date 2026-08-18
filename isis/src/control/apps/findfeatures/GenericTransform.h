@@ -74,7 +74,14 @@ class GenericTransform : public ImageTransform {
 
     void setSize(const cv::Size &mSize);
 
+    static bool isTileable(const cv::Size &srcSize, const cv::Size &dstSize);
+    cv::Mat renderTiled(const cv::Mat &image, const cv::Size &dstSize) const;
+    void renderTile(const cv::Mat &image, cv::Mat &result,
+                    const cv::Rect &tile) const;
+
   private:
+    static constexpr int m_tileSize = 4096;  //!< Tile edge used by renderTiled()
+
     cv::Mat  m_matrix;    //!< Generic tranform matrix
     cv::Mat  m_inverse;   //!< Inverse of m_matrix
     cv::Size m_size;      //!< Optional output size of resuting image

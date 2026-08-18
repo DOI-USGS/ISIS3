@@ -41,8 +41,8 @@ namespace Isis {
 
   class DefaultCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
-      Cube *projTestCube;
+      Cube *testCube = nullptr;
+      Cube *projTestCube = nullptr;
 
       Pvl label;
       Pvl projLabel;
@@ -55,8 +55,8 @@ namespace Isis {
 
   class LineScannerCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
-      Cube *projTestCube;
+      Cube *testCube = nullptr;
+      Cube *projTestCube = nullptr;
 
       Pvl label;
       Pvl projLabel;
@@ -68,7 +68,7 @@ namespace Isis {
 
   class OffBodyCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -76,7 +76,7 @@ namespace Isis {
 
   class MiniRFCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -84,7 +84,7 @@ namespace Isis {
 
   class DemCube : public DefaultCube {
     protected:
-      Cube *demCube;
+      Cube *demCube = nullptr;
 
       void SetUp() override;
       void TearDown() override;
@@ -151,7 +151,7 @@ namespace Isis {
 
   class ClipperWacFcCube : public DefaultCube {
     protected:
-      Cube *wacFcCube;
+      Cube *wacFcCube = nullptr;
       Pvl label;
       nlohmann::json isd;
       void SetUp() override;
@@ -166,7 +166,7 @@ namespace Isis {
 
   class ClipperPbCube : public TempTestingFiles {
     protected:
-      Cube *testCube;
+      Cube *testCube = nullptr;
       void setInstrument(QString instrumentId);
   };
 

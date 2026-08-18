@@ -507,6 +507,16 @@ if (buildDocs)
                     -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocs.cmake)
 endif()
 
+# Generate just llms.txt/llms-full.txt. Available even where buildDocs is off (e.g. Arm).
+find_package(Python3 COMPONENTS Interpreter)
+if (Python3_FOUND)
+  add_custom_target(llmsdocs COMMAND ${Python3_EXECUTABLE}
+                    ${PROJECT_SOURCE_DIR}/scripts/build_llms_txt.py
+                    --src-dir ${PROJECT_SOURCE_DIR}/src
+                    --out-dir ${CMAKE_BINARY_DIR}/docs/${PACKAGE_VERSION}
+                    --version ${PACKAGE_VERSION})
+endif()
+
 # Add custom build target to copy modified header files to the build/incs directory.
 # ALL is specified so that the target is added to the default build target, i.e. the copy command
 # will be executed when running "ninja install"

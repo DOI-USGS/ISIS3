@@ -118,14 +118,59 @@ void ImageSource::load(const QString &name, const double minPercent,
   return;
 }
 
+/**
+ * @brief Determine if the ISIS Cube reader can open a file
+ *
+ * Cube reads ISIS cubes as well as any format GDAL provides a driver for, so
+ * it is preferred over the OpenCV reader whenever it succeeds. OpenCV's TIFF
+ * reader in particular cannot handle 32-bit samples.
+ *
+ * @param name Name of the file to test
+ *
+ * @return bool True if the file can be opened as a Cube
+ */
+bool ImageSource::isCubeReadable(const QString &name) {
+  try {
+    Cube cube;
+    cube.open(FileName(name).expanded(), "r");
+    return ( true );
+  }
+  catch (IException &ie) {
+    return ( false );
+  }
+}
+
+
+/**
+ * @brief Compose a serial number for a Cube
+ *
+ * The serial number is the identity of the image in the output control
+ * network, so a failure to compose one is fatal rather than silently
+ * substituted.
+ *
+ * @param cube  Cube to compose a serial number for
+ * @param ifile File name of the cube
+ *
+ * @return QString The serial number
+ */
+QString ImageSource::composeSerialNumber(Cube &cube, const FileName &ifile) {
+  QString serialno = SerialNumber::Compose(cube, true);
+  if ( serialno.isEmpty() || ("Unknown" == serialno) ) {
+    return ( ifile.baseName() );
+  }
+  return ( serialno );
+}
+
+
 void ImageSource::load(const double minPercent,const double maxPercent) {
 
   QString name = m_data->m_name;
   FileName ifile(name);
 
-  // Handle ISIS cube specifically. If its not a cube, use OpenCV's image
-  // reader
-  if ( "cub" == ifile.extension() ) {
+  // Prefer the ISIS reader for anything it can open. It reads GeoTIFF and
+  // other GDAL formats at any bit depth and provides geometry when available.
+  // Fall back to OpenCV's reader for formats GDAL does not handle.
+  if ( isCubeReadable(name) ) {
     Cube cube;
     CubeAttributeInput attTrans(name);
     std::vector<QString> bandTrans = attTrans.bands();
@@ -139,7 +184,7 @@ void ImageSource::load(const double minPercent,const double maxPercent) {
 
 
     // Determine projection capabilities
-    m_data->m_serialno = SerialNumber::Compose(cube, true);
+    m_data->m_serialno = composeSerialNumber(cube, ifile);
     initGeometry( cube );
 
     try {
@@ -398,7 +443,7 @@ bool ImageSource::initGeometry() {
   }
 
   // Get the geometry
-  m_data->m_serialno = SerialNumber::Compose(cube, true);
+  m_data->m_serialno = composeSerialNumber(cube, ifile);
   return ( initGeometry(cube) );
 }
 

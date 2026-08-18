@@ -32,7 +32,7 @@ namespace Isis {
 
   class CSMCameraFixture : public CSMCubeFixture {
     protected:
-      Camera *testCam;
+      Camera *testCam = nullptr;
 
       void SetUp() override;
   };
@@ -51,7 +51,7 @@ namespace Isis {
 
   class CSMCameraDemFixture : public CSMCubeFixture {
     protected:
-      Camera *testCam;
+      Camera *testCam = nullptr;
       double demRadius;
 
       void SetUp() override;
@@ -65,7 +65,7 @@ namespace Isis {
       QVector<FileName> labelFiles;
       QVector<Cube*> cubes;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
       void SetUp() override;

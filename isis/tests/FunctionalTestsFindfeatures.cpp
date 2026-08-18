@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QStringList>
 
+#include "GenericTransform.h"
 #include "NetworkFixtures.h"
 #include "PvlFlatMap.h"
 #include "PvlGroup.h"
@@ -553,3 +554,72 @@ TEST_F(ThreeImageNetwork, FunctionalTestFindfeaturesFastGeomGridConfig) {
 }
 
 
+
+
+/** Exposes the protected tiled rendering of GenericTransform for testing */
+class TiledTransform : public GenericTransform {
+  public:
+    TiledTransform(const cv::Mat &matrix, const cv::Size &imSize) :
+                   GenericTransform("TiledTransform", matrix, imSize) { }
+    using GenericTransform::isTileable;
+    using GenericTransform::renderTiled;
+};
+
+static cv::Mat testHomography() {
+  return ( (cv::Mat_<double>(3,3) <<  1.02, 0.03,  12.5,
+                                     -0.02, 0.99,  -7.25,
+                                      1e-7, 2e-8,   1.0) );
+}
+
+TEST(GenericTransform, TiledRenderMatchesWarpPerspective) {
+  cv::Mat matrix = testHomography();
+  cv::Size dstSize(900, 5200);
+
+  cv::Mat image(5000, 800, CV_8UC1);
+  cv::randu(image, cv::Scalar(0), cv::Scalar(255));
+
+  cv::Mat expected;
+  cv::warpPerspective(image, expected, matrix, dstSize, cv::INTER_LINEAR);
+
+  TiledTransform xform(matrix, dstSize);
+  EXPECT_EQ(cv::countNonZero(xform.renderTiled(image, dstSize) != expected), 0);
+}
+
+TEST(GenericTransform, TiledRenderIsThreadCountIndependent) {
+  cv::Mat matrix = testHomography();
+  cv::Size dstSize(900, 5200);
+
+  cv::Mat image(5000, 800, CV_8UC1);
+  cv::randu(image, cv::Scalar(0), cv::Scalar(255));
+
+  TiledTransform xform(matrix, dstSize);
+  cv::Mat threaded = xform.renderTiled(image, dstSize);
+
+  int nthreads = cv::getNumThreads();
+  cv::setNumThreads(1);
+  cv::Mat serial = xform.renderTiled(image, dstSize);
+  cv::setNumThreads(nthreads);
+
+  EXPECT_EQ(cv::countNonZero(serial != threaded), 0);
+}
+
+TEST(GenericTransform, RenderExceedsOpenCvSizeLimit) {
+  cv::Mat matrix = testHomography();
+  cv::Size dstSize(64, 33000);
+
+  cv::Mat image(33000, 64, CV_8UC1);
+  cv::randu(image, cv::Scalar(0), cv::Scalar(255));
+
+  EXPECT_TRUE(TiledTransform::isTileable(image.size(), dstSize));
+  EXPECT_ANY_THROW({
+    cv::Mat unused;
+    cv::warpPerspective(image, unused, matrix, dstSize, cv::INTER_LINEAR);
+  });
+
+  GenericTransform xform("BigTransform", matrix, dstSize);
+  cv::Mat result;
+  ASSERT_NO_THROW(result = xform.render(image));
+  EXPECT_EQ(result.rows, dstSize.height);
+  EXPECT_EQ(result.cols, dstSize.width);
+  EXPECT_GT(cv::countNonZero(result), 0);
+}

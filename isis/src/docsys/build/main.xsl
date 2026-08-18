@@ -49,6 +49,10 @@ Deborah Lee Soltesz
         <meta name="zip" content="86001"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
 
+        <!-- llms.txt -->
+        <link rel="alternate" type="text/plain" title="llms.txt" href="llms.txt"/>
+        <link rel="alternate" type="text/plain" title="llms-full.txt" href="llms-full.txt"/>
+
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="assets/styles/IsisStyleCommon.css"/>
         <link rel="stylesheet" media="print" href="assets/styles/print.css"/>

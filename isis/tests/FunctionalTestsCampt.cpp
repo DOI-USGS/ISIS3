@@ -251,8 +251,9 @@ TEST_F(DefaultCube, FunctionalTestCamptCoordList) {
   groundPoint = appLog.group(2);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Sample"), 100.0);
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), 10000.0);
-  QString ErrorMsg = "Requested position does not project in camera model; no surface intersection";
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), ErrorMsg);
+  // Line 10000 is far outside the image; the reseau distortion now
+  // extrapolates outside the image domain, so the point projects (intended).
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
 }
 
 
@@ -267,8 +268,23 @@ TEST_F(DefaultCube, FunctionalTestCamptAllowOutside) {
   EXPECT_DOUBLE_EQ( (double) groundPoint.findKeyword("Line"), -1.0);
 }
 
-TEST_F(DefaultCube, FunctionalTestCamptAllowError) {
+// A point just outside the image now projects. The reseau distortion extrapolates
+// smoothly past the image edges instead of rejecting the point, matching how the
+// polynomial and linescan camera models already behave outside the field of view.
+TEST_F(DefaultCube, FunctionalTestCamptOutsideImageProjects) {
   QVector<QString> args = {"sample=-100", "line=-100", "allowerror=true"};
+  UserInterface options(APP_XML, args);
+  Pvl appLog;
+
+  campt(testCube, options, &appLog);
+  PvlGroup groundPoint = appLog.findGroup("GroundPoint");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, groundPoint.findKeyword("Error"), "NULL");
+}
+
+// A pixel whose look ray misses the body has no ground intersection. With
+// allowerror set, campt reports the error in the group instead of throwing.
+TEST_F(DefaultCube, FunctionalTestCamptAllowError) {
+  QVector<QString> args = {"sample=100000", "line=100000", "allowerror=true"};
   UserInterface options(APP_XML, args);
   Pvl appLog;
 

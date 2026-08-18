@@ -88,14 +88,25 @@ namespace Isis {
     double focalLine = dy / p_pixelPitch +
                        p_camera->FocalPlaneMap()->DetectorLineOrigin();
 
-    // Find distance from input point to all nominal reseaus
+    // Anchor the local affine fit at a query point clamped to the image box, then
+    // evaluate that fit at the true point. Inside the box this is unchanged.
+    // Outside, the fit stays well conditioned and extrapolates the distortion
+    // smoothly past the edges instead of rejecting the point.
+    double querySamp = focalSamp;
+    double queryLine = focalLine;
+    if(querySamp < 0.5) querySamp = 0.5;
+    if(querySamp > p_distortedSamps + 0.5) querySamp = p_distortedSamps + 0.5;
+    if(queryLine < 0.5) queryLine = 0.5;
+    if(queryLine > p_distortedLines + 0.5) queryLine = p_distortedLines + 0.5;
+
+    // Find distance from the query point to all nominal reseaus
     std::vector<double> distances(p_numRes, 0.0);
     double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {
-      sdiffsq = (focalSamp - p_rsamps[i]) * (focalSamp - p_rsamps[i]);
-      ldiffsq = (focalLine - p_rlines[i]) * (focalLine - p_rlines[i]);
+      sdiffsq = (querySamp - p_rsamps[i]) * (querySamp - p_rsamps[i]);
+      ldiffsq = (queryLine - p_rlines[i]) * (queryLine - p_rlines[i]);
       distances[i]  =  ldiffsq + sdiffsq;
     }
 
@@ -154,16 +165,13 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
+      // Evaluate the fit at the true input point (interpolation inside the box,
+      // smooth extrapolation outside).
       known[1] = focalSamp;
       known[2] = focalLine;
 
-      // Test to make sure the point is inside of the image
       double undistortedFocalSamp = lsqX.Evaluate(known);
       double undistortedFocalLine = lsqY.Evaluate(known);
-      if(undistortedFocalSamp < 0.5) return false;
-      if(undistortedFocalLine < 0.5) return false;
-      if(undistortedFocalSamp > p_undistortedSamps + 0.5) return false;
-      if(undistortedFocalLine > p_undistortedLines + 0.5) return false;
 
       // Convert undistorted sample, line position to an x,y position
       p_undistortedFocalPlaneX = (undistortedFocalSamp - p_undistortedSamps
@@ -199,16 +207,26 @@ namespace Isis {
     double undistortedFocalSamp = ux / p_pixelPitch + p_undistortedSamps / 2.0;
     double undistortedFocalLine = uy / p_pixelPitch + p_undistortedLines / 2.0;
 
-    // Find distance from input point to all nominal reseaus
+    // Clamp a query point to the image box for the fit, then evaluate at the true
+    // point, extrapolating smoothly outside rather than rejecting it. See
+    // SetFocalPlane for details.
+    double querySamp = undistortedFocalSamp;
+    double queryLine = undistortedFocalLine;
+    if(querySamp < 0.5) querySamp = 0.5;
+    if(querySamp > p_undistortedSamps + 0.5) querySamp = p_undistortedSamps + 0.5;
+    if(queryLine < 0.5) queryLine = 0.5;
+    if(queryLine > p_undistortedLines + 0.5) queryLine = p_undistortedLines + 0.5;
+
+    // Find distance from the query point to all nominal reseaus
     std::vector<double> distances(p_numRes, 0.0);
     double wt[5];
     int closepts[5];
     double ldiffsq, sdiffsq;
     for(int i = 0; i < p_numRes; i++) {
-      sdiffsq = (undistortedFocalSamp - p_msamps[i]) *
-                (undistortedFocalSamp - p_msamps[i]);
-      ldiffsq = (undistortedFocalLine - p_mlines[i]) *
-                (undistortedFocalLine - p_mlines[i]);
+      sdiffsq = (querySamp - p_msamps[i]) *
+                (querySamp - p_msamps[i]);
+      ldiffsq = (queryLine - p_mlines[i]) *
+                (queryLine - p_mlines[i]);
       distances[i]  =  ldiffsq + sdiffsq;
     }
 
@@ -266,16 +284,13 @@ namespace Isis {
       lsqX.Solve();
       lsqY.Solve();
 
+      // Evaluate the fit at the true input point (interpolation inside the box,
+      // smooth extrapolation outside).
       known[1] = undistortedFocalSamp;
       known[2] = undistortedFocalLine;
 
-      // Test points to make sure they are in the image
       double distortedFocalSamp = lsqX.Evaluate(known);
       double distortedFocalLine = lsqY.Evaluate(known);
-      if(distortedFocalSamp < 0.5) return false;
-      if(distortedFocalLine < 0.5) return false;
-      if(distortedFocalSamp > p_undistortedSamps + 0.5) return false;
-      if(distortedFocalLine > p_undistortedLines + 0.5) return false;
 
       // Convert distorted sample, line position back to an x,y position
       p_focalPlaneX = (distortedFocalSamp -
