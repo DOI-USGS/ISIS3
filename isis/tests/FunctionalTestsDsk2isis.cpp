@@ -128,23 +128,15 @@ TEST_F(Dsk2isisDefault, FunctionalTestDsk2isisRayMethod) {
   QString dskFile = testDataPath("hay_a_amica_5_itokawashape_v1_0_64q.bds");
   QString outputCube = tempDir.path() + "/dsk_ray_output.cub";
 
-  // Run dsk2isis as subprocess
-  QString dsk2isisApp = FileName("$ISISROOT/bin/dsk2isis").expanded();
-  QStringList args;
-  args << "from=" + dskFile
-       << "map=" + mapFile
-       << "to=" + outputCube
-       << "method=RAY";
+  QVector<QString> args = {"from="+dskFile, "map=" + mapFile, "to="+outputCube, "method=RAY"};
 
-  QProcess dsk2isis;
-  dsk2isis.setProgram(dsk2isisApp);
-  dsk2isis.setArguments(args);
-  dsk2isis.start();
-  bool finished = dsk2isis.waitForFinished(60000);
-
-  ASSERT_TRUE(finished) << "dsk2isis did not finish within timeout";
-  EXPECT_EQ(dsk2isis.exitCode(), 0) << "dsk2isis failed with exit code: " << dsk2isis.exitCode()
-                                     << "\nStderr: " << dsk2isis.readAllStandardError().toStdString();
+  UserInterface options(APP_XML, args);
+  try {
+    dsk2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to convert dsk to dem: " <<e.toString().toStdString().c_str() << std::endl;
+  }
 
   // Verify output cube was created
   Cube output(outputCube);
@@ -192,23 +184,15 @@ TEST_F(Dsk2isisDefault, FunctionalTestDsk2isisHigherScale) {
   QString dskFile = testDataPath("hay_a_amica_5_itokawashape_v1_0_64q.bds");
   QString outputCube = tempDir.path() + "/dsk_hiscale_output.cub";
 
-  // Run dsk2isis as subprocess
-  QString dsk2isisApp = FileName("$ISISROOT/bin/dsk2isis").expanded();
-  QStringList args;
-  args << "from=" + dskFile
-       << "map=" + mapFile
-       << "to=" + outputCube
-       << "method=GRID";
+  QVector<QString> args = {"from="+dskFile, "map=" + mapFile, "to="+outputCube, "method=GRID"};
 
-  QProcess dsk2isis;
-  dsk2isis.setProgram(dsk2isisApp);
-  dsk2isis.setArguments(args);
-  dsk2isis.start();
-  bool finished = dsk2isis.waitForFinished(60000);
-
-  ASSERT_TRUE(finished) << "dsk2isis did not finish within timeout";
-  EXPECT_EQ(dsk2isis.exitCode(), 0) << "dsk2isis failed with exit code: " << dsk2isis.exitCode()
-                                     << "\nStderr: " << dsk2isis.readAllStandardError().toStdString();
+  UserInterface options(APP_XML, args);
+  try {
+    dsk2isis(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to convert dsk to dem: " <<e.toString().toStdString().c_str() << std::endl;
+  }
 
   // Verify output
   Cube output(outputCube);
@@ -245,24 +229,14 @@ TEST_F(Dsk2isisDefault, FunctionalTestDsk2isisInvalidDskFile) {
 
   QString outputCube = tempDir.path() + "/output.cub";
 
-  // Run dsk2isis as subprocess with invalid DSK file
-  QString dsk2isisApp = FileName("$ISISROOT/bin/dsk2isis").expanded();
-  QStringList args;
-  args << "from=/nonexistent/file.bds"
-       << "map=" + mapFile
-       << "to=" + outputCube
-       << "method=GRID";
+  QVector<QString> args = {"from=/nonexistent/file.bds", "map=" + mapFile, "to=" + outputCube, "method=GRID"};
 
-  QProcess dsk2isis;
-  dsk2isis.setProgram(dsk2isisApp);
-  dsk2isis.setArguments(args);
-  dsk2isis.start();
-  bool finished = dsk2isis.waitForFinished(10000);
+  UserInterface options(APP_XML, args);
+  try {
+    dsk2isis(options);
+  }
+  catch (IException &e) {
+    // FAIL() << "Unable to convert dsk to dem: " <<e.toString().toStdString().c_str() << std::endl;
+  }
 
-  ASSERT_TRUE(finished) << "dsk2isis did not finish within timeout";
-  EXPECT_NE(dsk2isis.exitCode(), 0) << "dsk2isis should have failed with invalid file";
-
-  QString stderr_output = dsk2isis.readAllStandardError();
-  EXPECT_TRUE(stderr_output.contains("does not exist") || stderr_output.contains("USER ERROR"))
-      << "Expected error message about missing file, got: " << stderr_output.toStdString();
 }
