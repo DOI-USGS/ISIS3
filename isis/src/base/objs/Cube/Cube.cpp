@@ -46,6 +46,7 @@ find files of those names at the top level of this repository. **/
 using namespace std;
 
 namespace Isis {
+
   //! Constructs a Cube object.
   Cube::Cube() {
     construct();
@@ -768,7 +769,8 @@ namespace Isis {
       const QString &cubeFileName, const CubeAttributeOutput &att) {
 
     setByteOrder(att.byteOrder());
-    setFormat(att.fileFormat());
+    if (!att.propagateFileFormat())
+      setFormat(att.fileFormat());
     setLabelsAttached(att.labelAttachment());
     if (!att.propagatePixelType())
       setPixelType(att.pixelType());
@@ -1215,7 +1217,7 @@ namespace Isis {
     }
     catch (IException &e) {
       QString msg = "Failed to read table [" + name + "] from cube [" + fileName() + "].";
-      throw IException(e, IException::Programmer, msg, _FILEINFO_);
+      throw IException(e, IException::User, msg, _FILEINFO_);
     }
     return Table(tableBlob);
   }
