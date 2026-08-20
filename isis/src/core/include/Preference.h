@@ -78,6 +78,7 @@ namespace Isis {
       bool getShowDeprecatedPref();
       bool getStackTracePref();
       bool useWebSpice();
+      bool autodetectFileFormat();
 
       static Preference &Preferences(bool unitTest = false);
 
