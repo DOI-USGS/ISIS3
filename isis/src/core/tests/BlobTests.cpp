@@ -3,6 +3,8 @@
 #include <QString>
 #include <iostream>
 
+#include <nlohmann/json.hpp>
+
 #include "Pvl.h"
 #include "Blob.h"
 #include "SpecialPixel.h"
@@ -157,6 +159,64 @@ TEST_F(DefaultBlob, TestBlobWriteReadGdal) {
   std::string readBuff(readBlob.getBuffer());
 
   EXPECT_EQ(writeBuff, readBuff);
+
+  GDALClose(dataset);
+}
+
+TEST_F(DefaultBlob, TestBlobReadGdalMissingData) {
+  GDALDataset *dataset = NULL;
+  QString path = tempDir.path() + "/tiny.tiff";
+  GDALAllRegister();
+  GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
+  if (driver) {
+    char **papszOptions = NULL;
+    dataset = driver->Create(path.toStdString().c_str(), 1, 1, 1, GDT_Byte, papszOptions);
+    if (dataset) {
+      double noDataValue = (double) NULL1;
+      GDALRasterBand *band = dataset->GetRasterBand(1);
+      band->SetScale(1);
+      band->SetOffset(0);
+      band->SetNoDataValue(noDataValue);
+      dataset->CreateMaskBand(GMF_ALPHA);
+      dataset->GetRasterBand(1)->GetMaskBand()->Fill(255);
+      dataset->Close();
+    }
+  }
+  dataset = GDALDataset::FromHandle(GDALOpen(path.toStdString().c_str(), GA_Update));
+
+  Blob writeBlob("UnitTest", "Blob");
+  char buf[] = {"ABCD"};
+  writeBlob.setData(buf, 4);
+
+  std::string jsonblobstr = "{}";
+  writeBlob.WriteGdal(jsonblobstr);
+
+  nlohmann::ordered_json jsonblob = nlohmann::ordered_json::parse(jsonblobstr);
+  EXPECT_THAT(jsonblob["Blob_UnitTest"]["_data"], ::testing::Not(::testing::IsEmpty()));
+
+  // Remove "_data" to test
+  jsonblob["Blob_UnitTest"].erase("_data");
+  jsonblobstr = jsonblob.dump();
+  EXPECT_THAT(jsonblob["Blob_UnitTest"]["_data"], ::testing::IsEmpty());
+
+  char ** outputMetadata = new char*[1];
+  outputMetadata[0] = jsonblobstr.data();
+  dataset->SetMetadata(outputMetadata, "json:ISIS3");
+  delete []outputMetadata;
+
+  GDALClose(dataset);
+  dataset = GDALDataset::FromHandle(GDALOpen(path.toStdString().c_str(), GA_Update));
+
+  Blob readBlob("UnitTest", "Blob");
+  try {
+    readBlob.ReadGdal(dataset);
+    FAIL() << "Expected ReadGdal to throw when blob data is missing";
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.toString().toStdString(),
+      ::testing::HasSubstr("does not contain blob data for [Blob_UnitTest]"));
+  }
+  
 
   GDALClose(dataset);
 }

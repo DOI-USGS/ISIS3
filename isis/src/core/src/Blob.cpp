@@ -289,6 +289,13 @@ namespace Isis {
       ordered_json jsonblob = {};
       jsonblob[key] = nlohmann::ordered_json::parse(metadata);
 
+      if (!jsonblob[key].contains("_data")) {
+        QString msg = "Gdal ISIS3 metadata does not contain blob data for [" + QString::fromStdString(key) + "].\n"
+                      "The metadata was likely created in a version of GDAL prior to 3.12.2.\n"
+                      "The image will likely need additional ISIS processing to attach the same blob with data.";
+        throw IException(IException::Io, msg, _FILEINFO_);
+      }
+
       std::string blobData = jsonblob[key]["_data"];
       jsonblob[key].erase("_data");
 
