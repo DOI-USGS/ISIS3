@@ -183,13 +183,6 @@ namespace Isis {
     else if (CSLFindString(metadataDomains.List(), domainPds) != -1) {
       metadata = CPLStringList(dataset->GetMetadata(domainPds), false);
     }
-    else {
-      QString msg = "This file [" + dataFilename.name() + "] has not been initialized "
-                    "with GDAL version 3.12.2+ or ISIS v10+. It is recommended to upgrade "
-                    "your software and recreate this file to allow for native TIFF/GeoTIFF "
-                    "support in ISIS v10+.";
-      IException(IException::User, msg, _FILEINFO_).print();
-    }
 
     if (metadata.Count() > 0 && metadata[0] != nullptr) {
       const char *metadataJsonString = metadata[0];

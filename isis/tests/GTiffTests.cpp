@@ -300,13 +300,3 @@ TEST_F(ReadWriteTiff, TestGTiffSRS) {
 
   dataset->Close();
 }
-
-TEST_F(ReadWriteTiff, TestGTiffNoIsisMetadata) {
-  createTiff(SignedWord);
-
-  ::testing::internal::CaptureStderr();
-  Pvl label(path);
-  std::string err = ::testing::internal::GetCapturedStderr();
-
-  EXPECT_THAT(err, ::testing::HasSubstr("has not been initialized"));
-}
