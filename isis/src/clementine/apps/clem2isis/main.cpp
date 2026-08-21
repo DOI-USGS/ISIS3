@@ -71,7 +71,9 @@ void IsisMain() {
   pdsi = PDSR(filename.toLatin1().data(), &lines, &samps);
 
   ProcessByLine p;
-  CubeAttributeOutput cubeAtt("+unsignedByte+1.0:254.0");
+  CubeAttributeOutput cubeAtt = ui.GetOutputAttribute("TO");
+  cubeAtt.setMinimum(1.0);
+  cubeAtt.setMaximum(254.0);
   Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), cubeAtt, pdsi->image_ncols, pdsi->image_nrows);
   p.StartProcess(writeLine);
   translateLabels(in, ocube);
