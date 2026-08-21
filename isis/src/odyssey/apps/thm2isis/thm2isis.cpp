@@ -79,8 +79,8 @@ namespace Isis {
       even->setDimensions(p.Samples(), p.Lines(), p.Bands());
       odd->setDimensions(p.Samples(), p.Lines(), p.Bands());
 
-      QString evenFile = outFile.path() + "/" + outFile.baseName() + ".even.cub";
-      QString oddFile = outFile.path() + "/" + outFile.baseName() + ".odd.cub";
+      QString evenFile = outFile.path() + "/" + outFile.baseName() + ".even";
+      QString oddFile = outFile.path() + "/" + outFile.baseName() + ".odd";
 
       even->create(evenFile, outAttr);
       odd->create(oddFile, outAttr);
