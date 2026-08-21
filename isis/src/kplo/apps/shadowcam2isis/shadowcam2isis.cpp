@@ -180,8 +180,8 @@ namespace Isis {
       };
 
       // Process raw EDR cube
-      CubeAttributeOutput outAttr = CubeAttributeOutput("+Real");
-      Isis::CubeAttributeInput &att = ui.GetInputAttribute("FROM");
+      CubeAttributeInput &att = ui.GetInputAttribute("FROM");
+      CubeAttributeOutput outAttr = ui.GetOutputAttribute("TO");
       ProcessByLine p;
       p.SetInputCube(ui.GetCubeName("FROM"), att);
       p.SetOutputCube(ui.GetCubeName("TO"), outAttr);
