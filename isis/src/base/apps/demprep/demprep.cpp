@@ -60,50 +60,6 @@ namespace Isis{
       throw IException(IException::User, message, _FILEINFO_);
     }
 
-    double datum_radius_base = 0.0;
-    if ( ui.WasEntered("SPHERICALDATUMRADIUS") ) {
-      if (icube->base() != 0.0 || icube->multiplier() != 1.0) {
-        QString msg = "The input file [" + ui.GetCubeName("TO") + "] has a none zero base value "
-                      "[" + QString::number(icube->base()) + "]. Updating base to a new Radius will create inaccurate DNs. "
-                      "It's likely that the input data should be reprocessed to have a base of 0.0 and "
-                      "a multiplyer of 1.0";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      datum_radius_base = ui.GetDouble("SPHERICALDATUMRADIUS");
-    }
-
-    if(!proj->IsEquatorialCylindrical()) {
-      CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
-      p.StartProcess(GetStats);
-
-      PvlGroup demRange("Results");
-      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum() + datum_radius_base), "meters");
-      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum() + datum_radius_base), "meters");
-      Application::AppendAndLog(demRange, log);
-
-      // Store min/max radii values in new ShapeModelStatistics table
-      QString shp_name = "ShapeModelStatistics";
-      TableField fmin("MinimumRadius",Isis::TableField::Double);
-      TableField fmax("MaximumRadius",Isis::TableField::Double);
-
-      TableRecord record;
-      record += fmin;
-      record += fmax;
-
-      Table table(shp_name,record);
-
-      record[0] = Distance(inCubeStats.Minimum() + datum_radius_base,
-                           Distance::Meters).kilometers();
-      record[1] = Distance(inCubeStats.Maximum() + datum_radius_base,
-                           Distance::Meters).kilometers();
-      table += record;
-
-      ocube->write(table);
-      p.EndProcess();
-      return;
-    }
-
     if (proj->LatitudeTypeString() != "Planetocentric") {
       IString message = "The input cube must have Planetocentric latitude type.";
       throw IException(IException::User, message, _FILEINFO_);
@@ -260,6 +216,53 @@ namespace Isis{
     // We need to create the output file
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+
+    double datum_radius_base = 0.0;
+    if ( ui.WasEntered("SPHERICALDATUMRADIUS") ) {
+      if (icube->base() != 0.0 || icube->multiplier() != 1.0) {
+        QString msg = "The input file [" + ui.GetCubeName("TO") + "] has a none zero base value "
+                      "[" + QString::number(icube->base()) + "]. Updating base to a new Radius will create inaccurate DNs. "
+                      "It's likely that the input data should be reprocessed to have a base of 0.0 and "
+                      "a multiplyer of 1.0";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      if (ocube->pixelType() == Isis::Double) {
+        QString msg = "Output file [" + ocube->fileName() + "] pixel type is set to double which does not support "
+                      "base and multipler changes. Please set a different output pixel type.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      datum_radius_base = ui.GetDouble("SPHERICALDATUMRADIUS");
+    }
+
+    if(!proj->IsEquatorialCylindrical()) {
+      p.StartProcess(GetStats);
+
+      PvlGroup demRange("Results");
+      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum() + datum_radius_base), "meters");
+      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum() + datum_radius_base), "meters");
+      Application::AppendAndLog(demRange, log);
+
+      // Store min/max radii values in new ShapeModelStatistics table
+      QString shp_name = "ShapeModelStatistics";
+      TableField fmin("MinimumRadius",Isis::TableField::Double);
+      TableField fmax("MaximumRadius",Isis::TableField::Double);
+
+      TableRecord record;
+      record += fmin;
+      record += fmax;
+
+      Table table(shp_name,record);
+
+      record[0] = Distance(inCubeStats.Minimum() + datum_radius_base,
+                           Distance::Meters).kilometers();
+      record[1] = Distance(inCubeStats.Maximum() + datum_radius_base,
+                           Distance::Meters).kilometers();
+      table += record;
+
+      ocube->write(table);
+      p.EndProcess();
+      return;
+    }
 
     // Make sure everything is propagated and closed
     p.EndProcess();
