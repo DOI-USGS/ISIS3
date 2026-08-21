@@ -66,6 +66,7 @@
         <filter>
           *.cub
         </filter>
+        <pixelType>real</pixelType>
       </parameter>
 
       <parameter name="TOSTDDEV">
