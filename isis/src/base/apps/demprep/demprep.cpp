@@ -264,12 +264,13 @@ namespace Isis{
     // Make sure everything is propagated and closed
     p.EndProcess();
 
+    // Now we'll really be processing our input cube
+    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
+
     // We need to reopen the output file
     ocube = new Cube();
     ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
-    // Now we'll really be processing our input cube
-    p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     p.StartProcess(DoWrap);
 
     // Update mapping grp
