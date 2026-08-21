@@ -14,6 +14,7 @@
 #include "gtest/gtest.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
 
 static QString APP_XML = FileName("$ISISROOT/bin/xml/dsk2isis.xml").expanded();
 
@@ -236,7 +237,7 @@ TEST_F(Dsk2isisDefault, FunctionalTestDsk2isisInvalidDskFile) {
     dsk2isis(options);
   }
   catch (IException &e) {
-    // FAIL() << "Unable to convert dsk to dem: " <<e.toString().toStdString().c_str() << std::endl;
+    EXPECT_THAT(e.what(), HasSubstr("does not exist"));
   }
 
 }
