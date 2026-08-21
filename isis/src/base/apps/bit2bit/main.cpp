@@ -39,7 +39,7 @@ void IsisMain(){
 
 
   // Set properties MIN,MAX, and PixelType for output cube
-  CubeAttributeOutput outputProperties;
+  CubeAttributeOutput outputProperties = ui.GetOutputAttribute("TO");;
   if(ui.GetString("CLIP") == "PERCENT"){
     outputProperties.setMaximum(maxper);
     outputProperties.setMinimum(minper);
