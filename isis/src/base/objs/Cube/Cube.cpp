@@ -1394,9 +1394,9 @@ namespace Isis {
       if (isReadWrite()) {
         Pvl &cubeLabel = *label();
         PvlGroup &pixels = cubeLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels");
-        pixels["base"] = toString(base);
-        pixels["multiplier"] = toString(mult);
-        m_ioHandler->setBaseMultiplier(base, mult);
+        pixels["base"] = toString(m_base);
+        pixels["multiplier"] = toString(m_multiplier);
+        m_ioHandler->setBaseMultiplier(m_base, m_multiplier);
       }
       else {
         QString msg = "Cube opened in Read Mode, cannot set Base and Multiplier";

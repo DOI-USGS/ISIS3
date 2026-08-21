@@ -77,7 +77,7 @@ namespace Isis{
       ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
       p.StartProcess(GetStats);
 
-      PvlGroup demRange("Input Results");
+      PvlGroup demRange("Results");
       demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum() + datum_radius_base), "meters");
       demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum() + datum_radius_base), "meters");
       Application::AppendAndLog(demRange, log);
@@ -247,10 +247,6 @@ namespace Isis{
     int nl = inl + topPad + bottomPad;
     int nb = inb;
 
-    // We need to create the output file
-    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
-
     double upperLeftCorner = mapgrp["UpperLeftCornerX"];
     upperLeftCorner -= leftPad * proj->Resolution();
     mapgrp.addKeyword(PvlKeyword("UpperLeftCornerX", toString(upperLeftCorner), "meters"),
@@ -261,13 +257,14 @@ namespace Isis{
     mapgrp.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
                       Pvl::Replace);
 
-    // Update mapping grp
-    ocube->putGroup(mapgrp);
+    // We need to create the output file
+    CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
+    ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
 
     // Make sure everything is propagated and closed
     p.EndProcess();
 
-    // We need to create the output file
+    // We need to reopen the output file
     ocube = new Cube();
     ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
@@ -275,14 +272,10 @@ namespace Isis{
     p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
     p.StartProcess(DoWrap);
 
-    if (ui.WasEntered("SPHERICALDATUMRADIUS")) {
-      PvlObject &ocore = ocube->label()->findObject("IsisCube").findObject("Core");
-      PvlGroup &pixelGroup = ocore.findGroup("Pixels");
-      pixelGroup.findKeyword("Base")[0] = QString::number(datum_radius_base);
-      pixelGroup.findKeyword("Multiplier")[0] = "1.0";
-    }
+    // Update mapping grp
+    ocube->putGroup(mapgrp);
     
-    PvlGroup demRange("Output Results");
+    PvlGroup demRange("Results");
     demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum() + datum_radius_base), "meters");
     demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum() + datum_radius_base), "meters");
     Application::AppendAndLog(demRange, log);
@@ -305,11 +298,11 @@ namespace Isis{
     table += record;
 
     ocube->write(table);
-
-    p.EndProcess();
     if (datum_radius_base != 0) {
       ocube->setBaseMultiplier(datum_radius_base, 1.0);
     }
+    
+    p.EndProcess();
     ocube->close();
     delete ocube;
   }
