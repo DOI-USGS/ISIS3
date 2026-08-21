@@ -179,7 +179,7 @@ void createMosaicCube(QString inputName, QString outputName, QVector<QString> ba
   PvlGroup trackingGroup = PvlGroup("Tracking");
   PvlKeyword trackingName = PvlKeyword("Filename");
   FileName cubeName = FileName(outputName);
-  trackingName.setValue(cubeName.baseName() + "_tracking.cub"); //Strip off path and add _tracking
+  trackingName.setValue(cubeName.baseName() + "_tracking." + cubeName.extension()); //Strip off path and add _tracking
   trackingGroup.addKeyword(trackingName);
   mosaicCube.putGroup(trackingGroup);
 
@@ -204,12 +204,14 @@ void createTrackCube(QString inputName, QString ouputName, int trackBand) {
 
   FileName cubeName = FileName(ouputName);
   // Strip off any extensions and add _tracking
-  QString trackingName = cubeName.path() + "/" + cubeName.baseName() + "_tracking.cub";
+  QString trackingName = cubeName.path() + "/" + cubeName.baseName() + "_tracking";
+
   Cube inputCube = Cube(inputName);
   int numSample = inputCube.sampleCount();
   int numLine = inputCube.lineCount();
 
-  CubeAttributeOutput outAtt;
+  // Create cube attributes off of the original cube
+  CubeAttributeOutput outAtt(ouputName);
   outAtt.setPixelType(UnsignedInteger);
   outAtt.setMinimum(VALID_MINUI4);
   outAtt.setMaximum(VALID_MAXUI4);
