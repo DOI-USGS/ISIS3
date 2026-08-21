@@ -47,8 +47,7 @@ namespace Isis {
     CubeAttributeInput cai;
     p.SetInputCube(missionDir + "/calibration/" + camera + "_flatfield.cub", cai);
 
-    CubeAttributeOutput cao;
-    cao.setPixelType(Real);
+    CubeAttributeOutput &cao = ui.GetOutputAttribute("TO");
     p.SetOutputCube(
         FileName(ui.GetAsString("TO")).expanded(),
         cao, inCube->sampleCount(), inCube->lineCount(),
