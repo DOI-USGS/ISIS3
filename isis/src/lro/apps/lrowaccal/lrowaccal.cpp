@@ -31,25 +31,6 @@
 
 namespace Isis {
   namespace LroWacCal {
-    void CorrectRadiometric(Buffer &out, double exposure, double solarDistance, bool iof,
-                            const std::vector<double> &iofResponsivity,
-                            const std::vector<double> &radianceResponsivity) {
-      for (int i = 0; i < out.size(); i++) {
-        if (IsSpecial(out[i])) {
-          out[i] = Isis::Null;
-        }
-        else {
-          out[i] /= exposure;
-          if (iof) {
-            out[i] *= std::pow(solarDistance, 2) / iofResponsivity[out.Band(i) - 1];
-          }
-          else {
-            out[i] /= radianceResponsivity[out.Band(i) - 1];
-          }
-        }
-      }
-    }
-
     void CorrectSpecialPixels(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight,
                               int frameSize, Buffer *specpixCube) {
       for (int b = 0; b < in.BandDimension(); b++) {
@@ -780,6 +761,25 @@ namespace Isis {
           }
           else {
             outputPixel = Isis::Null;
+          }
+        }
+      }
+    }
+
+    void CorrectRadiometric(Buffer &out, double exposure, double solarDistance, bool iof,
+                            const std::vector<double> &iofResponsivity,
+                            const std::vector<double> &radianceResponsivity) {
+      for (int i = 0; i < out.size(); i++) {
+        if (IsSpecial(out[i])) {
+          out[i] = Isis::Null;
+        }
+        else {
+          out[i] /= exposure;
+          if (iof) {
+            out[i] *= std::pow(solarDistance, 2) / iofResponsivity[out.Band(i) - 1];
+          }
+          else {
+            out[i] /= radianceResponsivity[out.Band(i) - 1];
           }
         }
       }
