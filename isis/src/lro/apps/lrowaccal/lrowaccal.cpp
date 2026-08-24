@@ -371,8 +371,8 @@ namespace Isis {
     }
 
     static void CorrectFlatfield(const Buffer &in, Buffer &out, int correctBand,
-                                int frame, int frameHeight, int frameSize,
-                                Buffer *flatCube) {
+                                 int frame, int frameHeight, int frameSize,
+                                 Buffer *flatCube) {
       for (int b = 0; b < in.BandDimension(); b++) {
         // We find the index of the corresponding flat frame band as the offset
         int offset;
@@ -400,6 +400,25 @@ namespace Isis {
           }
           else {
             outputPixel = Isis::Null;
+          }
+        }
+      }
+    }
+
+    static void CorrectRadiometric(Buffer &out, double exposure, double solarDistance,
+                                   bool iof, const std::vector<double> &iofResponsivity,
+                                   const std::vector<double> &radianceResponsivity) {
+      for (int i = 0; i < out.size(); i++) {
+        if (IsSpecial(out[i])) {
+          out[i] = Isis::Null;
+        }
+        else {
+          out[i] /= exposure;
+          if (iof) {
+            out[i] *= std::pow(solarDistance, 2) / iofResponsivity[out.Band(i) - 1];
+          }
+          else {
+            out[i] /= radianceResponsivity[out.Band(i) - 1];
           }
         }
       }
