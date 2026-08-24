@@ -21,11 +21,6 @@
 
 #include "lrowaccal.h"
 
-
-using namespace std;
-using namespace Isis;
-
-
 namespace Isis {
   namespace LroWacCal {
     static constexpr int POLAR_MODE_SAMPLES = 1024;
@@ -122,8 +117,8 @@ namespace Isis {
    * @param ui the User Interface to parse the parameters from
    */
   void lrowaccal(Cube *icube, UserInterface &ui) {
-    vector<double> g_iofResponsivity;
-    vector<double> g_radianceResponsivity;
+    std::vector<double> g_iofResponsivity;
+    std::vector<double> g_radianceResponsivity;
     double g_TempratureConstants[7][2];
     for (int b = 0; b < 7; b++){
       g_TempratureConstants[b][0] = 0;
@@ -139,7 +134,7 @@ namespace Isis {
 
     int g_numFrames = 0;
 
-    vector<int> g_bands;
+    std::vector<int> g_bands;
 
     Buffer *g_darkCube1 = NULL, *g_darkCube2 = NULL, *g_flatCube = NULL, *g_specpixCube = NULL;
     
@@ -150,7 +145,7 @@ namespace Isis {
     g_specpix = ui.GetBoolean("SPECIALPIXELS");
     g_temprature = ui.GetBoolean("TEMPERATURE");
 
-    vector<QString> darkFiles;
+    std::vector<QString> darkFiles;
     ui.GetAsString("DARKFILE", darkFiles);
     QString flatFile = ui.GetAsString("FLATFIELDFILE");
     QString radFile = ui.GetAsString("RADIOMETRICFILE");
@@ -219,7 +214,7 @@ namespace Isis {
       // get a list of dark files that match our basename
       QDir dir(filename.path(), filter);
 
-      vector<DarkFileInfo> darkFiles;
+      std::vector<DarkFileInfo> darkFiles;
       darkFiles.reserve(dir.count());
 
       // Loop through all files in the dir that match our basename and extract time and temp
