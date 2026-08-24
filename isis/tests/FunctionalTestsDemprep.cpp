@@ -6,6 +6,7 @@
 
 #include "Cube.h"
 #include "Pvl.h"
+#include "TempFixtures.h"
 #include "TestUtilities.h"
 #include "FileName.h"
 #include "LineManager.h"
@@ -86,6 +87,78 @@ TEST(Demprep, DemprepDefault){
   EXPECT_EQ(hist->ValidPixels(), 96141);
   EXPECT_NEAR(hist->StandardDeviation(), 2055.78, .01);
 }
+
+TEST_F(TempTestingFiles, DemprepRadius) {
+  Pvl appLog;
+  QTemporaryDir prefix;
+  QString cubeFileName = prefix.path() + "/padded.cub";
+  QString fromFileName = "data/demprep/ulcn2005_lpo_downsampled.no_base.cub";
+
+  QVector<QString> args = {"from=" + fromFileName, "to=" + cubeFileName, "SPHERICALDATUMRADIUS=1737400" };
+
+  UserInterface options(APP_XML, args);
+  try {
+   demprep(options, &appLog);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to prep DEM: " << e.toString().toStdString().c_str() << std::endl;
+  }
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  EXPECT_EQ(cube.sampleCount(), 439);
+  EXPECT_EQ(cube.lineCount(), 221);
+  EXPECT_EQ(cube.bandCount(), 1);
+
+  // Pixels Group
+  PvlGroup &pixels = isisLabel->findGroup("Pixels", Pvl::Traverse);
+  EXPECT_EQ(pixels["Type"][0].toStdString(), "SignedWord");
+  EXPECT_EQ(pixels["ByteOrder"][0].toStdString(), "Lsb");
+  EXPECT_EQ(double(pixels["Base"]), 1737400.0);
+  EXPECT_EQ(double(pixels["Multiplier"]), 1.0);
+
+  // BandBin Group
+  // Check size, first, 2 middle, and last values? Enough?
+  PvlGroup &bandbin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_EQ(bandbin["Center"].size(), 1);
+  EXPECT_EQ(bandbin["OriginalBand"].size(), 1);
+
+  // Mapping Group
+  PvlGroup &mapping = isisLabel->findGroup("Mapping", Pvl::Traverse);
+  EXPECT_EQ(mapping["ProjectionName"][0].toStdString(), "Equirectangular");
+  EXPECT_DOUBLE_EQ(double(mapping["CenterLongitude"]), 180.0);
+  EXPECT_EQ(mapping["TargetName"][0].toStdString(), "Moon");
+  EXPECT_DOUBLE_EQ(double(mapping["EquatorialRadius"]), 1737400.0);
+  EXPECT_DOUBLE_EQ(double(mapping["PolarRadius"]), 1737400.0);
+  EXPECT_EQ(mapping["LatitudeType"][0].toStdString(), "Planetocentric");
+  EXPECT_EQ(mapping["LongitudeDirection"][0].toStdString(), "PositiveEast");
+  EXPECT_EQ(int(mapping["LongitudeDomain"]), 180);
+  EXPECT_DOUBLE_EQ(double(mapping["MinimumLatitude"]), -90.0);
+  EXPECT_DOUBLE_EQ(double(mapping["MaximumLatitude"]), 90.0);
+  EXPECT_DOUBLE_EQ(double(mapping["MinimumLongitude"]), -180.0);
+  EXPECT_DOUBLE_EQ(double(mapping["MaximumLongitude"]), 180.0);
+  EXPECT_DOUBLE_EQ(double(mapping["UpperLeftCornerX"]), -10950000.0);
+  EXPECT_DOUBLE_EQ(double(mapping["UpperLeftCornerY"]), 2775000.0);
+  EXPECT_DOUBLE_EQ(double(mapping["PixelResolution"]), 25000.0);
+  EXPECT_NEAR(double(mapping["Scale"]), 1.21293, .00001);
+  EXPECT_DOUBLE_EQ(double(mapping["CenterLatitude"]), 0.0);
+
+  Table shapeModel = cube.readTable("ShapeModelStatistics");
+  // Assertion for minimum radius
+  EXPECT_DOUBLE_EQ(double(shapeModel[0][0]), 1728.805);
+  // Assertion for maximum radius
+  EXPECT_DOUBLE_EQ(double(shapeModel[0][1]), 1745.313);
+
+
+  std::unique_ptr<Histogram> hist (cube.histogram());
+
+  EXPECT_NEAR(hist->Average(), 1736765.71744, .00001);
+  EXPECT_DOUBLE_EQ(hist->Sum(), 166974392841);
+  EXPECT_EQ(hist->ValidPixels(), 96141);
+  EXPECT_NEAR(hist->StandardDeviation(), 2055.78, .01);
+}
+
 
 
 TEST(Demprep, DemprepInside){
