@@ -89,6 +89,29 @@ namespace Isis {
       double exposure = 1.0;       //!< Exposure duration
       double solarDistance = 1.01; //!< average distance in [AU]
     };
+
+    static void CopyCubeIntoBuffer(QString &fileString, Buffer *&data) {
+      Cube cube;
+      FileName filename(fileString);
+      if (filename.isVersioned()) {
+        filename = filename.highestVersion();
+      }
+
+      if (!filename.fileExists()) {
+        QString msg = fileString + " does not exist.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      cube.open(filename.expanded());
+      Brick brick(cube.sampleCount(), cube.lineCount(), cube.bandCount(), cube.pixelType());
+      brick.SetBasePosition(1, 1, 1);
+      cube.read(brick);
+
+      data = nullptr;
+      data = new Buffer(brick);
+
+      fileString = filename.expanded();
+    }
   }
 
   /**
