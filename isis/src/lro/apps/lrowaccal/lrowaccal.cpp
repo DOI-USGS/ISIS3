@@ -31,17 +31,6 @@
 
 namespace Isis {
   namespace LroWacCal {
-    QString GetCalibrationDirectory(QString calibrationType) {
-      // Get the directory where the CISS calibration directories are.
-      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-      QString missionDir = (QString)dataDir["LRO"];
-      if (calibrationType != "") {
-        calibrationType += "/";
-      }
-
-      return missionDir + "/calibration/" + calibrationType;
-    }
-
     void CorrectDark(const Buffer &in, Buffer &out, int correctBand, double startTemp, double endTemp, int frame,
                      int frameHeight, int frameSize, int numFrames, double frameTemp, Buffer *darkCube1, double temp1,
                      Buffer *darkCube2, double temp2) {
@@ -783,6 +772,17 @@ namespace Isis {
       fileString.replace(index, 1, toString(static_cast<int>(bestTemp)));
 
       CopyCubeIntoBuffer(fileString, data);
+    }
+
+    QString GetCalibrationDirectory(QString calibrationType) {
+      // Get the directory where the CISS calibration directories are.
+      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+      QString missionDir = (QString)dataDir["LRO"];
+      if (calibrationType != "") {
+        calibrationType += "/";
+      }
+
+      return missionDir + "/calibration/" + calibrationType;
     }
   }
 }
