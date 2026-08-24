@@ -31,26 +31,6 @@
 
 namespace Isis {
   namespace LroWacCal {
-    void CorrectSpecialPixels(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight,
-                              int frameSize, Buffer *specpixCube) {
-      for (int b = 0; b < in.BandDimension(); b++) {
-        // We find the index of the corresponding specpix frame band as the offset
-        int offset = 0;
-        if (correctBand != -1) {
-          offset = specpixCube->Index(1, frameHeight * std::min(frame, (specpixCube->LineDimension() - 1) / frameHeight) + 1, correctBand);
-        }
-        else {
-          offset = specpixCube->Index(1, frameHeight * std::min(frame, (specpixCube->LineDimension() - 1) / frameHeight) + 1, b + 1);
-        }
-
-        for (int i = 0; i < frameSize; i++) {
-          if (IsSpecial((*specpixCube)[offset + i])) {
-            out[i + b * frameSize] = (*specpixCube)[offset + i];
-          }
-        }
-      }
-    }
-
     void CorrectTemperature(Buffer &out, int correctBand, double frameTemp,
                             const std::array<std::array<double, 2>, 7> &temperatureConstants) {
       for (int i = 0; i < out.size(); i++) {
@@ -780,6 +760,26 @@ namespace Isis {
           }
           else {
             out[i] /= radianceResponsivity[out.Band(i) - 1];
+          }
+        }
+      }
+    }
+
+    void CorrectSpecialPixels(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight,
+                              int frameSize, Buffer *specpixCube) {
+      for (int b = 0; b < in.BandDimension(); b++) {
+        // We find the index of the corresponding specpix frame band as the offset
+        int offset = 0;
+        if (correctBand != -1) {
+          offset = specpixCube->Index(1, frameHeight * std::min(frame, (specpixCube->LineDimension() - 1) / frameHeight) + 1, correctBand);
+        }
+        else {
+          offset = specpixCube->Index(1, frameHeight * std::min(frame, (specpixCube->LineDimension() - 1) / frameHeight) + 1, b + 1);
+        }
+
+        for (int i = 0; i < frameSize; i++) {
+          if (IsSpecial((*specpixCube)[offset + i])) {
+            out[i + b * frameSize] = (*specpixCube)[offset + i];
           }
         }
       }
