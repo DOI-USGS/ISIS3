@@ -31,70 +31,6 @@
 
 namespace Isis {
   namespace LroWacCal {
-    void CorrectDark(const Buffer &in, Buffer &out, int correctBand, double startTemp, double endTemp, int frame,
-                     int frameHeight, int frameSize, int numFrames, double frameTemp, Buffer *darkCube1, double temp1,
-                     Buffer *darkCube2, double temp2) {
-      const double tempFactor = (frameTemp - temp2) / (temp1 - temp2);
-
-      for (int b = 0; b < in.BandDimension(); b++) {
-        // We find the index of the corresponding dark frame band as the offset
-        int offset = 0;
-        if (correctBand != -1) {
-          offset = darkCube1->Index(1, frameHeight * std::min(frame, darkCube1->LineDimension() / frameHeight - 1) + 1, correctBand);
-        }
-        else {
-          offset = darkCube1->Index(1, frameHeight * std::min(frame, darkCube1->LineDimension() / frameHeight - 1) + 1, b + 1);
-        }
-
-        // We're bypassing Buffer::at for speed, so we need to make sure our
-        // index will not overrun the buffer
-        if (offset + frameSize > darkCube1->size()) {
-          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
-          throw IException(IException::Programmer, message, _FILEINFO_);
-        }
-        if (offset + frameSize > darkCube2->size()) {
-          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
-          throw IException(IException::Programmer, message, _FILEINFO_);
-        }
-
-        for (int i = 0; i < frameSize; i++) {
-          double dark1Pixel = (*darkCube1)[offset + i];
-          double dark2Pixel = (*darkCube2)[offset + i];
-          double &outputPixel = out[i + b * frameSize];
-          // Interpolate between the two darks with the current temperature
-          if (!IsSpecial(dark1Pixel) && !IsSpecial(dark2Pixel) && !IsSpecial(outputPixel)) {
-            if (temp1 != temp2) {
-              // Dark correction formula:
-              //
-              //    (dark1Pixel - dark2Pixel)
-              //    -------------------------   *   (frameTemp - dark2Temp)   +   dark2Pixel
-              //     (dark1Temp - dark2Temp)
-              //
-              // frameTemp:
-              //
-              //    (WAC end temp - WAC start temp)
-              //    -------------------------------   *   frame   +   WAC start temp
-              //         (WAC num framelets)
-              //
-              // tempFactor (calculated outside the loops for speed):
-              //
-              //    (frameTemp - dark2Temp)
-              //    -----------------------
-              //    (dark1Temp - dark2Temp)
-              //
-              outputPixel -= (dark1Pixel - dark2Pixel) * tempFactor + dark2Pixel;
-            }
-            else {
-              outputPixel -= dark1Pixel;
-            }
-          }
-          else {
-            outputPixel = Isis::Null;
-          }
-        }
-      }
-    }
-
     void CorrectFlatfield(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight, int frameSize,
                           Buffer *flatCube) {
       for (int b = 0; b < in.BandDimension(); b++) {
@@ -783,6 +719,70 @@ namespace Isis {
       }
 
       return missionDir + "/calibration/" + calibrationType;
+    }
+
+    void CorrectDark(const Buffer &in, Buffer &out, int correctBand, double startTemp, double endTemp, int frame,
+                     int frameHeight, int frameSize, int numFrames, double frameTemp, Buffer *darkCube1, double temp1,
+                     Buffer *darkCube2, double temp2) {
+      const double tempFactor = (frameTemp - temp2) / (temp1 - temp2);
+
+      for (int b = 0; b < in.BandDimension(); b++) {
+        // We find the index of the corresponding dark frame band as the offset
+        int offset = 0;
+        if (correctBand != -1) {
+          offset = darkCube1->Index(1, frameHeight * std::min(frame, darkCube1->LineDimension() / frameHeight - 1) + 1, correctBand);
+        }
+        else {
+          offset = darkCube1->Index(1, frameHeight * std::min(frame, darkCube1->LineDimension() / frameHeight - 1) + 1, b + 1);
+        }
+
+        // We're bypassing Buffer::at for speed, so we need to make sure our
+        // index will not overrun the buffer
+        if (offset + frameSize > darkCube1->size()) {
+          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
+          throw IException(IException::Programmer, message, _FILEINFO_);
+        }
+        if (offset + frameSize > darkCube2->size()) {
+          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
+          throw IException(IException::Programmer, message, _FILEINFO_);
+        }
+
+        for (int i = 0; i < frameSize; i++) {
+          double dark1Pixel = (*darkCube1)[offset + i];
+          double dark2Pixel = (*darkCube2)[offset + i];
+          double &outputPixel = out[i + b * frameSize];
+          // Interpolate between the two darks with the current temperature
+          if (!IsSpecial(dark1Pixel) && !IsSpecial(dark2Pixel) && !IsSpecial(outputPixel)) {
+            if (temp1 != temp2) {
+              // Dark correction formula:
+              //
+              //    (dark1Pixel - dark2Pixel)
+              //    -------------------------   *   (frameTemp - dark2Temp)   +   dark2Pixel
+              //     (dark1Temp - dark2Temp)
+              //
+              // frameTemp:
+              //
+              //    (WAC end temp - WAC start temp)
+              //    -------------------------------   *   frame   +   WAC start temp
+              //         (WAC num framelets)
+              //
+              // tempFactor (calculated outside the loops for speed):
+              //
+              //    (frameTemp - dark2Temp)
+              //    -----------------------
+              //    (dark1Temp - dark2Temp)
+              //
+              outputPixel -= (dark1Pixel - dark2Pixel) * tempFactor + dark2Pixel;
+            }
+            else {
+              outputPixel -= dark1Pixel;
+            }
+          }
+          else {
+            outputPixel = Isis::Null;
+          }
+        }
+      }
     }
   }
 }
