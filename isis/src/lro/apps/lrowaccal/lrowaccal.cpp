@@ -281,6 +281,28 @@ namespace Isis {
 
       CopyCubeIntoBuffer(fileString, data);
     }
+
+    /**
+    * @brief Returns a QString containing the path of an LRO calibration directory
+    *
+    * @param calibrationType The type of calibration data
+    *
+    * @return @b QString Path of the calibration directory
+    *
+    * @internal
+    *   @history 2008-11-05 Jeannie Walldren - Original version
+    *   @history 2016-08-16 Victor Silva - Added option for base calibration directory
+    */
+    static QString GetCalibrationDirectory(QString calibrationType) {
+      // Get the directory where the CISS calibration directories are.
+      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
+      QString missionDir = (QString)dataDir["LRO"];
+      if (calibrationType != "") {
+        calibrationType += "/";
+      }
+
+      return missionDir + "/calibration/" + calibrationType;
+    }
   }
 
   /**
