@@ -510,7 +510,7 @@ namespace Isis {
    * @param ui the User Interface to parse the parameters from
    */
   void lrowaccal(Cube *icube, UserInterface &ui) {
-    CalParams calParams;
+    LroWacCal::CalParams calParams;
     std::vector<double> iofResponsivity;
     std::vector<double> radianceResponsivity;
     std::array<std::array<double, 2>, 7> temperatureConstants = {{{{0, 0}},
@@ -619,25 +619,25 @@ namespace Isis {
         darkFiles.resize(2);
         double temp = (double)inst["MiddleTemperatureFpa"];
         double time = iTime(inst["StartTime"][0]).Et();
-        QString darkFile = GetCalibrationDirectory("wac_darks") + "WAC_" + instModeId;
+        QString darkFile = LroWacCal::GetCalibrationDirectory("wac_darks") + "WAC_" + instModeId;
         if (instModeId == "BW") {
           darkFile += "_" + filter + "_Mode" + mode;
         }
         darkFile += "_Offset" + offset + "_*C_*T_Dark.????.cub";
-        GetDark(darkFile, temp, time, darkCube1, darkCube2, temp1,
+        LroWacCal::GetDark(darkFile, temp, time, darkCube1, darkCube2, temp1,
                 temp2, darkFiles[0], darkFiles[1]);
       }
       else if (darkFiles.size() == 1) {
-        CopyCubeIntoBuffer(darkFiles[0], darkCube1);
+        LroWacCal::CopyCubeIntoBuffer(darkFiles[0], darkCube1);
         temp1 = 0.0;
         darkCube2 = new Buffer(*darkCube1);
         temp2 = temp1;
       }
       else {
-        CopyCubeIntoBuffer(darkFiles[0], darkCube1);
+        LroWacCal::CopyCubeIntoBuffer(darkFiles[0], darkCube1);
         int index = darkFiles[0].lastIndexOf("_");
         temp1 = IString(darkFiles[0].mid(darkFiles[0].lastIndexOf("_", index - 1), index)).ToDouble();
-        CopyCubeIntoBuffer(darkFiles[1], darkCube2);
+        LroWacCal::CopyCubeIntoBuffer(darkFiles[1], darkCube2);
         index = darkFiles[1].lastIndexOf("_");
         temp2 = IString(darkFiles[1].mid(darkFiles[1].lastIndexOf("_", index - 1), index)).ToDouble();
       }
@@ -645,12 +645,12 @@ namespace Isis {
 
     if (calParams.flatfield) {
       if (flatFile.toLower() == "default" || flatFile.length() == 0) {
-        flatFile = GetCalibrationDirectory("wac_flats") + "WAC_" + instModeId;
+        flatFile = LroWacCal::GetCalibrationDirectory("wac_flats") + "WAC_" + instModeId;
         if (instModeId == "BW")
           flatFile += "_" + filter + "_Mode" + mode;
         flatFile += "_Flatfield.????.cub";
       }
-      CopyCubeIntoBuffer(flatFile, flatCube);
+      LroWacCal::CopyCubeIntoBuffer(flatFile, flatCube);
 
       // invert the flat-field data here so we don't have to divide for every pixel of the wac
       for (int i = 0; i < flatCube->size(); i++) {
@@ -664,7 +664,7 @@ namespace Isis {
       Isis::PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
 
       if (radFile.toLower() == "default" || radFile.length() == 0)
-        radFile = GetCalibrationDirectory("") + "WAC_RadiometricResponsivity.????.pvl";
+        radFile = LroWacCal::GetCalibrationDirectory("") + "WAC_RadiometricResponsivity.????.pvl";
 
       FileName radFileName(radFile);
       if (radFileName.isVersioned()) {
@@ -724,23 +724,23 @@ namespace Isis {
 
     if (calParams.specpix) {
       if (specpixFile.toLower() == "default" || specpixFile.length() == 0) {
-        specpixFile = GetCalibrationDirectory("wac_masks") + "WAC_" + instModeId;
+        specpixFile = LroWacCal::GetCalibrationDirectory("wac_masks") + "WAC_" + instModeId;
         double temp = (double)inst["MiddleTemperatureFpa"];
         if (instModeId == "BW") {
           specpixFile += "_" + filter + "_Mode" + mode;
         }
         specpixFile += "_*C_SpecialPixels.????.cub";
-        GetMask(specpixFile, temp, specpixCube);
+        LroWacCal::GetMask(specpixFile, temp, specpixCube);
       }
       else {
-        CopyCubeIntoBuffer(specpixFile, specpixCube);
+        LroWacCal::CopyCubeIntoBuffer(specpixFile, specpixCube);
       }
     }
 
     PvlKeyword temperaturePvl("TemperatureFile");
     if (calParams.temperature) {
       if (tempFile.toLower() == "default" || tempFile.length() == 0)
-        tempFile = GetCalibrationDirectory("") + "WAC_TemperatureConstants.????.pvl";
+        tempFile = LroWacCal::GetCalibrationDirectory("") + "WAC_TemperatureConstants.????.pvl";
 
       FileName tempFileName(tempFile);
       if (tempFileName.isVersioned()) {
@@ -805,28 +805,28 @@ namespace Isis {
       }
 
       if (calParams.dark) {
-        CorrectDark(inCube, outCube, correctBand, startTemperature, endTemperature,
+        LroWacCal::CorrectDark(inCube, outCube, correctBand, startTemperature, endTemperature,
                     frame, frameHeight, frameSize, numFrames, frameTemp, darkCube1,
                     temp1, darkCube2, temp2);
       }
 
       if (calParams.flatfield) {
-        CorrectFlatfield(inCube, outCube, correctBand, frame, frameHeight, frameSize,
+        LroWacCal::CorrectFlatfield(inCube, outCube, correctBand, frame, frameHeight, frameSize,
                          flatCube);
       }
 
       if (calParams.radiometric) {
-        CorrectRadiometric(outCube, calParams.exposure, calParams.solarDistance, calParams.iof,
+        LroWacCal::CorrectRadiometric(outCube, calParams.exposure, calParams.solarDistance, calParams.iof,
                            iofResponsivity, radianceResponsivity);
       }
 
       if (calParams.specpix) {
-        CorrectSpecialPixels(inCube, outCube, correctBand, frame, frameHeight,
+        LroWacCal::CorrectSpecialPixels(inCube, outCube, correctBand, frame, frameHeight,
                              frameSize, specpixCube);
       }
 
       if (calParams.temperature) {
-        CorrectTemperature(outCube, correctBand, frameTemp, temperatureConstants);
+        LroWacCal::CorrectTemperature(outCube, correctBand, frameTemp, temperatureConstants);
       }
     };
 
