@@ -20,21 +20,24 @@
 
 #include "lrowaccal.h"
 
-#define POLAR_MODE_SAMPLES 1024
-#define NO_POLAR_MODE_SAMPLES 704
-#define BW_BANDS 1
-#define VIS_LINES 14
-#define COLOR_BANDS 5
-#define UV_SAMPLES 128
-#define UV_LINES 4
-#define UV_BANDS 2
-#define KM_PER_AU 149597871
 
 using namespace std;
 using namespace Isis;
 
 
 namespace Isis {
+  namespace LroWacCal {
+    static constexpr int POLAR_MODE_SAMPLES = 1024;
+    static constexpr int NO_POLAR_MODE_SAMPLES = 704;
+    static constexpr int BW_BANDS = 1;
+    static constexpr int VIS_LINES = 14;
+    static constexpr int COLOR_BANDS = 5;
+    static constexpr int UV_SAMPLES = 128;
+    static constexpr int UV_LINES = 4;
+    static constexpr int UV_BANDS = 2;
+    static constexpr double KM_PER_AU = 149597871;
+  }
+
   /**
    * @brief Calibrate a WAC cube. 
    *
