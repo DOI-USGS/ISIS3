@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -155,10 +156,6 @@ namespace Isis {
     //
     // Helper functions
     //
-    auto min = [](double a, double b) -> double {
-      return (a < b) ? a : b;
-    };
-
     auto CopyCubeIntoBuffer = [](QString &fileString, Buffer* &data) -> void {
       Cube cube;
       FileName filename(fileString);
@@ -373,9 +370,9 @@ namespace Isis {
           // We find the index of the corresponding dark frame band as the offset
           int offset;
           if (correctBand != -1)
-            offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, correctBand);
+            offset = g_darkCube1->Index(1, frameHeight * static_cast<int>(std::min(frame, g_darkCube1->LineDimension()/std::static_cast<double>(frameHeight) - 1)) + 1, correctBand);
           else
-            offset = g_darkCube1->Index(1, frameHeight * (int) min(frame, g_darkCube1->LineDimension()/frameHeight - 1) + 1, b+1);
+            offset = g_darkCube1->Index(1, frameHeight * static_cast<int>(std::min(frame, g_darkCube1->LineDimension()/std::static_cast<double>(frameHeight) - 1)) + 1, b+1);
 
           // We're bypassing Buffer::at for speed, so we need to make sure our
           // index will not overrun the buffer
@@ -431,9 +428,9 @@ namespace Isis {
           // We find the index of the corresponding flat frame band as the offset
           int offset;
           if (correctBand != -1)
-            offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, correctBand);
+            offset = g_flatCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_flatCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, correctBand);
           else
-            offset = g_flatCube->Index(1, frameHeight * (int) min(frame, (g_flatCube->LineDimension()-1) / frameHeight)+1, b+1);
+            offset = g_flatCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_flatCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, b+1);
 
           // We're bypassing Buffer::at for speed, so we need to make sure our
           // index will not overrun the buffer
@@ -474,9 +471,9 @@ namespace Isis {
           // We find the index of the corresponding flat frame band as the offset
           int offset;
           if (correctBand != -1)
-            offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, correctBand);
+            offset = g_specpixCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_specpixCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, correctBand);
           else
-            offset = g_specpixCube->Index(1, frameHeight * (int) min(frame, (g_specpixCube->LineDimension()-1) / frameHeight)+1, b+1);
+            offset = g_specpixCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_specpixCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, b+1);
 
           for (int i = 0; i < frameSize; i++) {
             if (IsSpecial(g_specpixCube->at(offset + i)))
@@ -744,15 +741,15 @@ namespace Isis {
 
     if (instModeId == "BW") {
       if (mode == "1" || mode == "0")
-        p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, (int)min(BW_BANDS, g_bands.size()));
+        p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(g_bands.size())));
       else
-        p.SetBrickSize(POLAR_MODE_SAMPLES, VIS_LINES, (int)min(BW_BANDS, g_bands.size()));
+        p.SetBrickSize(POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(g_bands.size())));
     }
     else if (instModeId == "COLOR") {
-      p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, (int)min(COLOR_BANDS, g_bands.size()));
+      p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(COLOR_BANDS, static_cast<int>(g_bands.size())));
     }
     else if (instModeId == "UV") {
-      p.SetBrickSize(UV_SAMPLES, UV_LINES, (int)min(UV_BANDS, g_bands.size()));
+      p.SetBrickSize(UV_SAMPLES, UV_LINES, std::min(UV_BANDS, static_cast<int>(g_bands.size())));
     }
 
     g_exposure = inst["ExposureDuration"];
