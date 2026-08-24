@@ -456,7 +456,7 @@ namespace Isis {
     p.SetInputCube(icube);
 
     // Make sure it is a WAC cube
-    Isis::PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
+    PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
     QString instId = (QString)inst["InstrumentId"];
     instId = instId.toUpper();
     if (instId != "WAC-VIS" && instId != "WAC-UV") {
@@ -504,7 +504,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    Isis::PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
+    PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
     QString filter = (QString)bandBin["Center"][0];
     QString filterNum = (QString)bandBin["FilterNumber"][0];
     // We have to pay special attention in case we are passed a
@@ -563,7 +563,7 @@ namespace Isis {
     PvlKeyword responsivity;
 
     if (calParams.radiometric) {
-      Isis::PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
+      PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
 
       if (radFile.toLower() == "default" || radFile.length() == 0)
         radFile = LroWacCal::GetCalibrationDirectory("") + "WAC_RadiometricResponsivity.????.pvl";
