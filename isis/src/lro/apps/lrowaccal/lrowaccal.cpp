@@ -52,24 +52,6 @@ namespace Isis {
       fileString = filename.expanded();
     }
 
-    /**
-    * @brief Finds 2 best dark files for WAC calibration.
-    *
-    * GetDark will find the 2 closest available dark file temperatures matching the given file name
-    * pattern. Then find the dark file at each temperature with the time closest to the WAC temperature.
-    * If there is only one temperature, it will pick the 2 closest times at that temperature.
-    *
-    *
-    * @param fileString String pattern defining dark files to search (ie. lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
-    * @param temp Temperature of WAC being calibrated
-    * @param time Time of WAC being calibrated
-    * @param data1 Buffer to hold dark file 1 cub data
-    * @param data2 Buffer to hold dark file 2 cub data
-    * @param temp1 Temperature of dark file 1
-    * @param temp2 Temperature of dark file 2
-    * @param file1 Filename of dark file 1
-    * @param file2 Filename of dark file 2
-    */
     void GetDark(const QString &fileString, double temp, double time, Buffer *&data1, Buffer *&data2, double &temp1,
                  double &temp2, QString &file1, QString &file2) {
       FileName filename(fileString);
@@ -216,17 +198,6 @@ namespace Isis {
       CopyCubeIntoBuffer(fileString, data);
     }
 
-    /**
-    * @brief Returns a QString containing the path of an LRO calibration directory
-    *
-    * @param calibrationType The type of calibration data
-    *
-    * @return @b QString Path of the calibration directory
-    *
-    * @internal
-    *   @history 2008-11-05 Jeannie Walldren - Original version
-    *   @history 2016-08-16 Victor Silva - Added option for base calibration directory
-    */
     QString GetCalibrationDirectory(QString calibrationType) {
       // Get the directory where the CISS calibration directories are.
       PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
