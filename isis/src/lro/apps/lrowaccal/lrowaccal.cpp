@@ -510,33 +510,35 @@ namespace Isis {
    * @param ui the User Interface to parse the parameters from
    */
   void lrowaccal(Cube *icube, UserInterface &ui) {
-    std::vector<double> g_iofResponsivity;
-    std::vector<double> g_radianceResponsivity;
-    double g_TempratureConstants[7][2];
-    for (int b = 0; b < 7; b++){
-      g_TempratureConstants[b][0] = 0;
-      g_TempratureConstants[b][1] = 0;
-    }
+    CalParams calParams;
+    std::vector<double> iofResponsivity;
+    std::vector<double> radianceResponsivity;
+    std::array<std::array<double, 2>, 7> temperatureConstants = {{{{0, 0}},
+                                                                  {{0, 0}},
+                                                                  {{0, 0}},
+                                                                  {{0, 0}},
+                                                                  {{0, 0}},
+                                                                  {{0, 0}},
+                                                                  {{0, 0}}}};
 
-    bool g_dark = true, g_flatfield = true, g_radiometric = true, g_iof = true, g_specpix = true, g_temprature = true;
+    double temp1 = 0.0;
+    double temp2 = 0.0;
 
-    double g_exposure = 1.0; //!< Exposure duration
-    double g_solarDistance = 1.01; //!< average distance in [AU]
-    double g_startTemperature, g_endTemperature;
-    double g_temp1 = 0.0, g_temp2 = 0.0;
+    int numFrames = 0;
 
-    int g_numFrames = 0;
+    std::vector<int> bands;
 
-    std::vector<int> g_bands;
+    Buffer *darkCube1 = nullptr;
+    Buffer *darkCube2 = nullptr;
+    Buffer *flatCube = nullptr;
+    Buffer *specpixCube = nullptr;
 
-    Buffer *g_darkCube1 = NULL, *g_darkCube2 = NULL, *g_flatCube = NULL, *g_specpixCube = NULL;
-    
-    g_dark = ui.GetBoolean("DARK");
-    g_flatfield = ui.GetBoolean("FLATFIELD");
-    g_radiometric = ui.GetBoolean("RADIOMETRIC");
-    g_iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
-    g_specpix = ui.GetBoolean("SPECIALPIXELS");
-    g_temprature = ui.GetBoolean("TEMPERATURE");
+    calParams.dark = ui.GetBoolean("DARK");
+    calParams.flatfield = ui.GetBoolean("FLATFIELD");
+    calParams.radiometric = ui.GetBoolean("RADIOMETRIC");
+    calParams.iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
+    calParams.specpix = ui.GetBoolean("SPECIALPIXELS");
+    calParams.temperature = ui.GetBoolean("TEMPERATURE");
 
     std::vector<QString> darkFiles;
     ui.GetAsString("DARKFILE", darkFiles);
@@ -546,394 +548,6 @@ namespace Isis {
     QString tempFile = ui.GetAsString("TEMPERATUREFILE");
 
     //
-    // Helper functions
-    //
-    auto CopyCubeIntoBuffer = [](QString &fileString, Buffer* &data) -> void {
-      Cube cube;
-      FileName filename(fileString);
-      if (filename.isVersioned())
-        filename = filename.highestVersion();
-      if (!filename.fileExists()) {
-        QString msg = fileString + " does not exist.";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-      cube.open(filename.expanded());
-      Brick brick(cube.sampleCount(), cube.lineCount(), cube.bandCount(), cube.pixelType());
-      brick.SetBasePosition(1, 1, 1);
-      cube.read(brick);
-
-      data = NULL;
-      data = new Buffer(brick);
-
-      fileString = filename.expanded();
-    };
-
-    /**
-    * Finds 2 best dark files for WAC calibration.
-    *
-    * GetDark will find the 2 closest available dark file tempuratures matching the given file name
-    * pattern. Then find the dark file at each tempurature with the time closest to the WAC tempurature.
-    * If there is only one tempurature, it will pick the 2 closest times at that tempurature.
-    *
-    *
-    * @param fileString String pattern defining dark files to search (ie. lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
-    * @param temp Tempurature of WAC being calibrated
-    * @param time Time of WAC being calibrated
-    * @param data1 Buffer to hold dark file 1 cub data
-    * @param data2 Buffer to hold dark file 2 cub data
-    * @param temp1 Tempurature of dark file 1
-    * @param temp2 Tempurature of dark file 2
-    * @param file1 Filename of dark file 1
-    * @param file2 Filename of dark file 2
-    */
-    auto GetDark = [CopyCubeIntoBuffer](QString fileString, double temp, double time, Buffer* &data1, Buffer* &data2,
-                      double & temp1, double & temp2, QString & file1, QString & file2) -> void {
-      FileName filename(fileString);
-      QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
-
-      // create a regular expression to capture the temp and time from filenames
-      QString regexPattern(basename);
-      regexPattern.replace("*", "([0-9\\.-]*)");
-      QRegExp regex(regexPattern);
-
-      // create a filter for the QDir to only load files matching our name
-      QString filter(basename);
-      filter.append(".*");
-
-      // get a list of dark files that match our basename
-      QDir dir(filename.path(), filter);
-
-      std::vector<DarkFileInfo> darkFiles;
-      darkFiles.reserve(dir.count());
-
-      // Loop through all files in the dir that match our basename and extract time and temp
-      for (unsigned int indx=0; indx < dir.count(); indx++) {
-        // match against our regular expression
-        int pos = regex.indexIn(dir[indx]);
-        if (pos == -1) {
-          continue; // filename did not match basename regex (time or temp contain non-digit)
-        }
-
-        // Get a list of regex matches. Item 0 should be the full QString, item 1
-        // is temp and item 2 is time.
-        QStringList texts = regex.capturedTexts();
-        if (texts.size() < 3) {
-          continue; // could not find time and/or temp
-        }
-
-        // extract time/temp from regex texts
-        bool tempOK, timeOK;
-        double fileTemp = texts[1].toDouble(&tempOK);
-        int fileTime = texts[2].toInt(&timeOK);
-        if (!tempOK || !timeOK) {
-          continue; // time or temp was not a valid numeric value
-        }
-
-        DarkFileInfo info(fileTemp, fileTime);
-        darkFiles.push_back(info);
-      }
-
-      // we require at least 2 different dark files to interpolate/extrapolate
-      if (darkFiles.size() < 2) {
-        QString msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-
-      // sort the files by distance from wac temp and time
-      DarkComp darkComp(temp, (int)time);
-      sort(darkFiles.begin(), darkFiles.end(), darkComp);
-
-      size_t temp1Index = 0;
-      size_t temp2Index;
-
-      temp1 = darkFiles[temp1Index].temp;
-
-      for (temp2Index = temp1Index+1; temp2Index < darkFiles.size(); temp2Index++) {
-        if (darkFiles[temp2Index].temp != temp1) {
-          break;
-        }
-      }
-
-      if (temp2Index >= darkFiles.size()) {
-        temp2Index = 1;
-      }
-
-      temp2 = darkFiles[temp2Index].temp;
-
-      int time1 = darkFiles[temp1Index].time;
-      int time2 = darkFiles[temp2Index].time;
-
-      int tempIndex = fileString.indexOf("*C");
-      int timeIndex = fileString.indexOf("*T");
-
-      file1 = fileString;
-      file1.replace(timeIndex, 1, toString(time1));
-      file1.replace(tempIndex, 1, toString((int)temp1));
-
-      file2 = fileString;
-      file2.replace(timeIndex, 1, toString(time2));
-      file2.replace(tempIndex, 1, toString((int)temp2));
-
-      CopyCubeIntoBuffer(file1, data1);
-      CopyCubeIntoBuffer(file2, data2);
-    };
-
-    auto GetMask = [CopyCubeIntoBuffer](QString &fileString, double temp, Buffer* &data) {
-      FileName filename(fileString);
-      QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
-
-      unsigned int index = basename.indexOf("*");
-
-      // create a filter for the QDir to only load files matching our name
-      QString filter(basename);
-      filter.append(".*");
-
-      QDir dir(filename.path(), filter);
-
-      // create a regular expression to capture the temp and time from filenames
-      QString regexPattern(basename);
-      regexPattern.replace("*", "([0-9\\.-]*)");
-      QRegExp regex(regexPattern);
-
-      double bestTemp = DBL_MAX;
-      for (unsigned int indx=0; indx < dir.count(); indx++) {
-        // match against our regular expression
-        int pos = regex.indexIn(dir[indx]);
-        if (pos == -1) {
-          continue; // filename did not match basename regex (temp contain non-digit)
-        }
-
-        // Get a list of regex matches. Item 0 should be the full QString, item 1 is temp
-        QStringList texts = regex.capturedTexts();
-        if (texts.size() < 2) {
-          continue; // could not find temp
-        }
-
-        // extract time/temp from regex texts
-        bool tempOK;
-        double fileTemp = texts[1].toDouble(&tempOK);
-        if (!tempOK) {
-          continue; // temp was not a valid numeric value
-        }
-
-        if (abs(temp - fileTemp) < abs(temp - bestTemp)) {
-          bestTemp = fileTemp;
-        }
-      }
-
-      if (bestTemp == DBL_MAX) {
-        QString msg = "No files exist for these mask options [" + basename + "]";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-
-      index = fileString.indexOf("*");
-      fileString.replace(index, 1, toString((int)bestTemp));
-
-      CopyCubeIntoBuffer(fileString, data);
-    };
-
-    // Calibrate each framelet
-    auto Calibrate = [&](Buffer &inCube, Buffer &outCube) -> void {
-      int correctBand = -1;
-      //If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
-      if (inCube.BandDimension() == 1 && g_bands.size() == 1)
-        correctBand = g_bands.front();
-
-      int frameHeight = inCube.LineDimension();
-      int frameSize = inCube.SampleDimension()*inCube.LineDimension();
-      int frame = inCube.Line() / frameHeight;
-
-      // Calculate a temperature factor for the current frame (this is done to avoid doing this for each pixel
-      // Used in dark and temprature correction
-      // frameTemp:
-      //
-      //    (WAC end temp - WAC start temp)
-      //    -------------------------------   *   frame   +   WAC start temp
-      //         (WAC num framelets)
-      double frameTemp = (g_endTemperature - g_startTemperature)/g_numFrames * frame + g_startTemperature;
-
-      for (int i = 0; i < outCube.size(); i++)
-        outCube[i] = inCube[i];
-
-      if (g_dark) {
-        double tempFactor = (frameTemp - g_temp2) / (g_temp1-g_temp2);
-
-        for (int b=0; b<inCube.BandDimension(); b++) {
-          // We find the index of the corresponding dark frame band as the offset
-          int offset;
-          if (correctBand != -1)
-            offset = g_darkCube1->Index(1, frameHeight * static_cast<int>(std::min(frame, g_darkCube1->LineDimension()/std::static_cast<double>(frameHeight) - 1)) + 1, correctBand);
-          else
-            offset = g_darkCube1->Index(1, frameHeight * static_cast<int>(std::min(frame, g_darkCube1->LineDimension()/std::static_cast<double>(frameHeight) - 1)) + 1, b+1);
-
-          // We're bypassing Buffer::at for speed, so we need to make sure our
-          // index will not overrun the buffer
-          if(offset + frameSize > g_darkCube1->size()) {
-            QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
-            throw IException(IException::Programmer, message, _FILEINFO_);
-          }
-          if(offset + frameSize > g_darkCube2->size()) {
-            QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
-            throw IException(IException::Programmer, message, _FILEINFO_);
-          }
-
-          for (int i = 0; i < frameSize; i++) {
-            double dark1Pixel = (*g_darkCube1)[offset + i];
-            double dark2Pixel = (*g_darkCube2)[offset + i];
-            double &outputPixel = outCube[i + b*frameSize];
-            // Interpolate between the two darks with the current temperaturube1
-            if (!IsSpecial(dark1Pixel) && !IsSpecial(dark2Pixel) && !IsSpecial(outputPixel)) {
-              if (g_temp1 != g_temp2) {
-                // Dark correction formula:
-                //
-                //    (dark1Pixel - dark2Pixel)
-                //    -------------------------   *   (frameTemp - dark2Temp)   +   dark2Pixel
-                //     (dark1Temp - dark2Temp)
-                //
-                // frameTemp:
-                //
-                //    (WAC end temp - WAC start temp)
-                //    -------------------------------   *   frame   +   WAC start temp
-                //         (WAC num framelets)
-                //
-                // tempFactor (calculated outside the loops for speed):
-                //
-                //    (frameTemp - dark2Temp)
-                //    -----------------------
-                //    (dark1Temp - dark2Temp)
-                //
-                outputPixel -= (dark1Pixel - dark2Pixel) * tempFactor + dark2Pixel;
-              }
-              else {
-                outputPixel -= dark1Pixel;
-              }
-            }
-            else {
-              outputPixel = Isis::Null;
-            }
-          }
-        }
-      }
-
-      if (g_flatfield) {
-        for (int b=0; b<inCube.BandDimension(); b++) {
-          // We find the index of the corresponding flat frame band as the offset
-          int offset;
-          if (correctBand != -1)
-            offset = g_flatCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_flatCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, correctBand);
-          else
-            offset = g_flatCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_flatCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, b+1);
-
-          // We're bypassing Buffer::at for speed, so we need to make sure our
-          // index will not overrun the buffer
-          if(offset + frameSize > g_flatCube->size()) {
-            QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
-            throw IException(IException::Programmer, message, _FILEINFO_);
-          }
-
-          int outFrameOffset = b*frameSize;
-          for (int i = 0; i < frameSize; i++) {
-            double flatPixel = (*g_flatCube)[offset + i];
-            double &outputPixel = outCube[i + outFrameOffset];
-
-            if (flatPixel > 0.0 && !IsSpecial(flatPixel) && !IsSpecial(outputPixel))
-              outputPixel *= flatPixel; // The flat-field data was inverted during load so we don't have to divide here.
-            else
-              outputPixel = Isis::Null;
-          }
-        }
-      }
-
-      if (g_radiometric) {
-        for (int i = 0; i < outCube.size(); i++) {
-          if (IsSpecial(outCube[i]))
-            outCube[i] = Isis::Null;
-          else {
-            outCube[i] /= g_exposure;
-            if (g_iof)
-              outCube[i] *= pow(g_solarDistance, 2) / g_iofResponsivity[outCube.Band(i) - 1];
-            else
-              outCube[i] /= g_radianceResponsivity[outCube.Band(i) - 1];
-          }
-        }
-      }
-
-      if (g_specpix) {
-        for (int b=0; b<inCube.BandDimension(); b++) {
-          // We find the index of the corresponding flat frame band as the offset
-          int offset;
-          if (correctBand != -1)
-            offset = g_specpixCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_specpixCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, correctBand);
-          else
-            offset = g_specpixCube->Index(1, frameHeight * static_cast<int>(std::min(frame, (g_specpixCube->LineDimension()-1) / static_cast<double>(frameHeight)))+1, b+1);
-
-          for (int i = 0; i < frameSize; i++) {
-            if (IsSpecial(g_specpixCube->at(offset + i)))
-              outCube[i+b*frameSize] = g_specpixCube->at(offset + i);
-          }
-        }
-      }
-
-      if (g_temprature) {
-        for (int i = 0; i < outCube.size(); i++) {
-          if (IsSpecial(outCube[i]))
-            outCube[i] = Isis::Null;
-          else {
-
-            // Temprature Correction Formula
-            //
-            //       inputPixel
-            //  ---------------------
-            //    a*(frameTemp) + b
-            //
-            // Where:
-            //  'a' and 'b' are band dependant constants read in via a pvl file
-            //
-            //  AND
-            //
-            // frameTemp: (Pre-Calculated as it is used in multiple places)
-            //
-            //    (WAC end temp - WAC start temp)
-            //    -------------------------------   *   frame   +   WAC start temp
-            //         (WAC num framelets)
-            //
-            //
-            //
-            if (correctBand != -1)
-              outCube[i] = outCube[i]/ (g_TempratureConstants[correctBand][0] * frameTemp + g_TempratureConstants[correctBand][1]);
-            else
-              outCube[i] = outCube[i]/ (g_TempratureConstants[outCube.Band(i)][0] * frameTemp + g_TempratureConstants[outCube.Band(i)][1]);
-
-          }
-        }
-      }
-    };
-
-    /**
-    * This method returns a QString containing the path of an
-    * LRO calibration directory
-    *
-    * @param calibrationType The type of calibration data
-    *
-    * @return @b QString Path of the calibration directory
-    *
-    * @internal
-    *   @history 2008-11-05 Jeannie Walldren - Original version
-    *   @history 2016-08-16 Victor Silva - Added option for base calibration directory
-    */
-    auto GetCalibrationDirectory = [](QString calibrationType) -> QString {
-      // Get the directory where the CISS calibration directories are.
-      PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
-      QString missionDir = (QString) dataDir["LRO"];
-      if(calibrationType != "") {
-        calibrationType += "/";
-      }
-
-      return missionDir + "/calibration/" + calibrationType;
-    };
-    
-
-    //
     // Start processing code
     //
     ProcessByBrick p;
@@ -941,7 +555,7 @@ namespace Isis {
 
     // Make sure it is a WAC cube
     Isis::PvlGroup &inst = icube->label()->findGroup("Instrument", Pvl::Traverse);
-    QString instId = (QString) inst["InstrumentId"];
+    QString instId = (QString)inst["InstrumentId"];
     instId = instId.toUpper();
     if (instId != "WAC-VIS" && instId != "WAC-UV") {
       QString msg = "This program is intended for use on LROC WAC images only. [";
@@ -961,90 +575,101 @@ namespace Isis {
     }
 
     // Determine the dark/flat files to use
-    QString offset = (QString) inst["BackgroundOffset"];
-    QString mode = (QString) inst["Mode"];
-    QString instModeId = (QString) inst["InstrumentModeId"];
+    QString offset = (QString)inst["BackgroundOffset"];
+    QString mode = (QString)inst["Mode"];
+    QString instModeId = (QString)inst["InstrumentModeId"];
     instModeId = instModeId.toUpper();
 
-    if (instModeId == "COLOR" && (QString) inst["InstrumentId"] == "WAC-UV")
+    if (instModeId == "COLOR" && (QString)inst["InstrumentId"] == "WAC-UV") {
       instModeId = "UV";
-    else if (instModeId == "VIS")
+    }
+    else if (instModeId == "VIS") {
       instModeId = "COLOR";
+    }
 
-    g_startTemperature = (double) inst["BeginTemperatureFpa"];
-    g_endTemperature = (double) inst["EndTemperatureFpa"];
+    double startTemperature = (double)inst["BeginTemperatureFpa"];
+    double endTemperature = (double)inst["EndTemperatureFpa"];
 
-    g_numFrames = (int) inst["NumFramelets"];
+    numFrames = (int)inst["NumFramelets"];
 
     // Figure out which bands are input
     for (int i = 1; i <= icube->bandCount(); i++) {
-      g_bands.push_back(icube->physicalBand(i));
+      bands.push_back(icube->physicalBand(i));
+    }
+    if (bands.size() < 1 || bands.size() > 7) {
+      QString msg = QString("This program is intended for use on LROC WAC images only.");
+      msg += "Expected 1 to 7 bands, but got [" + toString(static_cast<int>(bands.size())) + "].";
+      throw IException(IException::User, msg, _FILEINFO_);
     }
 
     Isis::PvlGroup &bandBin = icube->label()->findGroup("BandBin", Pvl::Traverse);
-    QString filter = (QString) bandBin["Center"][0];
-    QString filterNum = (QString) bandBin["FilterNumber"][0];
-    //We have to pay special attention incase we are passed a
-    //single band image that has been "exploded" from a multiband wac
-    if (instModeId == "COLOR" && g_bands.size() == 1)
-      g_bands[0] = (toInt(filterNum) -2);
-    else if (instModeId == "UV" && g_bands.size() == 1)
-      g_bands[0] = (toInt(filterNum));
+    QString filter = (QString)bandBin["Center"][0];
+    QString filterNum = (QString)bandBin["FilterNumber"][0];
+    // We have to pay special attention in case we are passed a
+    // single band image that has been "exploded" from a multiband wac
+    if (instModeId == "COLOR" && bands.size() == 1) {
+      bands[0] = (toInt(filterNum) - 2);
+    }
+    else if (instModeId == "UV" && bands.size() == 1) {
+      bands[0] = (toInt(filterNum));
+    }
 
-    if (g_dark) {
-      if (darkFiles.size() == 0 || darkFiles[0] =="Default" || darkFiles[0].length() == 0) {
+    if (calParams.dark) {
+      if (darkFiles.size() == 0 || darkFiles[0] == "Default" || darkFiles[0].length() == 0) {
         darkFiles.resize(2);
-        double temp = (double) inst["MiddleTemperatureFpa"];
+        double temp = (double)inst["MiddleTemperatureFpa"];
         double time = iTime(inst["StartTime"][0]).Et();
         QString darkFile = GetCalibrationDirectory("wac_darks") + "WAC_" + instModeId;
-        if (instModeId == "BW")
+        if (instModeId == "BW") {
           darkFile += "_" + filter + "_Mode" + mode;
+        }
         darkFile += "_Offset" + offset + "_*C_*T_Dark.????.cub";
-        GetDark(darkFile, temp, time, g_darkCube1, g_darkCube2, g_temp1, g_temp2, darkFiles[0], darkFiles[1]);
+        GetDark(darkFile, temp, time, darkCube1, darkCube2, temp1,
+                temp2, darkFiles[0], darkFiles[1]);
       }
       else if (darkFiles.size() == 1) {
-        CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
-        g_temp1 = 0.0;
-        g_darkCube2 = new Buffer(*g_darkCube1);
-        g_temp2 = g_temp1;
+        CopyCubeIntoBuffer(darkFiles[0], darkCube1);
+        temp1 = 0.0;
+        darkCube2 = new Buffer(*darkCube1);
+        temp2 = temp1;
       }
       else {
-        CopyCubeIntoBuffer(darkFiles[0], g_darkCube1);
+        CopyCubeIntoBuffer(darkFiles[0], darkCube1);
         int index = darkFiles[0].lastIndexOf("_");
-        g_temp1 = IString(darkFiles[0].mid(darkFiles[0].lastIndexOf("_", index-1), index)).ToDouble();
-        CopyCubeIntoBuffer(darkFiles[1], g_darkCube2);
+        temp1 = IString(darkFiles[0].mid(darkFiles[0].lastIndexOf("_", index - 1), index)).ToDouble();
+        CopyCubeIntoBuffer(darkFiles[1], darkCube2);
         index = darkFiles[1].lastIndexOf("_");
-        g_temp2 = IString(darkFiles[1].mid(darkFiles[1].lastIndexOf("_", index-1), index)).ToDouble();
+        temp2 = IString(darkFiles[1].mid(darkFiles[1].lastIndexOf("_", index - 1), index)).ToDouble();
       }
     }
 
-    if (g_flatfield) {
+    if (calParams.flatfield) {
       if (flatFile.toLower() == "default" || flatFile.length() == 0) {
         flatFile = GetCalibrationDirectory("wac_flats") + "WAC_" + instModeId;
         if (instModeId == "BW")
           flatFile += "_" + filter + "_Mode" + mode;
         flatFile += "_Flatfield.????.cub";
       }
-      CopyCubeIntoBuffer(flatFile, g_flatCube);
+      CopyCubeIntoBuffer(flatFile, flatCube);
 
       // invert the flat-field data here so we don't have to divide for every pixel of the wac
-      for (int i = 0; i < g_flatCube->size(); i++) {
-        (*g_flatCube)[i] = 1.0 / (*g_flatCube)[i];
+      for (int i = 0; i < flatCube->size(); i++) {
+        (*flatCube)[i] = 1.0 / (*flatCube)[i];
       }
     }
 
     PvlKeyword responsivity;
 
-    if (g_radiometric) {
-
-      Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
+    if (calParams.radiometric) {
+      Isis::PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
 
       if (radFile.toLower() == "default" || radFile.length() == 0)
         radFile = GetCalibrationDirectory("") + "WAC_RadiometricResponsivity.????.pvl";
 
       FileName radFileName(radFile);
-      if (radFileName.isVersioned())
+      if (radFileName.isVersioned()) {
         radFileName = radFileName.highestVersion();
+      }
       if (!radFileName.fileExists()) {
         QString msg = radFile + " does not exist.";
         throw IException(IException::User, msg, _FILEINFO_);
@@ -1052,145 +677,209 @@ namespace Isis {
 
       Pvl radPvl(radFileName.expanded());
 
-      if (g_iof) {
+      if (calParams.iof) {
         responsivity = radPvl["IOF"];
 
-        for (int i = 0; i < bands.size(); i++) {
-          g_iofResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
+        for (int i = 0; i < filterNumStrings.size(); i++) {
+          iofResponsivity.push_back(toDouble(responsivity[toInt(filterNumStrings[i]) - 1]));
         }
 
         try {
-          Camera *cam = NULL;
+          Camera *cam = nullptr;
           cam = icube->camera();
-          iTime startTime((QString) inst["StartTime"]);
+          iTime startTime((QString)inst["StartTime"]);
           cam->setTime(startTime);
-          g_solarDistance = cam->sunToBodyDist() / KM_PER_AU;
+          camParams.solarDistance = cam->sunToBodyDist() / KM_PER_AU;
         }
         catch(IException &e) {
           try {
             bool useWeb = Preference::Preferences().useWebSpice();
 
-            iTime startTime((QString) inst["StartTime"]);
+            iTime startTime((QString)inst["StartTime"]);
             double etStart = startTime.Et();
             // Get the distance between the Moon and the Sun at the given time in
             // Astronomical Units (AU)
-            double sunpos[6];
+            std::array<double, 6> sunpos;
 
             std::vector<double> etStartVec = {etStart};
             std::vector<std::string> kernels_to_use = {"/moon/tspk/moon_pa_de421_1900-2050.bpc", "/lro/tspk/de421.bsp", "/base/pck/pck[0-9]{5}.tpc", "/moon/pck/moon_080317.tf", "/moon/pck/moon_assoc_me.tf"};
             auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"}, useWeb, true, false, -1, 1, kernels_to_use);
-            std::copy(sunLt[0].begin(), sunLt[0].begin()+6, sunpos);
+            std::copy(sunLt[0].begin(), sunLt[0].begin() + 6, sunpos.begin());
 
-            g_solarDistance = vnorm_c(sunpos) / KM_PER_AU;
+            calParams.solarDistance = vnorm_c(sunpos.data()) / KM_PER_AU;
           }
           catch (IException &e) {
-            QString msg = "Can not find necessary SPICE kernels for converting to IOF";
+            QString msg = "Cannot find necessary SPICE kernels for converting to IOF";
             throw IException(e, IException::User, msg, _FILEINFO_);
           }
         }
       }
       else {
         responsivity = radPvl["Radiance"];
-        for (int i = 0; i < bands.size(); i++)
-          g_radianceResponsivity.push_back(toDouble(responsivity[toInt(bands[i]) - 1]));
+        for (int i = 0; i < filterNumStrings.size(); i++) {
+          radianceResponsivity.push_back(toDouble(responsivity[toInt(filterNumStrings[i]) - 1]));
+        }
       }
     }
 
-    if (g_specpix) {
+    if (calParams.specpix) {
       if (specpixFile.toLower() == "default" || specpixFile.length() == 0) {
         specpixFile = GetCalibrationDirectory("wac_masks") + "WAC_" + instModeId;
-        double temp = (double) inst["MiddleTemperatureFpa"];
-        if (instModeId == "BW")
+        double temp = (double)inst["MiddleTemperatureFpa"];
+        if (instModeId == "BW") {
           specpixFile += "_" + filter + "_Mode" + mode;
+        }
         specpixFile += "_*C_SpecialPixels.????.cub";
-        GetMask(specpixFile, temp, g_specpixCube);
+        GetMask(specpixFile, temp, specpixCube);
       }
-      else
-        CopyCubeIntoBuffer(specpixFile, g_specpixCube);
+      else {
+        CopyCubeIntoBuffer(specpixFile, specpixCube);
+      }
     }
 
     PvlKeyword temperaturePvl("TemperatureFile");
-    if (g_temprature) {
+    if (calParams.temperature) {
       if (tempFile.toLower() == "default" || tempFile.length() == 0)
-        tempFile = GetCalibrationDirectory("") + "WAC_TempratureConstants.????.pvl";
+        tempFile = GetCalibrationDirectory("") + "WAC_TemperatureConstants.????.pvl";
 
       FileName tempFileName(tempFile);
-      if (tempFileName.isVersioned())
+      if (tempFileName.isVersioned()) {
         tempFileName = tempFileName.highestVersion();
+      }
       if (!tempFileName.fileExists()) {
         QString msg = tempFile + " does not exist.";
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      Isis::PvlKeyword &bands = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
+      PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
       Pvl tempPvl(tempFileName.expanded());
       temperaturePvl.addValue(tempFileName.expanded());
-      for (int b = 0; b < bands.size(); b++){
-        g_TempratureConstants[g_bands[b]][0]=toDouble(tempPvl[bands[b]][0]);
-        g_TempratureConstants[g_bands[b]][1]=toDouble(tempPvl[bands[b]][1]);
+      for (int b = 0; b < filterNumStrings.size(); b++) {
+        temperatureConstants[bands[b] - 1][0] = toDouble(tempPvl[filterNumStrings[b]][0]);
+        temperatureConstants[bands[b] - 1][1] = toDouble(tempPvl[filterNumStrings[b]][1]);
       }
     }
 
     if (instModeId == "BW") {
-      if (mode == "1" || mode == "0")
-        p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(g_bands.size())));
-      else
-        p.SetBrickSize(POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(g_bands.size())));
+      if (mode == "1" || mode == "0") {
+        p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(bands.size())));
+      }
+      else {
+        p.SetBrickSize(POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(bands.size())));
+      }
     }
     else if (instModeId == "COLOR") {
-      p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(COLOR_BANDS, static_cast<int>(g_bands.size())));
+      p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(COLOR_BANDS, static_cast<int>(bands.size())));
     }
     else if (instModeId == "UV") {
-      p.SetBrickSize(UV_SAMPLES, UV_LINES, std::min(UV_BANDS, static_cast<int>(g_bands.size())));
+      p.SetBrickSize(UV_SAMPLES, UV_LINES, std::min(UV_BANDS, static_cast<int>(bands.size())));
     }
 
-    g_exposure = inst["ExposureDuration"];
+    calParams.exposure = inst["ExposureDuration"];
 
-    Cube *ocube = NULL;
+    // Calibrate each framelet
+    auto Calibrate = [calParams, &bands, startTemperature, endTemperature, darkCube1,
+                      darkCube2, flatCube, specpixCube, &temperatureConstants, numFrames,
+                      temp1, temp2, &iofResponsivity, &radianceResponsivity](Buffer &inCube, Buffer &outCube) -> void {
+      int correctBand = -1;
+      // If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
+      if (inCube.BandDimension() == 1 && bands.size() == 1) {
+        correctBand = bands.front();
+      }
+
+      int frameHeight = inCube.LineDimension();
+      int frameSize = inCube.SampleDimension() * inCube.LineDimension();
+      int frame = inCube.Line() / frameHeight;
+
+      // Calculate a temperature factor for the current frame (this is done to avoid doing this for each pixel
+      // Used in dark and temperature correction
+      // frameTemp:
+      //
+      //    (WAC end temp - WAC start temp)
+      //    -------------------------------   *   frame   +   WAC start temp
+      //         (WAC num framelets)
+      double frameTemp = (endTemperature - startTemperature) / numFrames * frame + startTemperature;
+
+      for (int i = 0; i < outCube.size(); i++) {
+        outCube[i] = inCube[i];
+      }
+
+      if (calParams.dark) {
+        CorrectDark(inCube, outCube, correctBand, startTemperature, endTemperature,
+                    frame, frameHeight, frameSize, numFrames, frameTemp, darkCube1,
+                    temp1, darkCube2, temp2);
+      }
+
+      if (calParams.flatfield) {
+        CorrectFlatfield(inCube, outCube, correctBand, frame, frameHeight, frameSize,
+                         flatCube);
+      }
+
+      if (calParams.radiometric) {
+        CorrectRadiometric(outCube, calParams.exposure, calParams.solarDistance, calParams.iof,
+                           iofResponsivity, radianceResponsivity);
+      }
+
+      if (calParams.specpix) {
+        CorrectSpecialPixels(inCube, outCube, correctBand, frame, frameHeight,
+                             frameSize, specpixCube);
+      }
+
+      if (calParams.temperature) {
+        CorrectTemperature(outCube, correctBand, frameTemp, temperatureConstants);
+      }
+    };
+
+    Cube *ocube = nullptr;
     ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"));
     p.ProcessCube(Calibrate, false);
 
     // Add an output group with the appropriate information
     PvlGroup calgrp("Radiometry");
-    if (g_temprature) {
-      calgrp += PvlKeyword("TemperatureFile",  temperaturePvl);
+    if (calParams.temperature) {
+      calgrp += PvlKeyword("TemperatureFile", temperaturePvl);
     }
-    if (g_dark) {
+    if (calParams.dark) {
       PvlKeyword darks("DarkFiles");
       darks.addValue(darkFiles[0]);
       if (darkFiles.size() > 1)
         darks.addValue(darkFiles[1]);
       calgrp += darks;
     }
-    if (g_flatfield)
+    if (calParams.flatfield) {
       calgrp += PvlKeyword("FlatFile", flatFile);
-    if (g_radiometric) {
+    }
+    if (calParams.radiometric) {
       PvlKeyword vals("ResponsivityValues");
-      if (g_iof) {
+      if (calParams.iof) {
         calgrp += PvlKeyword("RadiometricType", "IOF");
-        for (unsigned int i=0; i< g_iofResponsivity.size(); i++)
-          vals.addValue(toString(g_iofResponsivity[i]));
+        for (auto i = 0UL; i < iofResponsivity.size(); i++) {
+          vals.addValue(toString(iofResponsivity[i]));
+        }
       }
       else {
         calgrp += PvlKeyword("RadiometricType", "AbsoluteRadiance", "W/m2/sr/um");
-        for (unsigned int i=0; i< g_radianceResponsivity.size(); i++)
-          vals.addValue(toString(g_radianceResponsivity[i]));
+        for (auto i = 0UL; i < radianceResponsivity.size(); i++) {
+          vals.addValue(toString(radianceResponsivity[i]));
+        }
       }
       calgrp += vals;
-      calgrp += PvlKeyword("SolarDistance", toString(g_solarDistance));
+      calgrp += PvlKeyword("SolarDistance", toString(calParams.solarDistance));
     }
-    if (g_specpix)
+    if (calParams.specpix) {
       calgrp += PvlKeyword("SpecialPixelsFile", specpixFile);
+    }
+
     ocube->putGroup(calgrp);
 
-    delete g_darkCube1;
-    g_darkCube1 = NULL;
-    delete g_darkCube2;
-    g_darkCube2 = NULL;
-    delete g_flatCube;
-    g_flatCube = NULL;
-    delete g_specpixCube;
-    g_specpixCube = NULL;
+    delete darkCube1;
+    darkCube1 = nullptr;
+    delete darkCube2;
+    darkCube2 = nullptr;
+    delete flatCube;
+    flatCube = nullptr;
+    delete specpixCube;
+    specpixCube = nullptr;
   }
 }
 
