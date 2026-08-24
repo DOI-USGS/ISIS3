@@ -29,7 +29,7 @@
 
 namespace Isis {
   namespace LroWacCal {
-    static void CopyCubeIntoBuffer(QString &fileString, Buffer *&data) {
+    void CopyCubeIntoBuffer(QString &fileString, Buffer *&data) {
       Cube cube;
       FileName filename(fileString);
       if (filename.isVersioned()) {
@@ -70,9 +70,8 @@ namespace Isis {
     * @param file1 Filename of dark file 1
     * @param file2 Filename of dark file 2
     */
-    static void GetDark(const QString &fileString, double temp, double time, Buffer *&data1,
-                        Buffer *&data2, double &temp1, double &temp2, QString &file1,
-                        QString &file2) {
+    void GetDark(const QString &fileString, double temp, double time, Buffer *&data1, Buffer *&data2, double &temp1,
+                 double &temp2, QString &file1, QString &file2) {
       FileName filename(fileString);
       QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
@@ -129,7 +128,7 @@ namespace Isis {
       sort(darkFiles.begin(), darkFiles.end(), darkComp);
 
       std::size_t temp1Index = 0;
-      std::size_t temp2Index;
+      std::size_t temp2Index = 0;
 
       temp1 = darkFiles[temp1Index].temp;
 
@@ -163,7 +162,7 @@ namespace Isis {
       CopyCubeIntoBuffer(file2, data2);
     }
 
-    static void GetMask(QString &fileString, double temp, Buffer *&data) {
+    void GetMask(QString &fileString, double temp, Buffer *&data) {
       FileName filename(fileString);
       QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
 
@@ -228,7 +227,7 @@ namespace Isis {
     *   @history 2008-11-05 Jeannie Walldren - Original version
     *   @history 2016-08-16 Victor Silva - Added option for base calibration directory
     */
-    static QString GetCalibrationDirectory(QString calibrationType) {
+    QString GetCalibrationDirectory(QString calibrationType) {
       // Get the directory where the CISS calibration directories are.
       PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
       QString missionDir = (QString)dataDir["LRO"];
@@ -239,16 +238,14 @@ namespace Isis {
       return missionDir + "/calibration/" + calibrationType;
     }
 
-    static void CorrectDark(const Buffer &in, Buffer &out, int correctBand,
-                            double startTemp, double endTemp, int frame, int frameHeight,
-                            int frameSize, int numFrames, double frameTemp,
-                            Buffer *darkCube1, double temp1, Buffer *darkCube2,
-                            double temp2) {
+    void CorrectDark(const Buffer &in, Buffer &out, int correctBand, double startTemp, double endTemp, int frame,
+                     int frameHeight, int frameSize, int numFrames, double frameTemp, Buffer *darkCube1, double temp1,
+                     Buffer *darkCube2, double temp2) {
       const double tempFactor = (frameTemp - temp2) / (temp1 - temp2);
 
       for (int b = 0; b < in.BandDimension(); b++) {
         // We find the index of the corresponding dark frame band as the offset
-        int offset;
+        int offset = 0;
         if (correctBand != -1) {
           offset = darkCube1->Index(1, frameHeight * std::min(frame, darkCube1->LineDimension() / frameHeight - 1) + 1, correctBand);
         }
@@ -305,12 +302,11 @@ namespace Isis {
       }
     }
 
-    static void CorrectFlatfield(const Buffer &in, Buffer &out, int correctBand,
-                                 int frame, int frameHeight, int frameSize,
-                                 Buffer *flatCube) {
+    void CorrectFlatfield(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight, int frameSize,
+                          Buffer *flatCube) {
       for (int b = 0; b < in.BandDimension(); b++) {
         // We find the index of the corresponding flat frame band as the offset
-        int offset;
+        int offset = 0;
         if (correctBand != -1) {
           offset = flatCube->Index(1, frameHeight * std::min(frame, (flatCube->LineDimension() - 1) / frameHeight) + 1, correctBand);
         }
@@ -340,9 +336,9 @@ namespace Isis {
       }
     }
 
-    static void CorrectRadiometric(Buffer &out, double exposure, double solarDistance,
-                                   bool iof, const std::vector<double> &iofResponsivity,
-                                   const std::vector<double> &radianceResponsivity) {
+    void CorrectRadiometric(Buffer &out, double exposure, double solarDistance, bool iof,
+                            const std::vector<double> &iofResponsivity,
+                            const std::vector<double> &radianceResponsivity) {
       for (int i = 0; i < out.size(); i++) {
         if (IsSpecial(out[i])) {
           out[i] = Isis::Null;
@@ -359,9 +355,8 @@ namespace Isis {
       }
     }
 
-    static void CorrectSpecialPixels(const Buffer &in, Buffer &out, int correctBand,
-                                     int frame, int frameHeight, int frameSize,
-                                     Buffer *specpixCube) {
+    void CorrectSpecialPixels(const Buffer &in, Buffer &out, int correctBand, int frame, int frameHeight,
+                              int frameSize, Buffer *specpixCube) {
       for (int b = 0; b < in.BandDimension(); b++) {
         // We find the index of the corresponding specpix frame band as the offset
         int offset = 0;
@@ -380,8 +375,8 @@ namespace Isis {
       }
     }
 
-    static void CorrectTemperature(Buffer &out, int correctBand, double frameTemp,
-                                   const std::array<std::array<double, 2>, 7> &temperatureConstants) {
+    void CorrectTemperature(Buffer &out, int correctBand, double frameTemp,
+                            const std::array<std::array<double, 2>, 7> &temperatureConstants) {
       for (int i = 0; i < out.size(); i++) {
         if (IsSpecial(out[i])) {
           out[i] = Isis::Null;
