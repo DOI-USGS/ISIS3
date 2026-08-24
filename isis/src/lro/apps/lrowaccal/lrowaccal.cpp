@@ -7,9 +7,11 @@
 #include <QString>
 
 #include "Brick.h"
+#include "Buffer.h"
 #include "Camera.h"
 #include "Constants.h"
 #include "CubeAttribute.h"
+#include "FileName.h"
 #include "iTime.h"
 #include "Message.h"
 #include "NaifStatus.h"
@@ -111,6 +113,117 @@ namespace Isis {
       data = new Buffer(brick);
 
       fileString = filename.expanded();
+    }
+
+    /**
+    * @brief Finds 2 best dark files for WAC calibration.
+    *
+    * GetDark will find the 2 closest available dark file temperatures matching the given file name
+    * pattern. Then find the dark file at each temperature with the time closest to the WAC temperature.
+    * If there is only one temperature, it will pick the 2 closest times at that temperature.
+    *
+    *
+    * @param fileString String pattern defining dark files to search (ie. lro/calibration/wac_darks/WAC_COLOR_Offset68_*C_*T_Dark.????.cub)
+    * @param temp Temperature of WAC being calibrated
+    * @param time Time of WAC being calibrated
+    * @param data1 Buffer to hold dark file 1 cub data
+    * @param data2 Buffer to hold dark file 2 cub data
+    * @param temp1 Temperature of dark file 1
+    * @param temp2 Temperature of dark file 2
+    * @param file1 Filename of dark file 1
+    * @param file2 Filename of dark file 2
+    */
+    static void GetDark(const QString &fileString, double temp, double time, Buffer *&data1,
+                        Buffer *&data2, double &temp1, double &temp2, QString &file1,
+                        QString &file2) {
+      FileName filename(fileString);
+      QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
+
+      // create a regular expression to capture the temp and time from filenames
+      QString regexPattern(basename);
+      regexPattern.replace("*", "([0-9\\.-]*)");
+      QRegExp regex(regexPattern);
+
+      // create a filter for the QDir to only load files matching our name
+      QString filter(basename);
+      filter.append(".*");
+
+      // get a list of dark files that match our basename
+      QDir dir(filename.path(), filter);
+
+      std::vector<DarkFileInfo> darkFiles;
+      darkFiles.reserve(dir.count());
+
+      // Loop through all files in the dir that match our basename and extract time and temp
+      for (auto indx = 0U; indx < dir.count(); indx++) {
+        // match against our regular expression
+        int pos = regex.indexIn(dir[indx]);
+        if (pos == -1) {
+          continue; // filename did not match basename regex (time or temp contain non-digit)
+        }
+
+        // Get a list of regex matches. Item 0 should be the full QString, item 1
+        // is temp and item 2 is time.
+        QStringList texts = regex.capturedTexts();
+        if (texts.size() < 3) {
+          continue; // could not find time and/or temp
+        }
+
+        // extract time/temp from regex texts
+        bool tempOK, timeOK;
+        double fileTemp = texts[1].toDouble(&tempOK);
+        int fileTime = texts[2].toInt(&timeOK);
+        if (!tempOK || !timeOK) {
+          continue; // time or temp was not a valid numeric value
+        }
+
+        DarkFileInfo info(fileTemp, fileTime);
+        darkFiles.push_back(info);
+      }
+
+      // we require at least 2 different dark files to interpolate/extrapolate
+      if (darkFiles.size() < 2) {
+        QString msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      // sort the files by distance from wac temp and time
+      DarkComp darkComp(temp, static_cast<int>(time));
+      sort(darkFiles.begin(), darkFiles.end(), darkComp);
+
+      std::size_t temp1Index = 0;
+      std::size_t temp2Index;
+
+      temp1 = darkFiles[temp1Index].temp;
+
+      for (temp2Index = temp1Index + 1; temp2Index < darkFiles.size(); temp2Index++) {
+        if (darkFiles[temp2Index].temp != temp1) {
+          break;
+        }
+      }
+
+      if (temp2Index >= darkFiles.size()) {
+        temp2Index = 1;
+      }
+
+      temp2 = darkFiles[temp2Index].temp;
+
+      int time1 = darkFiles[temp1Index].time;
+      int time2 = darkFiles[temp2Index].time;
+
+      int tempIndex = fileString.indexOf("*C");
+      int timeIndex = fileString.indexOf("*T");
+
+      file1 = fileString;
+      file1.replace(timeIndex, 1, toString(time1));
+      file1.replace(tempIndex, 1, toString(static_cast<int>(temp1)));
+
+      file2 = fileString;
+      file2.replace(timeIndex, 1, toString(time2));
+      file2.replace(tempIndex, 1, toString(static_cast<int>(temp2)));
+
+      CopyCubeIntoBuffer(file1, data1);
+      CopyCubeIntoBuffer(file2, data2);
     }
   }
 
