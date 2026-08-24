@@ -78,6 +78,20 @@ namespace Isis {
         return false;
       }
     };
+
+    /**
+     * @brief Struct for holding calibration parameters.
+     */
+    struct CalParams {
+      bool dark = true;
+      bool flatfield = true;
+      bool radiometric = true;
+      bool iof = true;
+      bool specpix = true;
+      bool temperature = true;
+      double exposure = 1.0;       //!< Exposure duration
+      double solarDistance = 1.01; //!< average distance in [AU]
+    };
   }
 
   /**
