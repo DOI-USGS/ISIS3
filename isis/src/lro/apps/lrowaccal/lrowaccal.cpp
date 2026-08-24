@@ -31,60 +31,6 @@
 
 namespace Isis {
   namespace LroWacCal {
-    void GetMask(QString &fileString, double temp, Buffer *&data) {
-      FileName filename(fileString);
-      QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
-
-      int index = basename.indexOf("*");
-
-      // create a filter for the QDir to only load files matching our name
-      QString filter(basename);
-      filter.append(".*");
-
-      QDir dir(filename.path(), filter);
-
-      // create a regular expression to capture the temp and time from filenames
-      QString regexPattern(basename);
-      regexPattern.replace("*", "([0-9\\.-]*)");
-      QRegExp regex(regexPattern);
-
-      double bestTemp = std::numeric_limits<double>::max();
-      for (auto indx = 0U; indx < dir.count(); indx++) {
-        // match against our regular expression
-        int pos = regex.indexIn(dir[indx]);
-        if (pos == -1) {
-          continue; // filename did not match basename regex (temp contain non-digit)
-        }
-
-        // Get a list of regex matches. Item 0 should be the full QString, item 1 is temp
-        QStringList texts = regex.capturedTexts();
-        if (texts.size() < 2) {
-          continue; // could not find temp
-        }
-
-        // extract time/temp from regex texts
-        bool tempOK;
-        double fileTemp = texts[1].toDouble(&tempOK);
-        if (!tempOK) {
-          continue; // temp was not a valid numeric value
-        }
-
-        if (std::abs(temp - fileTemp) < std::abs(temp - bestTemp)) {
-          bestTemp = fileTemp;
-        }
-      }
-
-      if (bestTemp == std::numeric_limits<double>::max()) {
-        QString msg = "No files exist for these mask options [" + basename + "]";
-        throw IException(IException::User, msg, _FILEINFO_);
-      }
-
-      index = fileString.indexOf("*");
-      fileString.replace(index, 1, toString(static_cast<int>(bestTemp)));
-
-      CopyCubeIntoBuffer(fileString, data);
-    }
-
     QString GetCalibrationDirectory(QString calibrationType) {
       // Get the directory where the CISS calibration directories are.
       PvlGroup &dataDir = Preference::Preferences().findGroup("DataDirectory");
@@ -783,6 +729,60 @@ namespace Isis {
 
       CopyCubeIntoBuffer(file1, data1);
       CopyCubeIntoBuffer(file2, data2);
+    }
+
+    void GetMask(QString &fileString, double temp, Buffer *&data) {
+      FileName filename(fileString);
+      QString basename = FileName(filename.baseName()).baseName(); // We do it twice to remove the ".????.cub"
+
+      int index = basename.indexOf("*");
+
+      // create a filter for the QDir to only load files matching our name
+      QString filter(basename);
+      filter.append(".*");
+
+      QDir dir(filename.path(), filter);
+
+      // create a regular expression to capture the temp and time from filenames
+      QString regexPattern(basename);
+      regexPattern.replace("*", "([0-9\\.-]*)");
+      QRegExp regex(regexPattern);
+
+      double bestTemp = std::numeric_limits<double>::max();
+      for (auto indx = 0U; indx < dir.count(); indx++) {
+        // match against our regular expression
+        int pos = regex.indexIn(dir[indx]);
+        if (pos == -1) {
+          continue; // filename did not match basename regex (temp contain non-digit)
+        }
+
+        // Get a list of regex matches. Item 0 should be the full QString, item 1 is temp
+        QStringList texts = regex.capturedTexts();
+        if (texts.size() < 2) {
+          continue; // could not find temp
+        }
+
+        // extract time/temp from regex texts
+        bool tempOK;
+        double fileTemp = texts[1].toDouble(&tempOK);
+        if (!tempOK) {
+          continue; // temp was not a valid numeric value
+        }
+
+        if (std::abs(temp - fileTemp) < std::abs(temp - bestTemp)) {
+          bestTemp = fileTemp;
+        }
+      }
+
+      if (bestTemp == std::numeric_limits<double>::max()) {
+        QString msg = "No files exist for these mask options [" + basename + "]";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
+      index = fileString.indexOf("*");
+      fileString.replace(index, 1, toString(static_cast<int>(bestTemp)));
+
+      CopyCubeIntoBuffer(fileString, data);
     }
   }
 }
