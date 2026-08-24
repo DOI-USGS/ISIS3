@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <limits>
 #include <memory>
@@ -440,6 +441,42 @@ namespace Isis {
         for (int i = 0; i < frameSize; i++) {
           if (IsSpecial((*specpixCube)[offset + i])) {
             out[i + b * frameSize] = (*specpixCube)[offset + i];
+          }
+        }
+      }
+    }
+
+    static void CorrectTemperature(Buffer &out, int correctBand, double frameTemp,
+                                   const std::array<std::array<double, 2>, 7> &temperatureConstants) {
+      for (int i = 0; i < out.size(); i++) {
+        if (IsSpecial(out[i])) {
+          out[i] = Isis::Null;
+        }
+        else {
+          // Temperature Correction Formula
+          //
+          //       inputPixel
+          //  ---------------------
+          //    a*(frameTemp) + b
+          //
+          // Where:
+          //  'a' and 'b' are band-dependent constants read in via a pvl file
+          //
+          //  AND
+          //
+          // frameTemp: (Pre-calculated as it is used in multiple places)
+          //
+          //    (WAC end temp - WAC start temp)
+          //    -------------------------------   *   frame   +   WAC start temp
+          //         (WAC num framelets)
+          //
+          //
+          //
+          if (correctBand != -1) {
+            out[i] = out[i] / (temperatureConstants[correctBand - 1][0] * frameTemp + temperatureConstants[correctBand - 1][1]);
+          }
+          else {
+            out[i] = out[i] / (temperatureConstants[out.Band(i) - 1][0] * frameTemp + temperatureConstants[out.Band(i) - 1][1]);
           }
         }
       }
