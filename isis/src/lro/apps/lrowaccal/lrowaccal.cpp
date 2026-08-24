@@ -369,6 +369,41 @@ namespace Isis {
         }
       }
     }
+
+    static void CorrectFlatfield(const Buffer &in, Buffer &out, int correctBand,
+                                int frame, int frameHeight, int frameSize,
+                                Buffer *flatCube) {
+      for (int b = 0; b < in.BandDimension(); b++) {
+        // We find the index of the corresponding flat frame band as the offset
+        int offset;
+        if (correctBand != -1) {
+          offset = flatCube->Index(1, frameHeight * std::min(frame, (flatCube->LineDimension() - 1) / frameHeight) + 1, correctBand);
+        }
+        else {
+          offset = flatCube->Index(1, frameHeight * std::min(frame, (flatCube->LineDimension() - 1) / frameHeight) + 1, b + 1);
+        }
+
+        // We're bypassing Buffer::at for speed, so we need to make sure our
+        // index will not overrun the buffer
+        if (offset + frameSize > flatCube->size()) {
+          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
+          throw IException(IException::Programmer, message, _FILEINFO_);
+        }
+
+        const int outFrameOffset = b * frameSize;
+        for (int i = 0; i < frameSize; i++) {
+          const double flatPixel = (*flatCube)[offset + i];
+          double &outputPixel = out[i + outFrameOffset];
+
+          if (flatPixel > 0.0 && !IsSpecial(flatPixel) && !IsSpecial(outputPixel)) {
+            outputPixel *= flatPixel; // The flat-field data was inverted during load so we don't have to divide here.
+          }
+          else {
+            outputPixel = Isis::Null;
+          }
+        }
+      }
+    }
   }
 
   /**
