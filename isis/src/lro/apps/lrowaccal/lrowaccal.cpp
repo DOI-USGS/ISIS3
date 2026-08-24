@@ -1,3 +1,4 @@
+#include <memory>
 #include <vector>
 
 #include <QDir>
@@ -102,18 +103,14 @@ namespace Isis {
    * @param ui the User Interface to parse the parameters from
    */
   void lrowaccal(UserInterface &ui) {
-    Cube *icube = NULL;
-    icube = new Cube();
+    std::unique_ptr<Cube> icube = std::make_unique<Cube>();
     CubeAttributeInput inAtt = ui.GetInputAttribute("FROM");
     if (inAtt.bands().size() != 0) {
       icube->setVirtualBands(inAtt.bands());
     }
     icube->open(ui.GetCubeName("FROM"));
 
-    lrowaccal(icube, ui);
-
-    delete icube;
-    icube = NULL;
+    lrowaccal(icube.get(), ui);
   }
 
   /**
