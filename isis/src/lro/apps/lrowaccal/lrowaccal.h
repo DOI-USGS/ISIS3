@@ -9,6 +9,7 @@
 
 #include "Buffer.h"
 #include "Cube.h"
+#include "Pvl.h"
 #include "UserInterface.h"
 
 
@@ -137,6 +138,47 @@ namespace Isis {
 
     void CorrectTemperature(Buffer &out, int correctBand, double frameTemp,
                             const std::array<std::array<double, 2>, 7> &temperatureConstants);
+
+    /**
+     * @brief Gets a QDateTime representing the image time from an image label.
+     *
+     * @param label The label of the image to get a time for
+     *
+     * @return A QDateTime representing the image time
+     *
+     * @internal
+     *   @history 2026-08-25 Cordell Michaud - Original version
+     */
+    QDateTime GetImageDateTime(Pvl *label);
+
+    /**
+     * @brief Parses the time-dependent correction coefficients from a PVL file.
+     *
+     * @param coefficientsFile The path to the coefficients file to parse
+     *
+     * @return A 7x2 array containing the 2 time-dependent correction coefficients for each of the 7 filter numbers
+     *
+     * @internal
+     *   @history 2026-08-25 Cordell Michaud - Original version
+     */
+    std::array<std::array<double, 2>, 7> GetTDRCoefficients(const QString &coefficientsFile);
+
+    /**
+     * @brief Performs a time-dependent correction on the `inout` buffer.
+     *
+     * @param inout The buffer to read from and write to
+     * @param correctBand A specific band (1-based indexing) to correct, otherwise -1 to correct all bands
+     * @param timeDifferenceYears The time difference between the image time and the initial time in fractional Julian
+     *                            years, excluding leapseconds
+     * @param filterNums The filter numbers corresponding to each band in order
+     * @param coefficients The time-dependent correction coefficients for each band
+     *
+     * @internal
+     *   @history 2026-08-25 Cordell Michaud - Original version
+     */
+    void CorrectTDR(Buffer &inout, int correctBand, double timeDifferenceYears,
+                    const std::vector<int> &filterNums,
+                    const std::array<std::array<double, 2>, 7> &coefficients);
   }
 }
 

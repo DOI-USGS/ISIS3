@@ -787,6 +787,71 @@ namespace Isis {
         }
       }
     }
+
+    QDateTime GetImageDateTime(Pvl *label) {
+      const PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
+      const QString startTimeString = inst["StartTime"][0];
+      QDateTime startTime = QDateTime::fromString(startTimeString, Qt::ISODate);
+      startTime.setTimeSpec(Qt::UTC);
+      return startTime;
+    }
+
+    std::array<std::array<double, 2>, 7> GetTDRCoefficients(const QString &coefficientsFile) {
+      FileName coefficientsFileName(coefficientsFile);
+      if (coefficientsFileName.isVersioned()) {
+        coefficientsFileName = coefficientsFileName.highestVersion();
+      }
+      if (!coefficientsFileName.fileExists()) {
+        QString msg = QStringLiteral("Coefficients file [%1] does not exist.").arg(coefficientsFile);
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      Pvl tdrPvl(coefficientsFileName.expanded());
+      std::array<std::array<double, 2>, 7> coefficients{{{{0, 0}},
+                                                         {{0, 0}},
+                                                         {{0, 0}},
+                                                         {{0, 0}},
+                                                         {{0, 0}},
+                                                         {{0, 0}},
+                                                         {{0, 0}}}};
+      for (int tdrPvlKeywordIndex = 0; tdrPvlKeywordIndex < tdrPvl.keywords(); tdrPvlKeywordIndex++) {
+        const PvlKeyword &tdrPvlKeyword = tdrPvl[tdrPvlKeywordIndex];
+        const QString filterNumString = tdrPvlKeyword.name();
+        int filterNum = toInt(filterNumString);
+        if (filterNum < 1 || filterNum > 7) {
+          QString msg = QStringLiteral(
+            "Invalid filter number [%1] in time-dependent correction coefficients file [%2]."
+            " Filter numbers must be between 1 and 7.").arg(
+            filterNumString, coefficientsFile);
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        if (tdrPvlKeyword.size() != 2) {
+          QString msg = QStringLiteral(
+            "Invalid coefficients for filter number [%1] in time-dependent correction coefficients file [%2]."
+            " Expected 2 coefficients, but found %3.").arg(
+            filterNumString, coefficientsFile, static_cast<int>(tdrPvlKeyword.size()));
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
+        coefficients[filterNum - 1][0] = toDouble(tdrPvlKeyword[0]);
+        coefficients[filterNum - 1][1] = toDouble(tdrPvlKeyword[1]);
+      }
+      return coefficients;
+    }
+
+    void CorrectTDR(Buffer &inout, int correctBand, double timeDifferenceYears,
+                    const std::vector<int> &filterNums,
+                    const std::array<std::array<double, 2>, 7> &coefficients) {
+      for (int i = 0; i < inout.size(); i++) {
+        if (!IsSpecial(inout[i]) && !IsNullPixel(inout[i])) {
+          const int bandNum = (correctBand != -1) ? correctBand : inout.Band(i);
+          const int filterNum = (correctBand != -1) ? filterNums[0] : filterNums[bandNum - 1];
+          const std::array<double, 2> &currentCoefficients = coefficients[filterNum - 1];
+          const double a = currentCoefficients[0];
+          const double b = currentCoefficients[1];
+          const double correctionFactor = 1 - a * timeDifferenceYears + b * timeDifferenceYears * timeDifferenceYears;
+          inout[i] /= correctionFactor;
+        }
+      }
+    }
   }
 }
 
