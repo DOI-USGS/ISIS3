@@ -405,24 +405,21 @@ namespace Isis {
       }
 
       if (calParams.dark) {
-        LroWacCal::CorrectDark(inCube, outCube, correctBand, startTemperature, endTemperature,
-                    frame, frameHeight, frameSize, numFrames, frameTemp, darkCube1,
-                    temp1, darkCube2, temp2);
+        LroWacCal::CorrectDark(inCube, outCube, correctBand, startTemperature, endTemperature, frame, frameHeight,
+          frameSize, numFrames, frameTemp, darkCube1, temp1, darkCube2, temp2);
       }
 
       if (calParams.flatfield) {
-        LroWacCal::CorrectFlatfield(inCube, outCube, correctBand, frame, frameHeight, frameSize,
-                         flatCube);
+        LroWacCal::CorrectFlatfield(inCube, outCube, correctBand, frame, frameHeight, frameSize, flatCube);
       }
 
       if (calParams.radiometric) {
         LroWacCal::CorrectRadiometric(outCube, calParams.exposure, calParams.solarDistance, calParams.iof,
-                           iofResponsivity, radianceResponsivity);
+          iofResponsivity, radianceResponsivity);
       }
 
       if (calParams.specpix) {
-        LroWacCal::CorrectSpecialPixels(inCube, outCube, correctBand, frame, frameHeight,
-                             frameSize, specpixCube);
+        LroWacCal::CorrectSpecialPixels(inCube, outCube, correctBand, frame, frameHeight, frameSize, specpixCube);
       }
 
       if (calParams.temperature) {
@@ -913,5 +910,3 @@ namespace Isis {
     }
   }
 }
-
-
