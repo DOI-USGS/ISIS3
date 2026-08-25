@@ -8,14 +8,14 @@
 
   <description>
     <p>
-      This program applies dark, flat-field, radiometric, and temperature corrections for each
+      This program applies dark, flat-field, radiometric, temperature, and time-dependent corrections for each
       framelet based on the band's filter number. There is also an optional mask to replace
       special pixels in the calibrated image. In order to output in I/F units, the cube must
       have spice data.
     </p>
 
     <p>
-      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, and Temperature.
+      Corrections are applied in the following order: Dark, Flat-field, Radiometric, Special pixel mask, Temperature, and Time-dependent.
     </p>
 
     <h3>Dark Correction:</h3>
@@ -128,26 +128,40 @@
 
       If SpecialPixelsFile is not set, special pixel mask is loaded from $lro/calibration/wac_masks/WAC_&lt;wac mode&gt;_&lt;temp&gt;C_SpecialPixels.????.cub. temp is closest temperature to WAC MiddleTemperatureFpa.
     </p>
+
     <h3>Temperature Correction:</h3>
     <p>
       <pre>
         for each framlet in the output cube
           if output[pixel] is special- leave it alone
           else preform the correction
-        </pre>
-        Correction:
-        <pre>
-
-                inputPixel
-            --------------------
-             a*(frameTemp) + b
-
-             Where:
-               'a' and 'b' are band dependent constants, read in from a file.
-             AND
-               frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
       </pre>
-      If TEMPRATUREFILE is not set, the constants are loaded from $lro/calibration/WAC_TempratureConstants.????.pvl
+      Correction:
+      <pre>
+
+            inputPixel
+        --------------------
+         a*(frameTemp) + b
+
+         Where:
+           'a' and 'b' are band-dependent constants, read in from a file.
+         AND
+           frameTemp = (WAC EndTemperatureFpa - WAC BeginTemperatureFpa)/WAC NumFramelets * frame + WAC BeginTemperatureFpa
+      </pre>
+      If TEMPERATUREFILE is not set, the constants are loaded from $lro/calibration/WAC_TemperatureConstants.????.pvl
+    </p>
+
+    <h3>Time-Dependent Correction:</h3>
+    <p>
+      <pre>output[pixel] /= 1 - a*t + b*t^2</pre>
+      where
+      <pre>
+        t is the time difference in fractional Julian years from 2011-02-21 00:00:00 UTC, excluding leapseconds
+        a is a coefficient defined for each band
+        b is a coefficient defined for each band
+      </pre>
+
+      If TimeDependentFile is not set, the coefficients a and b for each band are loaded from $lro/calibration/WAC_TimeDependentCoefficients.????.pvl.
     </p>
 
     <p>
@@ -164,14 +178,15 @@
 
     <p>
       The calibration equation is:
-      <pre>  reportedDN = ObservedDN - MeanBias - DarkCurrent </pre>
+      <pre>  reportedDN = ObservedDN - MeanBias - DarkCurrent</pre>
 
-        Where:
-        <pre>
-   ObservedDN = TrueDN + E
-   E is a randomly sampled value from (mu, sigma^2) and mu=0
-   TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.</pre>
-     </p>
+      Where:
+      <pre>
+        ObservedDN = TrueDN + E
+        E is a randomly sampled value from (mu, sigma^2) and mu=0
+        TrueDN is the signal that would be reported in an idealized case of an instrument with zero noise.
+      </pre>
+    </p>
 
     <p>
       Let's look at the case of a calibrated image for which the true signal
@@ -245,6 +260,20 @@
       variables and helper functions. Added units label "W/m2/sr/um" to 
       RadiometricType keyword in output cube label when RadiometricType is 
       AbsoluteRadiance.
+    </change>
+    <change name="Cordell Michaud" date="2026-08-25">
+      Implementated a time-dependent correction in lrowaccal.
+      This correction is enabled by default and requires coefficients which
+      are read from a pvl file which can be passed in via argument or left as
+      default to choose the highest version from the expected location in the
+      calibration directory.
+      Added time-dependent correction coefficients for each band to the output cube label
+      in the TimeDependentACoefficients and TimeDependentBCoefficients keywords in the Radiometry
+      group.
+      Updated documentation accordingly.
+      Refactored lrowaccal to improve code organization.
+      Added check that the band count does not exceed 7.
+      Fixed off-by-one error in temperature correction.
     </change>
   </history>
 
