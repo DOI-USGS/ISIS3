@@ -87,6 +87,7 @@ namespace Isis {
     calParams.iof = (ui.GetString("RADIOMETRICTYPE") == "IOF");
     calParams.specpix = ui.GetBoolean("SPECIALPIXELS");
     calParams.temperature = ui.GetBoolean("TEMPERATURE");
+    calParams.timeDependent = ui.GetBoolean("TIMEDEPENDENT");
 
     std::vector<QString> darkFiles;
     ui.GetAsString("DARKFILE", darkFiles);
@@ -94,6 +95,7 @@ namespace Isis {
     QString radFile = ui.GetAsString("RADIOMETRICFILE");
     QString specpixFile = ui.GetAsString("SPECIALPIXELSFILE");
     QString tempFile = ui.GetAsString("TEMPERATUREFILE");
+    QString timeDependentFile = ui.GetAsString("TIMEDEPENDENTFILE");
 
     //
     // Start processing code
@@ -310,6 +312,52 @@ namespace Isis {
       }
     }
 
+    double timeDifferenceYears = 0.0;
+    std::vector<int> filterNums;
+    filterNums.reserve(bands.size());
+    const PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
+    for (auto bandIndex = 0UL; bandIndex < bands.size(); bandIndex++) {
+      int bandNum = bands[bandIndex];
+      if (bandNum > filterNumStrings.size()) {
+        QString msg = QStringLiteral("No corresponding filter number found for band %1.")(static_cast<int>(bandNum));
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      filterNums.push_back(toInt(filterNumStrings[bandNum - 1]));
+    }
+    std::array<std::array<double, 2>, 7> timeCorrectionCoefficients;
+    PvlKeyword timeDependentFilePvlKeyword("TimeDependentFile");
+    PvlKeyword timeDependentACoefficientsPvlKeyword("TimeDependentACoefficients");
+    PvlKeyword timeDependentBCoefficientsPvlKeyword("TimeDependentBCoefficients");
+    if (calParams.timeDependent) {
+      if (timeDependentFile.toLower() == "default" || timeDependentFile.length() == 0) {
+        timeDependentFile = GetCalibrationDirectory("") + "WAC_TimeDependentCoefficients.????.pvl";
+      }
+      FileName timeDependentFileName(timeDependentFile);
+      if (timeDependentFileName.isVersioned()) {
+        timeDependentFileName = timeDependentFileName.highestVersion();
+      }
+      timeDependentFilePvlKeyword.addValue(timeDependentFileName.expanded());
+
+      // We explicitly exclude leapseconds when we get the time difference between the reference initial time and the
+      // image time because that is the measure of time used for the correction and for which the coefficients were
+      // determined
+      const QString initialTimestampUTC = "2011-02-21T00:00:00Z";
+      const QDateTime initialDateTime = QDateTime::fromString(initialTimestampUTC, Qt::ISODate);
+      const QDateTime imageDateTime = GetImageDateTime(icube->label());
+      const double timeDifferenceSeconds = static_cast<double>(initialDateTime.msecsTo(imageDateTime)) / 1000.0;
+      constexpr double secondsPerYear = 365.25 * 24 * 60 * 60;
+      timeDifferenceYears = timeDifferenceSeconds / secondsPerYear;
+
+      timeCorrectionCoefficients = GetTDRCoefficients(timeDependentFileName.expanded());
+      for (auto filterNumIndex = 0UL; filterNumIndex < filterNums.size(); filterNumIndex++) {
+        const int &filterNum = filterNums[filterNumIndex];
+        const double &a = timeCorrectionCoefficients[filterNum - 1][0];
+        const double &b = timeCorrectionCoefficients[filterNum - 1][1];
+        timeDependentACoefficientsPvlKeyword.addValue(toString(a));
+        timeDependentBCoefficientsPvlKeyword.addValue(toString(b));
+      }
+    }
+
     if (instModeId == "BW") {
       if (mode == "1" || mode == "0") {
         p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(bands.size())));
@@ -330,7 +378,9 @@ namespace Isis {
     // Calibrate each framelet
     auto Calibrate = [calParams, &bands, startTemperature, endTemperature, darkCube1,
                       darkCube2, flatCube, specpixCube, &temperatureConstants, numFrames,
-                      temp1, temp2, &iofResponsivity, &radianceResponsivity](Buffer &inCube, Buffer &outCube) -> void {
+                      temp1, temp2, &iofResponsivity, &radianceResponsivity,
+                      timeDifferenceYears, &timeCorrectionCoefficients,
+                      &filterNums](Buffer &inCube, Buffer &outCube) -> void {
       int correctBand = -1;
       // If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
       if (inCube.BandDimension() == 1 && bands.size() == 1) {
@@ -378,6 +428,10 @@ namespace Isis {
       if (calParams.temperature) {
         LroWacCal::CorrectTemperature(outCube, correctBand, frameTemp, temperatureConstants);
       }
+
+      if (calParams.timeDependent) {
+        CorrectTDR(outCube, correctBand, timeDifferenceYears, filterNums, timeCorrectionCoefficients);
+      }
     };
 
     Cube *ocube = nullptr;
@@ -418,6 +472,11 @@ namespace Isis {
     }
     if (calParams.specpix) {
       calgrp += PvlKeyword("SpecialPixelsFile", specpixFile);
+    }
+    if (calParams.timeDependent) {
+      calgrp += timeDependentFilePvlKeyword;
+      calgrp += timeDependentACoefficientsPvlKeyword;
+      calgrp += timeDependentBCoefficientsPvlKeyword;
     }
 
     ocube->putGroup(calgrp);
