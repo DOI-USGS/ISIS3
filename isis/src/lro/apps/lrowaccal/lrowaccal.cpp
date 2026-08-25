@@ -241,7 +241,7 @@ namespace Isis {
           cam = icube->camera();
           iTime startTime((QString)inst["StartTime"]);
           cam->setTime(startTime);
-          camParams.solarDistance = cam->sunToBodyDist() / KM_PER_AU;
+          camParams.solarDistance = cam->sunToBodyDist() / LroWacCal::KM_PER_AU;
         }
         catch(IException &e) {
           try {
@@ -258,7 +258,7 @@ namespace Isis {
             auto [sunLt, kernels] = SpiceQL::getTargetStates(etStartVec, "sun", "moon", "MOON_ME", "LT+S", "lroc", {"reconstructed"}, {"reconstructed"}, useWeb, true, false, -1, 1, kernels_to_use);
             std::copy(sunLt[0].begin(), sunLt[0].begin() + 6, sunpos.begin());
 
-            calParams.solarDistance = vnorm_c(sunpos.data()) / KM_PER_AU;
+            calParams.solarDistance = vnorm_c(sunpos.data()) / LroWacCal::KM_PER_AU;
           }
           catch (IException &e) {
             QString msg = "Cannot find necessary SPICE kernels for converting to IOF.";
@@ -360,17 +360,29 @@ namespace Isis {
 
     if (instModeId == "BW") {
       if (mode == "1" || mode == "0") {
-        p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(bands.size())));
+        p.SetBrickSize(
+          LroWacCal::NO_POLAR_MODE_SAMPLES,
+          LroWacCal::VIS_LINES,
+          std::min(LroWacCal::BW_BANDS, static_cast<int>(bands.size())));
       }
       else {
-        p.SetBrickSize(POLAR_MODE_SAMPLES, VIS_LINES, std::min(BW_BANDS, static_cast<int>(bands.size())));
+        p.SetBrickSize(
+          LroWacCal::POLAR_MODE_SAMPLES,
+          LroWacCal::VIS_LINES,
+          std::min(LroWacCal::BW_BANDS, static_cast<int>(bands.size())));
       }
     }
     else if (instModeId == "COLOR") {
-      p.SetBrickSize(NO_POLAR_MODE_SAMPLES, VIS_LINES, std::min(COLOR_BANDS, static_cast<int>(bands.size())));
+      p.SetBrickSize(
+        LroWacCal::NO_POLAR_MODE_SAMPLES,
+        LroWacCal::VIS_LINES,
+        std::min(LroWacCal::COLOR_BANDS, static_cast<int>(bands.size())));
     }
     else if (instModeId == "UV") {
-      p.SetBrickSize(UV_SAMPLES, UV_LINES, std::min(UV_BANDS, static_cast<int>(bands.size())));
+      p.SetBrickSize(
+        LroWacCal::UV_SAMPLES,
+        LroWacCal::UV_LINES,
+        std::min(LroWacCal::UV_BANDS, static_cast<int>(bands.size())));
     }
 
     calParams.exposure = inst["ExposureDuration"];
