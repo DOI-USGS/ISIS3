@@ -80,6 +80,7 @@ namespace Isis {
       bool iof = true;
       bool specpix = true;
       bool temperature = true;
+      bool timeDependent = true;
       double exposure = 1.0;       //!< Exposure duration
       double solarDistance = 1.01; //!< average distance in [AU]
     };
