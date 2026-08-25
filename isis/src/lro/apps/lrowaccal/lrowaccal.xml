@@ -445,5 +445,30 @@
       </parameter>
     </group>
 
+    <group name="Time-Dependent Options">
+      <parameter name="TimeDependent">
+        <type>boolean</type>
+        <default><item>True</item></default>
+        <brief>
+          Calibrate using time-dependent correction.
+        </brief>
+        <description>
+          Calibrate using time-dependent correction.
+        </description>
+        <inclusions><item>TimeDependentFile</item></inclusions>
+      </parameter>
+      <parameter name="TimeDependentFile">
+        <type>filename</type>
+        <default><item>Default</item></default>
+        <brief>
+          Time-dependent correction coefficients file.
+        </brief>
+        <description>
+          Time-dependent correction coefficients file. The default behavior is to use the system-defined time-dependent
+          correction coefficients file with the highest version number.
+        </description>
+      </parameter>
+    </group>
+
   </groups>
 </application>
