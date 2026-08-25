@@ -158,6 +158,9 @@ class ImageSource {
 
     Histogram *getHistogram(Cube &cube) const;
 
+    static bool isCubeReadable(const QString &name);
+    static QString composeSerialNumber(Cube &cube, const FileName &ifile);
+
     bool initGeometry();
     bool initGeometry(Cube &cube);
 

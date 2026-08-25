@@ -45,7 +45,7 @@ namespace Isis {
       }
 
       if(ui.GetParamPreference() != "") { 
-        parameters += " -PREF=" + ui.GetParamPreference();
+        parameters += " -PREFERENCE=" + ui.GetParamPreference();
       }
 
       ProgramLauncher::RunIsisProgram("crop", parameters);

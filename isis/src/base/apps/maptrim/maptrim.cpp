@@ -78,6 +78,9 @@ namespace Isis{
       cropParams += " nsamples= " + toString(samples);
       cropParams += " line= "     + toString(smallestLine);
       cropParams += " nlines= "   + toString(lines);
+      if (ui.GetParamPreference() != "") { 
+        cropParams += " -PREFERENCE=" + ui.GetParamPreference();
+      }
 
       try {
         ProgramLauncher::RunIsisProgram("crop", cropParams);

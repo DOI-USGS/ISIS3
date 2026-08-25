@@ -347,22 +347,27 @@ namespace Isis {
 
 
     ProcessImport importer;
-    if (inputFileName.removeExtension().addExtension("dat").fileExists()){
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("dat").expanded());
+    importer.SetInputFile(inputFileName.expanded());
+
+    // Check for files that match the from= file, except with these file extensions.
+    // If found, replace the data filename to import.  Check upper and lower cases for linux compatibility.
+    QString fileExtensions[] = {"dat", "img", "qub"};
+
+    for (const QString& ext : fileExtensions) {
+      if(inputFileName.setExtension(ext).fileExists()){
+        importer.SetInputFile(inputFileName.setExtension(ext).expanded());
+        break;
+      }
+      else if(inputFileName.setExtension(ext.toUpper()).fileExists()){
+        importer.SetInputFile(inputFileName.setExtension(ext.toUpper()).expanded());
+        break;
+      }
     }
-    else if (inputFileName.removeExtension().addExtension("img").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("img").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("QUB").fileExists()) {
-      importer.SetInputFile(inputFileName.removeExtension().addExtension("QUB").expanded());
-    }
-    else if (inputFileName.removeExtension().addExtension("tif").fileExists()) {
-    QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
-                  "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
+
+    if (inputFileName.setExtension("tif").fileExists() || inputFileName.setExtension("TIF").fileExists()) {
+      QString msg = "GeoTIFFs may contain ancillary data that isisimport cannot process. "
+                    "Please convert the .TIF to a cube using another tool, such as gdal_translate.";
       throw IException(IException::User, msg, _FILEINFO_);
-    }
-    else {
-      importer.SetInputFile(inputFileName.expanded());
     }
 
     // Use inja to get number of lines, samples, and bands from the input label

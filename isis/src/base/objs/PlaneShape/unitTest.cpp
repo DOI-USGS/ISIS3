@@ -143,10 +143,6 @@ int main() {
     printf("   Localradius = %lf km\n", radius);
     // radius at point on ring plane = 127509023.718129977583885
 
-    cout << endl << "  Testing setHasIntersection method..." << endl;
-    shape.setHasIntersection(false);
-    cout << "    Do we have an intersection? " << shape.hasIntersection() << endl;
-
     cout << endl << "  Testing setSurfacePoint method..." << endl;
     shape.setSurfacePoint(*sp);
     cout << "     Do we have an intersection? " << shape.hasIntersection() << endl;

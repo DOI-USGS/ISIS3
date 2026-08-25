@@ -137,6 +137,9 @@ void IsisMain() {
   QString pfile = phoFile.expanded();
   QString parameters = "FROM=" + input.expanded() + " TO=" + pfile +
                       " LATITUDE=TRUE LONGITUDE=TRUE PHASE=TRUE EMISSION=TRUE INCIDENCE=TRUE";
+  if (ui.GetParamPreference() != "") { 
+    parameters += " -PREFERENCE=" + ui.GetParamPreference();
+  }
   ProgramLauncher::RunIsisProgram("phocube", parameters);
 
   //  Wrap a try clause so that if anything goes wrong below, we can remove

@@ -251,6 +251,9 @@ void hicolormos(Cube *from1, Cube* from2, UserInterface &ui) {
                       " MOSAIC=" + ui.GetCubeName("TO") +
                       " PRIORITY=" + MosaicPriority +
                       " MATCHBANDBIN=" + (matchBandBin ? "TRUE" : "FALSE");
+  if (ui.GetParamPreference() != "") { 
+      parameters += " -PREFERENCE=" + ui.GetParamPreference();
+  } 
   ProgramLauncher::RunIsisProgram("automos", parameters);
 
   PvlGroup mos("Mosaic");

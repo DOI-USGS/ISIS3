@@ -165,13 +165,12 @@ namespace Isis {
    * @return @b btVector3 The intersection point in body fixed (x, y, z) kilometers.
    */
   btVector3 BulletClosestRayCallback::point() const {
-    if ( hasHit() ) { 
-      return ( m_point );
+    if ( !hasHit() ) { 
+      throw IException(IException::Programmer, 
+                  "No hits in ray trace so no surface point!", 
+                  _FILEINFO_);
     }
-    throw IException(IException::Programmer, 
-                     "No hits in ray trace so no surface point!", 
-                     _FILEINFO_);
-    return ( btVector3(0.0, 0.0, 0.0) );
+    return ( m_point );
   }
 
 
@@ -181,14 +180,12 @@ namespace Isis {
    * @return @b btVector3 The local surface normal in body fixed (x, y, z).
    */
   btVector3 BulletClosestRayCallback::normal() const {
-    if ( hasHit() ) {
-      return ( m_normal );
+    if ( !hasHit() ) {
+      throw IException(IException::Programmer, 
+                  "No hits in ray trace so no normal!", 
+                  _FILEINFO_);
     }
-
-    throw IException(IException::Programmer, 
-                     "No hits in ray trace so no normal!", 
-                     _FILEINFO_);
-    return btVector3(0.0, 0.0, 0.0);
+    return btVector3( m_normal);
   }
 
 

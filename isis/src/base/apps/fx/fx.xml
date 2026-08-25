@@ -136,8 +136,8 @@
       The equation parser is case insensitive and all braces, such as
       "[{[{ }]}]" are converted to parentheses "(((( ))))" first.  Whitespace
       is ignored.  Currently, you must explicitly state all multiplication
-      operations (e.g. 2pi will not work, but 2*pi will).  The modulus (%),
-      AND, and OR operators are not implemented yet.  Functions
+      operations (e.g. 2pi will not work, but 2*pi will).  The 
+      AND and OR operators are not implemented yet.  Functions
       such as pha, ina, ema, lat, lon, radius, and resolution require a
       <def>Level1</def> input file with <def>SPICE</def> information in the
       image labels.  That is, the program <i>spiceinit</i> should be executed on the

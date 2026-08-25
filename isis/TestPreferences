@@ -46,6 +46,7 @@ EndGroup
 Group = ErrorFacility
   FileLine = Off
   Format = Standard
+  ShowDeprecated = Off
   StackTrace = Off
 EndGroup
 

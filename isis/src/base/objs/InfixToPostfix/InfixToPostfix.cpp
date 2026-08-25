@@ -32,6 +32,7 @@ namespace Isis {
     p_operators.push_back(new InfixOperator(7, "^"));
     p_operators.push_back(new InfixOperator(5, "/"));
     p_operators.push_back(new InfixOperator(5, "*"));
+    p_operators.push_back(new InfixOperator(5, "%"));
     p_operators.push_back(new InfixOperator(3, "<<"));
     p_operators.push_back(new InfixOperator(3, ">>"));
     p_operators.push_back(new InfixOperator(2, "+"));

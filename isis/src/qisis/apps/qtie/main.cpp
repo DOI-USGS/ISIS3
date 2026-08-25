@@ -47,6 +47,16 @@ int main(int argc, char *argv[]) {
   }
   Isis::Gui::checkX11();
 
+  // Setup gdal drivers and error handler
+  try {
+    GDALAllRegister();
+    CPLSetErrorHandler(CPLQuietErrorHandler);
+  }
+  catch(std::exception &e) {
+    QString msg = "Failed to load GDAL Drivers, with error [" + QString(e.what()) + "]";
+    throw IException(IException::Unknown, msg, _FILEINFO_);
+  }
+
   try {
 
     // Add the Qt plugin directory to the library path
@@ -98,6 +108,8 @@ int main(int argc, char *argv[]) {
                      SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)),
                      tieTool,
                      SIGNAL(stretchChipViewport(Stretch *, CubeViewport *)));
+
+    
 
     vw->show();
 

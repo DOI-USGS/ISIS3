@@ -270,6 +270,10 @@ void IsisMain() {
                       " strans=" + toString(sTrans) +
                       " ltrans=" + toString(lTrans) +
                       " interp=" + ui.GetString("INTERP");
+      if (ui.GetParamPreference() != "") { 
+        params += " -PREFERENCE=" + ui.GetParamPreference();
+      }
+
       ProgramLauncher::RunIsisProgram("translate", params);
     }
     else {
@@ -279,6 +283,10 @@ void IsisMain() {
                       " cnet="   + ui.GetFileName("ONET") +
                       " interp=" + ui.GetString("INTERP") +
                       " degree=" + toString(ui.GetInteger("DEGREE"));
+      if (ui.GetParamPreference() != "") { 
+        params += " -PREFERENCE=" + ui.GetParamPreference();
+      }
+
       ProgramLauncher::RunIsisProgram("warp", params);
     }
   }

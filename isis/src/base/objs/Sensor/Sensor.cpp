@@ -161,7 +161,6 @@ namespace Isis {
 
     // Don't try to intersect the sky
     if (target()->isSky()) {
-      target()->shape()->setHasIntersection(false);
       return false;
     }
 
@@ -501,18 +500,14 @@ namespace Isis {
     // This may be good if the computation of the look direction is more sophisticated.
     if (backCheck) {
       // Assume the intersection point is good in order to get the emission angle
-      // shape->setHasIntersection(true);  //KJB there should be a formal intersection in ShapeModel
       std::vector<double> lookdir = lookDirectionBodyFixed();
       if ( !shape->isVisibleFrom(sB, lookdir) ) {
         shape->clearSurfacePoint();
-        shape->setHasIntersection(false);
         return false;
       }
     }
 
     // return with success
-    shape->setHasIntersection(true);
-
     return true;
   }
 

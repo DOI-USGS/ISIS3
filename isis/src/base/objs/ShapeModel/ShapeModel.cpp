@@ -27,6 +27,7 @@ find files of those names at the top level of this repository. **/
 #include "NaifStatus.h"
 #include "Spice.h"
 #include "Target.h"
+#include "Preference.h"
 
 using namespace std;
 

@@ -237,7 +237,10 @@ void IsisMain() {
 
   if (ui.WasEntered("JITTERCK")) {
     QString params = "FROM=" + masterFile + " TO=" + ui.GetFileName("JITTERCK");
-
+    if (ui.GetParamPreference() != "") { 
+      params += " -PREFERENCE=" + ui.GetParamPreference();
+    } 
+    
     try {
       Progress ckwriterProg;
       ckwriterProg.SetText("Running ckwriter");
@@ -533,6 +536,9 @@ void processNoprojFiles(Pipeline &p) {
       params += " MATCH=" + tempDir + "/noproj." + outputs[i + 1] + ".cub";
       params += " REGDEF=" + ui.GetFileName("REGDEF");
       params += " FLAT=" + flatFileName;
+      if (ui.GetParamPreference() != "") { 
+        params += " -PREFERENCE=" + ui.GetParamPreference();
+      } 
 
       try {
         // hijitreg FROM=$TEMPORARY/noproj.FROM1.cub MATCH=
