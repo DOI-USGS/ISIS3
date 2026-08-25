@@ -8,6 +8,7 @@
 #include <QDir>
 #include <QRegExp>
 #include <QString>
+#include <QStringLiteral>
 
 #include "Brick.h"
 #include "Buffer.h"
@@ -105,8 +106,9 @@ namespace Isis {
     QString instId = (QString)inst["InstrumentId"];
     instId = instId.toUpper();
     if (instId != "WAC-VIS" && instId != "WAC-UV") {
-      QString msg = "This program is intended for use on LROC WAC images only. [";
-      msg += icube->fileName() + "] does not appear to be a WAC image.";
+      QString msg = QStringLiteral(
+        "This program is intended for use on LROC WAC images only. [%1] does not appear to be a WAC image.").arg(
+        icube->fileName().expanded());
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -144,8 +146,9 @@ namespace Isis {
       bands.push_back(icube->physicalBand(i));
     }
     if (bands.size() < 1 || bands.size() > 7) {
-      QString msg = QString("This program is intended for use on LROC WAC images only.");
-      msg += "Expected 1 to 7 bands, but got [" + toString(static_cast<int>(bands.size())) + "].";
+      QString msg = QStringLiteral(
+        "This program is intended for use on LROC WAC images only. Expected 1 to 7 bands, but got %1."
+        ).arg(static_cast<int>(bands.size()));
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -218,7 +221,7 @@ namespace Isis {
         radFileName = radFileName.highestVersion();
       }
       if (!radFileName.fileExists()) {
-        QString msg = radFile + " does not exist.";
+        QString msg = QStringLiteral("Radiometric file [%1] does not exist.").arg(radFile);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -256,7 +259,7 @@ namespace Isis {
             calParams.solarDistance = vnorm_c(sunpos.data()) / KM_PER_AU;
           }
           catch (IException &e) {
-            QString msg = "Cannot find necessary SPICE kernels for converting to IOF";
+            QString msg = "Cannot find necessary SPICE kernels for converting to IOF.";
             throw IException(e, IException::User, msg, _FILEINFO_);
           }
         }
@@ -294,7 +297,7 @@ namespace Isis {
         tempFileName = tempFileName.highestVersion();
       }
       if (!tempFileName.fileExists()) {
-        QString msg = tempFile + " does not exist.";
+        QString msg = QStringLiteral("Temperature file [%1] does not exist.").arg(tempFile);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -438,7 +441,7 @@ namespace Isis {
       }
 
       if (!filename.fileExists()) {
-        QString msg = fileString + " does not exist.";
+        QString msg = QStringLiteral("File [%1] does not exist.").arg(fileString);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -502,7 +505,7 @@ namespace Isis {
 
       // we require at least 2 different dark files to interpolate/extrapolate
       if (darkFiles.size() < 2) {
-        QString msg = "Not enough Dark files exist for these image options [" + basename + "]. Need at least 2 files with different temperatures\n";
+        QString msg = QStringLiteral("Not enough Dark files exist for these image options [%1]. Need at least 2 files with different temperatures.").arg(basename);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -589,7 +592,7 @@ namespace Isis {
       }
 
       if (bestTemp == std::numeric_limits<double>::max()) {
-        QString msg = "No files exist for these mask options [" + basename + "]";
+        QString msg = QStringLiteral("No files exist for these mask options [%1].").arg(basename);
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
@@ -628,12 +631,12 @@ namespace Isis {
         // We're bypassing Buffer::at for speed, so we need to make sure our
         // index will not overrun the buffer
         if (offset + frameSize > darkCube1->size()) {
-          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 1)";
-          throw IException(IException::Programmer, message, _FILEINFO_);
+          QString msg = QStringLiteral("%1 (Dark cube 1)").arg(Message::ArraySubscriptNotInRange(offset + frameSize));
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
         if (offset + frameSize > darkCube2->size()) {
-          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Dark cube 2)";
-          throw IException(IException::Programmer, message, _FILEINFO_);
+          QString msg = QStringLiteral("%1 (Dark cube 2)").arg(Message::ArraySubscriptNotInRange(offset + frameSize));
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         for (int i = 0; i < frameSize; i++) {
@@ -689,8 +692,10 @@ namespace Isis {
         // We're bypassing Buffer::at for speed, so we need to make sure our
         // index will not overrun the buffer
         if (offset + frameSize > flatCube->size()) {
-          QString message = Message::ArraySubscriptNotInRange(offset + frameSize) + " (Flat-field cube)";
-          throw IException(IException::Programmer, message, _FILEINFO_);
+          QString msg = QStringLiteral(
+            "%1 (Flat-field cube)").arg(
+            Message::ArraySubscriptNotInRange(offset + frameSize));
+          throw IException(IException::Programmer, msg, _FILEINFO_);
         }
 
         const int outFrameOffset = b * frameSize;
