@@ -5,10 +5,12 @@
 #include <memory>
 #include <vector>
 
+#include <QDateTime>
 #include <QDir>
 #include <QRegExp>
 #include <QString>
 #include <QStringLiteral>
+#include <QTimeZone>
 
 #include "Brick.h"
 #include "Buffer.h"
@@ -110,7 +112,7 @@ namespace Isis {
     if (instId != "WAC-VIS" && instId != "WAC-UV") {
       QString msg = QStringLiteral(
         "This program is intended for use on LROC WAC images only. [%1] does not appear to be a WAC image.").arg(
-        icube->fileName().expanded());
+        icube->fileName());
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
@@ -241,7 +243,7 @@ namespace Isis {
           cam = icube->camera();
           iTime startTime((QString)inst["StartTime"]);
           cam->setTime(startTime);
-          camParams.solarDistance = cam->sunToBodyDist() / LroWacCal::KM_PER_AU;
+          calParams.solarDistance = cam->sunToBodyDist() / LroWacCal::KM_PER_AU;
         }
         catch(IException &e) {
           try {
@@ -319,7 +321,7 @@ namespace Isis {
     for (auto bandIndex = 0UL; bandIndex < bands.size(); bandIndex++) {
       int bandNum = bands[bandIndex];
       if (bandNum > filterNumStrings.size()) {
-        QString msg = QStringLiteral("No corresponding filter number found for band %1.")(static_cast<int>(bandNum));
+        QString msg = QStringLiteral("No corresponding filter number found for band %1.").arg(static_cast<int>(bandNum));
         throw IException(IException::User, msg, _FILEINFO_);
       }
       filterNums.push_back(toInt(filterNumStrings[bandNum - 1]));
@@ -330,7 +332,7 @@ namespace Isis {
     PvlKeyword timeDependentBCoefficientsPvlKeyword("TimeDependentBCoefficients");
     if (calParams.timeDependent) {
       if (timeDependentFile.toLower() == "default" || timeDependentFile.length() == 0) {
-        timeDependentFile = GetCalibrationDirectory("") + "WAC_TimeDependentCoefficients.????.pvl";
+        timeDependentFile = LroWacCal::GetCalibrationDirectory("") + "WAC_TimeDependentCoefficients.????.pvl";
       }
       FileName timeDependentFileName(timeDependentFile);
       if (timeDependentFileName.isVersioned()) {
@@ -343,12 +345,12 @@ namespace Isis {
       // determined
       const QString initialTimestampUTC = "2011-02-21T00:00:00Z";
       const QDateTime initialDateTime = QDateTime::fromString(initialTimestampUTC, Qt::ISODate);
-      const QDateTime imageDateTime = GetImageDateTime(icube->label());
+      const QDateTime imageDateTime = LroWacCal::GetImageDateTime(icube->label());
       const double timeDifferenceSeconds = static_cast<double>(initialDateTime.msecsTo(imageDateTime)) / 1000.0;
       constexpr double secondsPerYear = 365.25 * 24 * 60 * 60;
       timeDifferenceYears = timeDifferenceSeconds / secondsPerYear;
 
-      timeCorrectionCoefficients = GetTDRCoefficients(timeDependentFileName.expanded());
+      timeCorrectionCoefficients = LroWacCal::GetTDRCoefficients(timeDependentFileName.expanded());
       for (auto filterNumIndex = 0UL; filterNumIndex < filterNums.size(); filterNumIndex++) {
         const int &filterNum = filterNums[filterNumIndex];
         const double &a = timeCorrectionCoefficients[filterNum - 1][0];
@@ -439,7 +441,7 @@ namespace Isis {
       }
 
       if (calParams.timeDependent) {
-        CorrectTDR(outCube, correctBand, timeDifferenceYears, filterNums, timeCorrectionCoefficients);
+        LroWacCal::CorrectTDR(outCube, correctBand, timeDifferenceYears, filterNums, timeCorrectionCoefficients);
       }
     };
 
@@ -860,7 +862,7 @@ namespace Isis {
       const PvlGroup &inst = label->findGroup("Instrument", Pvl::Traverse);
       const QString startTimeString = inst["StartTime"][0];
       QDateTime startTime = QDateTime::fromString(startTimeString, Qt::ISODate);
-      startTime.setTimeSpec(Qt::UTC);
+      startTime.setTimeZone(QTimeZone::UTC);
       return startTime;
     }
 
@@ -888,15 +890,14 @@ namespace Isis {
         if (filterNum < 1 || filterNum > 7) {
           QString msg = QStringLiteral(
             "Invalid filter number [%1] in time-dependent correction coefficients file [%2]."
-            " Filter numbers must be between 1 and 7.").arg(
-            filterNumString, coefficientsFile);
+            " Filter numbers must be between 1 and 7.").arg(filterNumString).arg(coefficientsFile);
           throw IException(IException::User, msg, _FILEINFO_);
         }
         if (tdrPvlKeyword.size() != 2) {
           QString msg = QStringLiteral(
             "Invalid coefficients for filter number [%1] in time-dependent correction coefficients file [%2]."
             " Expected 2 coefficients, but found %3.").arg(
-            filterNumString, coefficientsFile, static_cast<int>(tdrPvlKeyword.size()));
+            filterNumString).arg(coefficientsFile).arg(static_cast<int>(tdrPvlKeyword.size()));
           throw IException(IException::User, msg, _FILEINFO_);
         }
         coefficients[filterNum - 1][0] = toDouble(tdrPvlKeyword[0]);
