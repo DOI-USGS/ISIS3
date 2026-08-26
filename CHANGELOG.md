@@ -47,6 +47,70 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
+## [10.1.0_RC1] - 2026-08-25
+
+### Added
+
+- Added support for double pixel type for ISIS cubes ([#5786](https://github.com/DOI-USGS/ISIS3/issues/5786))
+- Added reconsplit feature to kerneldbgen to enable splitting of TGO cassis recon SPKs ([#6094](https://github.com/DOI-USGS/ISIS3/issues/6094))
+- Added support for TGO CaSSIS images to `socetframesettings`. ([#6101](https://github.com/DOI-USGS/ISIS3/issues/6101))
+- Added Parquet support for control networks
+- Added support for accessing Cloud Optimized GeoTIFF (COG) shape models via STAC API.
+- Published llms.txt and llms-full.txt with the ISIS documentation so LLMs can discover and ingest the application manuals
+
+### Changed
+
+- Refactored `ringscam2map` to be callable and migrated tests to gtest/CTest using subprocess invocation due to ProcessRubberSheet/camera initialization behavior. The converted tests retain required Cassini ring-plane input fixtures and minimal SPICE dependencies, but no longer depend on legacy truth cubes, reducing the effective test-data dependency from about 251 MB to about 21 MB. ([#ringscam2map-gtest-conversion](https://github.com/DOI-USGS/ISIS3/issues/ringscam2map-gtest-conversion))
+- Reading a GeoTIFF whose ISIS metadata was created with GDAL older than 3.12.2 now raises an error if the blob data is missing. ([#5947](https://github.com/DOI-USGS/ISIS3/issues/5947))
+- Extracted complex shell logic from isismake.tsts into standalone scripts for maintainability. ([#5982](https://github.com/DOI-USGS/ISIS3/issues/5982))
+- Add asp_map option to cam2map for per-pixel exact projection matching ASP mapproject. ([#5988](https://github.com/DOI-USGS/ISIS3/issues/5988))
+- Replaced proprietary Kakadu library with GDAL (OpenJPEG) for JPEG2000 support in `std2isis` and `isis2std`. JP2 is now available on all platforms including Mac ARM64. ([#5994](https://github.com/DOI-USGS/ISIS3/issues/5994))
+- Add ISDLIST parameter to jigsaw for loading CSM cameras from external ISD or model state files instead of cube blobs. Fix OUTPUT_ADJUSTED_CSMSTATE to write the actual adjusted state instead of regenerating an unadjusted one via ale. Add CSMCamera constructor that takes csm::RasterGM* directly, eliminating the model-state-model round-trip in CreateFromIsd. ([#6004](https://github.com/DOI-USGS/ISIS3/issues/6004))
+- Changes the `LineScanCameraGroundMap` to attempt to use a projective approximate translation when going from ground to image. If this fails, fall back on the old method ([#6046](https://github.com/DOI-USGS/ISIS3/issues/6046))
+- Refactored `blend` to be callable and migrated its legacy Makefile tests to gtest/CTest. Replaced the legacy ISISTESTDATA dependency with reduced repo-local fixtures, reducing blend test data footprint from 118 MB to 12 MB. ([#6059](https://github.com/DOI-USGS/ISIS3/issues/6059))
+- Added .tif and .tiff file extensions to q-apps cube file open dialogs/commands. ([#6073](https://github.com/DOI-USGS/ISIS3/issues/6073))
+- Made the reseau distortion model (Viking, Voyager, Mariner 10, Apollo Metric) extrapolate smoothly outside the image area instead of failing, so a ground point that projects just off the sensor still yields a focal plane position. This helps bundle adjustment and map projection near image edges. Behavior inside the image is unchanged.
+- Migrated `fx` legacy Makefile tests to gtest/CTest and eliminated the external ISISTESTDATA dependency for enabled tests by using generated cubes with controlled DN values.
+- Migrated `lineeq` legacy Makefile tests to gtest/CTest. The converted tests use synthetic cubes generated at runtime with controlled DN values, reducing the test data footprint from 66 MB to 0 bytes.
+- Migrated `makeflat` legacy Makefile tests to gtest/CTest. The converted tests use synthetic cubes generated at runtime, reducing the test data footprint from 87 MB to 0 bytes.
+- Migrated `maplab` legacy Makefile tests to gtest/CTest. The converted tests generate tiny cubes and map files at runtime, reducing the test data footprint from 51 MB to 0 bytes.
+- Refactored `dsk2isis` to be callable and migrated tests to gtest/CTest framework. Tests invoke subprocess due to NAIF global state requirements. Reduced test data footprint from 300MB to 4.6MB (98.5% reduction).
+- Refactored `handmos` to be callable and migrated tests to gtest/CTest framework. Eliminated test data footprint entirely (from 105 MB legacy to 0 MB) by replacing band-priority tests with existing equalizer fixtures and replacing large overlay fixtures with synthetic generated cubes that provide superior positioning validation.
+- Refactored `kuwahara` to be callable and migrated its legacy Makefile tests to gtest/CTest. The converted tests use synthetic cubes generated at runtime with controlled DN values, eliminating the 56 MB legacy external test-data dependency.
+- Sped up PVL label reading for every application by comparing keyword, group and object names in a single pass without allocating, scanning keyword names for whitespace instead of compiling a regular expression per keyword, reading label lines directly from the stream buffer, copying keyword names directly rather than revalidating them on every keyword copy, and looking up label groups by reference rather than copying them when building serial number lists.
+- Sped up jigsaw by computing only the entries of the inverse of the normal equations that the point uncertainties require rather than the entire inverse, analyzing the normal equations once instead of every iteration, indexing points by block column and batching each block column's right-hand sides into a single CHOLMOD call during error propagation, evaluating the residuals and the next iteration's partial derivatives in one pass over the measures instead of two, caching the adjusted surface point in the partial derivative computation, caching the Euler angle decomposition of the camera rotation, evaluating the camera position and pointing polynomials directly instead of through a general basis function, passing the parameter corrections by reference, computing millimeter residuals once per point instead of once per measure, no longer opening every cube to build an image list that only the GUI reads, and no longer computing the solar longitude on every camera time change since it is recomputed on request.
+
+### Fixed
+
+- Fixed HRSC bullet cam2map crash by adding a missing ground-truth check to ensure the ShapeModel and Bullet engine agree on surface intersections. ([#5291](https://github.com/DOI-USGS/ISIS3/issues/5291))
+- Fixed `map2cam` dropping all but the first band when the FROM cube is multi-band and the MATCH cube is single-band. Every FROM band is now reprojected into the output. ([#5501](https://github.com/DOI-USGS/ISIS3/issues/5501))
+- Fixed findfeatures not reading large images due to opencv restrictions ([#5655](https://github.com/DOI-USGS/ISIS3/issues/5655))
+- Fixed issue where apps that call other apps do not always pass the user-provided preference file to child applications. ([#5709](https://github.com/DOI-USGS/ISIS3/issues/5709))
+- Various speedup optimizations for jigsaw. ([#5721](https://github.com/DOI-USGS/ISIS3/issues/5721))
+- Fixed bug where modulus operator (%) was implemented in Calculator but not added to the known operators/functions list, causing % to be rejected as an unrecognized operator in fx. ([#5727](https://github.com/DOI-USGS/ISIS3/issues/5727))
+- Fixed Qview Histogram Tool crash when dragging right-to-left due to incorrect sample range ordering causing invalid nsamps. ([#5792](https://github.com/DOI-USGS/ISIS3/issues/5792))
+- Fixed rgb2hsv input parameter validation so that BMIN can be greater than RMAX but must be less than BMAX. ([#5872](https://github.com/DOI-USGS/ISIS3/issues/5872))
+- Fix downloadIsisData to properly apply extra rclone commands ([#5929](https://github.com/DOI-USGS/ISIS3/issues/5929))
+- Fixed case-sensitivity in isisimport on linux, now can succeed whether data file is upper or lowercase. ([#5971](https://github.com/DOI-USGS/ISIS3/issues/5971))
+- Fixes runISISCoreTests timeout. ([#6002](https://github.com/DOI-USGS/ISIS3/issues/6002))
+- Fix Cube::open on GeoTIFF cubes whose json:ISIS3 metadata contains nested objects, e.g. where GDAL expanded a slash-named PVL keyword (such as INS-85600_F/RATIO in LROC NAC) into a nested JSON object. Pvl::readObject now flattens such nested objects back to '/'-separated keyword names, while keeping the {value, unit} shape as a single keyword. Issue #6038. ([#6038](https://github.com/DOI-USGS/ISIS3/issues/6038))
+- Fixed KPLO ShadowCam serial number returning "Unknown" because KploShadowCamCameraSerialNumber.trn used the bare keyword Auto instead of Auto = 1, breaking findimageoverlaps and other tools that require a real serial number. ([#6061](https://github.com/DOI-USGS/ISIS3/issues/6061))
+- Fixed `tgocassis2isis` to populate `SpacecraftClockStartCount` for PSA-exported CaSSIS calibrated products by decoding it from the label `exposuretimestamp` field, so these products ingest without a manual `editlab` step. ([#6079](https://github.com/DOI-USGS/ISIS3/issues/6079))
+- Register GDAL Drivers in qtie to allow GTIFF opening. ([#6086](https://github.com/DOI-USGS/ISIS3/issues/6086))
+- Fixed SpiceQL mission name from "chandrayaan1" to "m3" for chan1m32isis. ([#6092](https://github.com/DOI-USGS/ISIS3/issues/6092))
+- Improved qview BSQ cube RGB display performance by batching line reads to 20 lines per band. ([#6096](https://github.com/DOI-USGS/ISIS3/issues/6096))
+- Allowed parquet control networks to be opened in cneteditor, qnet, and the mosaic scene control net tool.
+- Fix `downloadIsisData` filters removing test data needed to run the app tests.
+- Fixed dsk2isis to be callable in code
+- Fixed test fixtures crashing in TearDown after a failed SetUp, which left temp directories behind and aborted the rest of the test run.
+- Fixed the ground-to-image round trip of the HRSC and other variable line-rate cameras near a line-rate change, where it could be off by about a pixel.
+- TGO images can now be spiceinit'd with reconstructed spacecraft position. kerneldbgen gained reconsplit=DELIVERYDATE, which splits a kernel into a reconstructed and a predicted selection at the Flight Dynamics delivery date recorded in its comments, as needed by the TGO fsp SPKs that hold both qualities in one file.
+
+### Deprecated
+
+- Deprecated the ctxcal MONTHLYFLAT parameter. This parameter references legacy monthly flat field calibration files that are no longer supported. ([#6010](https://github.com/DOI-USGS/ISIS3/issues/6010))
+
+
 ## [10.0.0] - 2026-06-22
 
 ### Fixed
