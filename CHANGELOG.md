@@ -47,6 +47,27 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 <!-- towncrier release notes start -->
 
+## [10.0.0_LTS] - 2026-08-26
+
+### Fixed
+
+- Fixed HRSC bullet cam2map crash by adding a missing ground-truth check to ensure the ShapeModel and Bullet engine agree on surface intersections. ([#5291](https://github.com/DOI-USGS/ISIS3/issues/5291))
+- Fixed `map2cam` dropping all but the first band when the FROM cube is multi-band and the MATCH cube is single-band. Every FROM band is now reprojected into the output. ([#5501](https://github.com/DOI-USGS/ISIS3/issues/5501))
+- Fixed findfeatures not reading large images due to opencv restrictions ([#5655](https://github.com/DOI-USGS/ISIS3/issues/5655))
+- Fixed issue where apps that call other apps do not always pass the user-provided preference file to child applications. ([#5709](https://github.com/DOI-USGS/ISIS3/issues/5709))
+- Fixed bug where modulus operator (%) was implemented in Calculator but not added to the known operators/functions list, causing % to be rejected as an unrecognized operator in fx. ([#5727](https://github.com/DOI-USGS/ISIS3/issues/5727))
+- Fixed Qview Histogram Tool crash when dragging right-to-left due to incorrect sample range ordering causing invalid nsamps. ([#5792](https://github.com/DOI-USGS/ISIS3/issues/5792))
+- Fixed rgb2hsv input parameter validation so that BMIN can be greater than RMAX but must be less than BMAX. ([#5872](https://github.com/DOI-USGS/ISIS3/issues/5872))
+- Fix downloadIsisData to properly apply extra rclone commands ([#5929](https://github.com/DOI-USGS/ISIS3/issues/5929))
+- Fixed case-sensitivity in isisimport on linux, now can succeed whether data file is upper or lowercase. ([#5971](https://github.com/DOI-USGS/ISIS3/issues/5971))
+- Fixes runISISCoreTests timeout. ([#6002](https://github.com/DOI-USGS/ISIS3/issues/6002))
+- Fix Cube::open on GeoTIFF cubes whose json:ISIS3 metadata contains nested objects, e.g. where GDAL expanded a slash-named PVL keyword (such as INS-85600_F/RATIO in LROC NAC) into a nested JSON object. Pvl::readObject now flattens such nested objects back to '/'-separated keyword names, while keeping the {value, unit} shape as a single keyword. Issue #6038. ([#6038](https://github.com/DOI-USGS/ISIS3/issues/6038))
+- Register GDAL Drivers in qtie to allow GTIFF opening. ([#6086](https://github.com/DOI-USGS/ISIS3/issues/6086))
+- Fixed SpiceQL mission name from "chandrayaan1" to "m3" for chan1m32isis. ([#6092](https://github.com/DOI-USGS/ISIS3/issues/6092))
+- Improved qview BSQ cube RGB display performance by batching line reads to 20 lines per band. ([#6096](https://github.com/DOI-USGS/ISIS3/issues/6096))
+- Fix `downloadIsisData` filters removing test data needed to run the app tests.
+
+
 ## [10.0.0] - 2026-06-22
 
 ### Fixed
