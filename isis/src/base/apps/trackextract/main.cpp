@@ -19,8 +19,6 @@ using namespace Isis;
 const int FLOAT_MIN = -16777215;
 
 void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBand);
-void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector);
-void createTrackCube(QString inputName, QString ouputName, int trackBand);
 void copyPixels(Buffer &in, Buffer &out);
 
 
@@ -76,11 +74,10 @@ class CopyPixelsFunctor {
 void IsisMain() {
   UserInterface &ui = Application::GetUserInterface();
   QString inputName = ui.GetCubeName("FROM");
-  QString outputName = ui.GetCubeName("TO");
 
   // Confirm that the input mosaic is of pixel-type "Real" as trackextract does not work on other
   // bit types due to corruption of these files
-  Cube inputCube = Cube(inputName);
+  Cube inputCube(inputName);
   PixelType pixelType = inputCube.pixelType();
   if (pixelType != Real) {
     QString msg = "The input mosaic [" + inputName + "] is of pixel type ["
@@ -91,8 +88,96 @@ void IsisMain() {
   QVector<QString> copyBands;
   int trackBand;
   findTrackBand(inputName, copyBands, trackBand);
-  createMosaicCube(inputName, outputName, copyBands);
-  createTrackCube(inputName, outputName, trackBand);
+
+  // Begin process to create the output mosaic file
+  ProcessByLine p;
+
+  CubeAttributeInput inAtt = CubeAttributeInput();
+  inAtt.setBands(std::vector<QString>(copyBands.begin(), copyBands.end()));
+
+  p.SetInputCube(inputName, inAtt);
+  Cube *mosaicCube = p.SetOutputCube("TO");
+  p.StartProcess(copyPixels);
+
+  if (!mosaicCube->deleteBlob("InputImages", "Table")) {
+    QString msg = "The input cube [" + inputName + "] does not have a tracking table.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+  p.EndProcess();
+
+  // Begin process for creating tracking file
+  inAtt = CubeAttributeInput("+" + QString::number(trackBand));
+  p.SetInputCube(inputName, inAtt);
+
+  FileName outputFileName = FileName(ui.GetCubeName("TO"));
+
+  // Strip off any extensions and add _tracking
+  QString trackingFileString = outputFileName.path() + "/" + outputFileName.baseName() + "_tracking";
+
+  int numSample = inputCube.sampleCount();
+  int numLine = inputCube.lineCount();
+
+  // Create cube attributes off of the original cube
+  CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
+  outAtt.setPixelType(UnsignedInteger);
+  outAtt.setMinimum(VALID_MINUI4);
+  outAtt.setMaximum(VALID_MAXUI4);
+
+  Cube *trackCube = p.SetOutputCube(trackingFileString, outAtt, numSample, numLine);
+
+  int offset = 0;
+  int defaultVal = 0;
+  switch (SizeOf(inputCube.pixelType())) {
+    case 1:
+      offset = VALID_MIN1;
+      defaultVal = NULL1;
+      break;
+
+    case 2:
+      offset = VALID_MIN2;
+      defaultVal = NULL2;
+      break;
+
+    case 4:
+      offset = FLOAT_MIN;
+      defaultVal = INULL4;
+      break;
+
+    default:
+      QString msg = "Invalid Pixel Type [" + QString::number(inputCube.pixelType()) + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+  CopyPixelsFunctor copyTrackPixels(offset, defaultVal);
+
+  p.ProcessCube(copyTrackPixels);
+
+  // Create new tracking table with updated data and delete the old table
+  if (trackCube->hasTable("InputImages")) {
+    Table oldTable = trackCube->readTable("InputImages");
+    trackCube->deleteBlob("Table", "InputImages");
+
+    TrackingTable newTrackTable(oldTable);
+    Table newTable = newTrackTable.toTable();
+    trackCube->write(newTable);
+  }
+  else {
+    QString msg = "The tracking cube [" + trackCube->fileName() + "] does not have a tracking table.";
+    throw IException(IException::Programmer, msg, _FILEINFO_);
+  }
+
+  mosaicCube->reopen("rw");
+
+  // Add Tracking Group to the mosaic cube
+  PvlGroup trackingGroup = PvlGroup("Tracking");
+  PvlKeyword trackingName = PvlKeyword("Filename");
+  FileName trackingFileName = FileName(trackCube->fileName());
+  trackingName.setValue(trackingFileName.name());
+  trackingGroup.addKeyword(trackingName);
+  mosaicCube->putGroup(trackingGroup);
+  mosaicCube->close();
+
+  p.EndProcess();
 }
 
 
@@ -138,138 +223,6 @@ void findTrackBand(QString inputName, QVector<QString> &copyBands, int &trackBan
     throw IException(IException::Programmer, msg, _FILEINFO_);
   }
 }
-
-
-/**
- * Creates the mosaic cube by copying the input cube without the tracking band.
- * Then, removes the tracking table from the mosaic label and adds a group pointing
- * to the tracking cube.
- *
- * @param inputName   The name of the input cube
- * @param ouputName   The name of the output cube
- * @param bandsVector The indices of the bands that are not the tracking band
- */
-void createMosaicCube(QString inputName, QString outputName, QVector<QString> bandsVector) {
-  ProcessByLine p;
-
-  CubeAttributeInput inAtt = CubeAttributeInput();
-  inAtt.setBands(std::vector<QString>(bandsVector.begin(), bandsVector.end()));
-
-  p.SetInputCube(inputName, inAtt);
-  p.SetOutputCube("TO");
-  p.StartProcess(copyPixels);
-  p.EndProcess();
-
-  Cube mosaicCube;
-  try {
-    mosaicCube.open(outputName,"rw");
-  }
-  catch (IException &e) {
-    throw IException(IException::User,
-                     "Unable to open the file [" + outputName + "] as a cube.",
-                     _FILEINFO_);
-  }
-
-  if (!mosaicCube.deleteBlob("InputImages", "Table")) {
-    QString msg = "The input cube [" + inputName + "] does not have a tracking table.";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-
-  // Add Tracking Group to the mosaic cube
-  PvlGroup trackingGroup = PvlGroup("Tracking");
-  PvlKeyword trackingName = PvlKeyword("Filename");
-  FileName cubeName = FileName(outputName);
-  trackingName.setValue(cubeName.baseName() + "_tracking." + cubeName.extension()); //Strip off path and add _tracking
-  trackingGroup.addKeyword(trackingName);
-  mosaicCube.putGroup(trackingGroup);
-
-  mosaicCube.close();
-}
-
-
-/**
- * Creates the tracking cube by copying the input cube with only the tracking band.
- * Then, goes through each pixel and subtracts the input cube's pixel type's min value or sets
- * the value to Null, deletes the old tracking table, and creates a new table with updated data.
- *
- * @param inputName    The name of the input cube
- * @param ouputName    The name of the output cube
- * @param trackingBand The index of the tracking band
- */
-void createTrackCube(QString inputName, QString ouputName, int trackBand) {
-  ProcessByLine p;
-
-  CubeAttributeInput inAtt = CubeAttributeInput("+" + QString::number(trackBand));
-  p.SetInputCube(inputName, inAtt);
-
-  FileName cubeName = FileName(ouputName);
-  // Strip off any extensions and add _tracking
-  QString trackingName = cubeName.path() + "/" + cubeName.baseName() + "_tracking";
-
-  Cube inputCube = Cube(inputName);
-  int numSample = inputCube.sampleCount();
-  int numLine = inputCube.lineCount();
-
-  // Create cube attributes off of the original cube
-  CubeAttributeOutput outAtt(ouputName);
-  outAtt.setPixelType(UnsignedInteger);
-  outAtt.setMinimum(VALID_MINUI4);
-  outAtt.setMaximum(VALID_MAXUI4);
-
-  p.SetOutputCube(trackingName, outAtt, numSample, numLine);
-
-  int offset = 0;
-  int defaultVal = 0;
-  switch (SizeOf(inputCube.pixelType())) {
-    case 1:
-      offset = VALID_MIN1;
-      defaultVal = NULL1;
-      break;
-
-    case 2:
-      offset = VALID_MIN2;
-      defaultVal = NULL2;
-      break;
-
-    case 4:
-      offset = FLOAT_MIN;
-      defaultVal = INULL4;
-      break;
-
-    default:
-      QString msg = "Invalid Pixel Type [" + QString::number(inputCube.pixelType()) + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-  CopyPixelsFunctor copyTrackPixels(offset, defaultVal);
-
-  p.ProcessCube(copyTrackPixels);
-  p.EndProcess();
-
-  Cube trackCube;
-  try {
-    trackCube.open(trackingName,"rw");
-  }
-  catch (IException &e) {
-    throw IException(IException::User,
-                     "Unable to open the file [" + trackingName + "] as a cube.",
-                     _FILEINFO_);
-  }
-
-  // Create new tracking table with updated data and delete the old table
-  if (trackCube.hasTable("InputImages")) {
-    Table oldTable = trackCube.readTable("InputImages");
-    trackCube.deleteBlob("Table", "InputImages");
-
-    TrackingTable newTrackTable(oldTable);
-    Table newTable = newTrackTable.toTable();
-    trackCube.write(newTable);
-  }
-  else {
-    QString msg = "The tracking cube [" + trackingName + "] does not have a tracking table.";
-    throw IException(IException::Programmer, msg, _FILEINFO_);
-  }
-}
-
 
 /**
  * Copies DN's from the input cube to the mosaic cube.
