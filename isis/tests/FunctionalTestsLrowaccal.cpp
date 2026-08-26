@@ -1,8 +1,16 @@
+#include <iostream>
+
+#include <QString>
+#include <QVector>
 #include <QTemporaryDir>
 
-#include "Pvl.h"
+#include "Cube.h"
+#include "FileName.h"
+#include "IException.h"
 #include "PvlGroup.h"
+#include "PvlKeyword.h"
 #include "TestUtilities.h"
+#include "UserInterface.h"
 
 #include "lrowaccal.h"
 
@@ -10,14 +18,14 @@
 
 using namespace Isis;
 
-static QString APP_XML = FileName("$ISISROOT/bin/xml/lrowaccal.xml").expanded();
+static const QString APP_XML = FileName("$ISISROOT/bin/xml/lrowaccal.xml").expanded();
 
 TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
   QTemporaryDir tempDir;
   ASSERT_TRUE(tempDir.isValid());
 
-  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
+  const QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  const QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
 
   QVector<QString> args = {"from=" + testCubeFileName,
                            "to=" + outCubeFileName,
@@ -28,7 +36,7 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
   try {
     lrowaccal(options);
   }
-  catch(IException &e) {
+  catch(const IException &e) {
     FAIL() << "Call to lrowaccal failed, unable to calibrate cube: " << e.what() << std::endl;
   }
 
@@ -46,8 +54,8 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
   QTemporaryDir tempDir;
   ASSERT_TRUE(tempDir.isValid());
 
-  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
+  const QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  const QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
 
   QVector<QString> args = {"from=" + testCubeFileName,
                            "to=" + outCubeFileName,
@@ -58,7 +66,7 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
   try {
     lrowaccal(options);
   }
-  catch(IException &e) {
+  catch(const IException &e) {
     FAIL() << "Call to lrowaccal failed, unable to calibrate cube: " << e.what() << std::endl;
   }
 
