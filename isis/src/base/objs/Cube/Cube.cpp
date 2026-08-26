@@ -540,11 +540,10 @@ namespace Isis {
       core.addGroup(ptype);
     }
     else if (labelsAttached() == LabelAttachment::ExternalLabel) {
-      imageFile = imageFile.addExtension("ecub");
+      m_labelFileName = new FileName(imageFile.addExtension("ecub"));
+      m_labelFile = new QFile(m_labelFileName->expanded());
       if (!m_dataFileName) {
         if (format() == Bsq || format() == Tile) {
-          imageFile = imageFile.setExtension("cub");
-
           Pvl dnLabel;
           PvlObject isiscube("IsisCube");
           PvlObject dnCore(core);
@@ -557,6 +556,7 @@ namespace Isis {
           isiscube.addObject(dnCore);
           dnLabel.addObject(isiscube);
 
+          imageFile = imageFile.setExtension("cub");
           Cube dnCube;
           dnCube.fromLabel(imageFile, dnLabel, "rw");
           dnCube.close();
@@ -565,18 +565,10 @@ namespace Isis {
           imageFile = imageFile.setExtension("tif");
         }
         m_dataFileName = new FileName(imageFile);
-        
-        imageFile = imageFile.setExtension("ecub");
-        FileName labelFileName(imageFile);
-        m_labelFileName = new FileName(labelFileName);
-        m_labelFile = new QFile(m_labelFileName->expanded());
       }
 
       core += PvlKeyword("^DnFile", m_dataFileName->name());
       m_dataFile = new QFile(m_dataFileName->expanded());
-
-      m_labelFileName = new FileName(imageFile);
-      m_labelFile = new QFile(m_labelFileName->expanded());
     }
     else {
       QString msg = "Label type [" + LabelAttachmentName(labelsAttached()) + "] not supported";
@@ -2961,7 +2953,7 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    if (m_format == Format::GTiff) {
+    if (m_format == Format::GTiff && labelsAttached() == LabelAttachment::AttachedLabel) {
 
       nlohmann::ordered_json jsonblob = this->label()->toJson()["Root"];
 
