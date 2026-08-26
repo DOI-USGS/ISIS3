@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <QString>
+#include <QStringLiteral>
 #include <QVector>
 #include <QTemporaryDir>
 
@@ -25,7 +26,7 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelExists) {
   ASSERT_TRUE(tempDir.isValid());
 
   const QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  const QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
+  const QString testCubeFileName = QStringLiteral("data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub");
 
   QVector<QString> args = {"from=" + testCubeFileName,
                            "to=" + outCubeFileName,
@@ -55,7 +56,7 @@ TEST(Lrowaccal, FunctionalTestLrowaccalRadianceUnitsLabelNotForIOF) {
   ASSERT_TRUE(tempDir.isValid());
 
   const QString outCubeFileName = tempDir.path() + "/outTemp.cub";
-  const QString testCubeFileName = "data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub";
+  const QString testCubeFileName = QStringLiteral("data/lrowaccal/M1388981421CE.tmp.vis.even.reduced.cub");
 
   QVector<QString> args = {"from=" + testCubeFileName,
                            "to=" + outCubeFileName,
