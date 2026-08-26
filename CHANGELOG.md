@@ -51,6 +51,7 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 ### Added
 
+- Add SPHERICALDATUMRADIUS option to demprep to work with elevation DN files ([#6127](https://github.com/DOI-USGS/ISIS3/issues/6127))
 - Added support for double pixel type for ISIS cubes ([#5786](https://github.com/DOI-USGS/ISIS3/issues/5786))
 - Added reconsplit feature to kerneldbgen to enable splitting of TGO cassis recon SPKs ([#6094](https://github.com/DOI-USGS/ISIS3/issues/6094))
 - Added support for TGO CaSSIS images to `socetframesettings`. ([#6101](https://github.com/DOI-USGS/ISIS3/issues/6101))
