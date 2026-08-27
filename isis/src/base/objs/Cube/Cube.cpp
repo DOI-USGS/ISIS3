@@ -2451,6 +2451,9 @@ namespace Isis {
     delete m_virtualBandList;
     m_virtualBandList = NULL;
 
+    m_blobMap.clear();
+    m_blobQueue.clear();
+
     initialize();
   }
 
@@ -2966,7 +2969,6 @@ namespace Isis {
         jsonblob.update(blobJson);
       }
 
-      m_blobMap.clear();
       m_blobQueue.clear();
       std::string jsonOutStr = jsonblob.dump();
 
@@ -3067,7 +3069,6 @@ namespace Isis {
         }
         stream.flush();
       }
-      m_blobMap.clear();
       m_blobQueue.clear();
       stream.close();
 
