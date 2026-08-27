@@ -116,12 +116,20 @@ namespace Isis {
       virtual void updateLabels(Pvl &labels) = 0;
       QMutex *dataFileMutex();
 
+      void setBaseMultiplier(double base, double mult);
+
     protected:
       //! This enables us to block while the write thread is working
       QMutex *m_writeThreadMutex;
 
       //! Converts from virtual band to physical band.
       QList<int> *m_virtualBands;
+
+      //! The additive offset of the data on disk.
+      double m_base;
+
+      //! The multiplicative factor of the data on disk.
+      double m_multiplier;
   };
 }
 

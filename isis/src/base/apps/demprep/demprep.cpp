@@ -16,7 +16,7 @@ using namespace std;
 namespace Isis{
 
   void DoWrap(Buffer &in);
-  void GetStats(Buffer &in, Buffer &out);
+  void GetStats(Buffer &in);
 
   Cube *ocube;
 
@@ -58,38 +58,6 @@ namespace Isis{
       IString message = "The input cube must be a DEM file, which means it must be projected. ";
       message += "This file is not map projected.";
       throw IException(IException::User, message, _FILEINFO_);
-    }
-
-    if(!proj->IsEquatorialCylindrical()) {
-      CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
-      ocube = p.SetOutputCube(ui.GetCubeName("TO"), att);
-      p.StartProcess(GetStats);
-
-      PvlGroup demRange("Results");
-      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum()), "meters");
-      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum()), "meters");
-      Application::Log(demRange);
-
-      // Store min/max radii values in new ShapeModelStatistics table
-      QString shp_name = "ShapeModelStatistics";
-      TableField fmin("MinimumRadius",Isis::TableField::Double);
-      TableField fmax("MaximumRadius",Isis::TableField::Double);
-
-      TableRecord record;
-      record += fmin;
-      record += fmax;
-
-      Table table(shp_name,record);
-
-      record[0] = Distance(inCubeStats.Minimum(),
-                           Distance::Meters).kilometers();
-      record[1] = Distance(inCubeStats.Maximum(),
-                           Distance::Meters).kilometers();
-      table += record;
-
-      ocube->write(table);
-      p.EndProcess();
-      return;
     }
 
     if (proj->LatitudeTypeString() != "Planetocentric") {
@@ -245,16 +213,64 @@ namespace Isis{
     mapgrp.addKeyword(PvlKeyword("UpperLeftCornerY", toString(upperLeftCorner), "meters"),
                       Pvl::Replace);
 
-
+    // We need to create the output file
     CubeAttributeOutput &att = ui.GetOutputAttribute("TO");
     ocube = p.SetOutputCube(ui.GetCubeName("TO"), att, ns, nl, nb);
+
+    double datum_radius_base = 0.0;
+    if ( ui.WasEntered("SPHERICALDATUMRADIUS") ) {
+      if (icube->base() != 0.0 || icube->multiplier() != 1.0) {
+        QString msg = "The input file [" + ui.GetCubeName("TO") + "] has a none zero base value "
+                      "[" + QString::number(icube->base()) + "]. Updating base to a new Radius will create inaccurate DNs. "
+                      "It's likely that the input data should be reprocessed to have a base of 0.0 and "
+                      "a multiplyer of 1.0";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      if (ocube->pixelType() == Isis::Double) {
+        QString msg = "Output file [" + ocube->fileName() + "] pixel type is set to double which does not support "
+                      "base and multipler changes. Please set a different output pixel type.";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+      datum_radius_base = ui.GetDouble("SPHERICALDATUMRADIUS");
+    }
+
+    if(!proj->IsEquatorialCylindrical()) {
+      p.StartProcess(GetStats);
+
+      PvlGroup demRange("Results");
+      demRange += PvlKeyword("MinimumRadius", toString(inCubeStats.Minimum() + datum_radius_base), "meters");
+      demRange += PvlKeyword("MaximumRadius", toString(inCubeStats.Maximum() + datum_radius_base), "meters");
+      Application::AppendAndLog(demRange, log);
+
+      // Store min/max radii values in new ShapeModelStatistics table
+      QString shp_name = "ShapeModelStatistics";
+      TableField fmin("MinimumRadius",Isis::TableField::Double);
+      TableField fmax("MaximumRadius",Isis::TableField::Double);
+
+      TableRecord record;
+      record += fmin;
+      record += fmax;
+
+      Table table(shp_name,record);
+
+      record[0] = Distance(inCubeStats.Minimum() + datum_radius_base,
+                           Distance::Meters).kilometers();
+      record[1] = Distance(inCubeStats.Maximum() + datum_radius_base,
+                           Distance::Meters).kilometers();
+      table += record;
+
+      ocube->write(table);
+      p.EndProcess();
+      return;
+    }
+
     // Make sure everything is propagated and closed
     p.EndProcess();
 
     // Now we'll really be processing our input cube
     p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
-    // We need to create the output file
+    // We need to reopen the output file
     ocube = new Cube();
     ocube->open(FileName(ui.GetCubeName("TO")).expanded(), "rw");
 
@@ -262,11 +278,11 @@ namespace Isis{
 
     // Update mapping grp
     ocube->putGroup(mapgrp);
-
+    
     PvlGroup demRange("Results");
-    demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum()), "meters");
-    demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum()), "meters");
-    Application::Log(demRange);
+    demRange += PvlKeyword("MinimumRadius", toString(outCubeStats.Minimum() + datum_radius_base), "meters");
+    demRange += PvlKeyword("MaximumRadius", toString(outCubeStats.Maximum() + datum_radius_base), "meters");
+    Application::AppendAndLog(demRange, log);
 
     // Store min/max radii values in new ShapeModelStatistics table
     QString shp_name = "ShapeModelStatistics";
@@ -279,24 +295,24 @@ namespace Isis{
 
     Table table(shp_name,record);
 
-    record[0] = Distance(outCubeStats.Minimum(),
+    record[0] = Distance(outCubeStats.Minimum() + datum_radius_base,
                          Distance::Meters).kilometers();
-    record[1] = Distance(outCubeStats.Maximum(),
+    record[1] = Distance(outCubeStats.Maximum() + datum_radius_base,
                          Distance::Meters).kilometers();
     table += record;
 
     ocube->write(table);
-
+    if (datum_radius_base != 0) {
+      ocube->setBaseMultiplier(datum_radius_base, 1.0);
+    }
+    
     p.EndProcess();
     ocube->close();
     delete ocube;
   }
 
-  void GetStats(Buffer &in, Buffer &out) {
+  void GetStats(Buffer &in) {
     inCubeStats.AddData(&in[0], in.size());
-    for (int i=0; i<in.size(); i++) {
-      out[i] = in[i];
-    }
   }
 
   void DoWrap(Buffer &in) {
@@ -313,14 +329,12 @@ namespace Isis{
       for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
         int inputIndex = outputIndex - leftPad;
         if(inputIndex < 0) {
-          inputLineStats.AddData(in[inputIndex + inputSize]);
+          inputIndex += inputSize;
         }
-        else if(inputIndex < inputSize) {
-          inputLineStats.AddData(in[inputIndex]);
+        else if(inputIndex >= inputSize) {
+          inputIndex -= inputSize;
         }
-        else {
-          inputLineStats.AddData(in[inputIndex - inputSize]);
-        }
+        inputLineStats.AddData(in[inputIndex]);
       }
     }
 
@@ -329,27 +343,17 @@ namespace Isis{
       double average = inputLineStats.Average(); //may be Isis::NULL8
       for(int outputIndex = 0; outputIndex < outputSize; outputIndex++) {
         int inputIndex = outputIndex - leftPad;
+        if(inputIndex < 0) {
+          inputIndex += inputSize;
+        }
+        else if(inputIndex >= inputSize) {
+          inputIndex -= inputSize;
+        }
         if (average == Isis::NULL8) {
-          if(inputIndex < 0) {
-            outMan[outputIndex] = in[inputIndex + inputSize];
-          }
-          else if(inputIndex < inputSize) {
-            outMan[outputIndex] = in[inputIndex];
-          }
-          else {
-            outMan[outputIndex] = in[inputIndex - inputSize];
-          }
+          outMan[outputIndex] = in[inputIndex];
         }
         else {
-          if(inputIndex < 0) {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex + inputSize];
-          }
-          else if(inputIndex < inputSize) {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex];
-          }
-          else {
-            outMan[outputIndex] = 2.0 * average - in[inputIndex - inputSize];
-          }
+          outMan[outputIndex] = 2.0 * average - in[inputIndex];
         }
       }
       outMan.SetLine(1);
