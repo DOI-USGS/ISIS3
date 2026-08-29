@@ -463,6 +463,35 @@ TEST_F(CSMCameraSetFixture, SerialNumber) {
 }
 
 
+// jigsaw reads its input cubes into a SerialNumberList, which requires a unique serial
+// number per cube. A cube run through csminit gains a CsmInfo group. If the serial
+// number is taken from that group (CSMPlatformID, CSMInstrumentId, ReferenceTime), two
+// images that share a reference time, as sub-images of a framing instrument do, receive
+// the same serial number, and SerialNumberList reports "Duplicate serial number" - the
+// failure jigsaw reports when reading such cubes (ISIS #5482, #4240). This test
+// replicates that mechanism: two distinct cubes given the same CsmInfo must still get
+// distinct, instrument-based serial numbers and both be added to the list.
+TEST(CSMSerialNumber, SerialNumberListNoDuplicateFromCsmInfo) {
+  Pvl labelA(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
+  Pvl labelB(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub").expanded());
+
+  PvlGroup csmInfo("CsmInfo");
+  csmInfo += PvlKeyword("CSMPlatformID", "csm");
+  csmInfo += PvlKeyword("CSMInstrumentId", "csm");
+  csmInfo += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816");
+  labelA.findObject("IsisCube").addGroup(csmInfo);
+  labelB.findObject("IsisCube").addGroup(csmInfo);
+
+  SerialNumberList snl;
+  snl.add(labelA, "ab102401.cub");
+  snl.add(labelB, "m0402852.cub");
+
+  EXPECT_EQ(snl.size(), 2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, snl.serialNumber(0), "MGS/561812335:32/MOC-WA/RED");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, snl.serialNumber(1), "MGS/619971158:28/MOC-NA/BROAD_BAND");
+}
+
+
 TEST_F(CSMCameraFixture, CameraState) {
   std::string testString = "MockSensorModel\nTestModelState";
   EXPECT_CALL(mockModel, getModelState())
