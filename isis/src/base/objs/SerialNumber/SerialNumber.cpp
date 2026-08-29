@@ -97,25 +97,48 @@ namespace Isis {
   PvlGroup SerialNumber::FindSerialTranslation(Pvl &label) {
     Pvl outLabel;
 
-    // check if label has CSM information
-    if(label.findObject("IsisCube").hasGroup("CsmInfo")) {
+    // Determine the mission and instrument for the instrument-based serial number,
+    // if the cube has an ISIS instrument label. These translations return a default
+    // ("Unknown") for an unrecognized instrument, but can throw if the expected
+    // groups/keywords are missing, so they are guarded.
+    QString mission;
+    QString instrument;
+    if(label.findObject("IsisCube").hasGroup("Instrument")) {
+      try {
+        static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
+        static PvlToPvlTranslationManager missionXlater(missionTransFile);
+        missionXlater.SetLabel(label);
+        mission = missionXlater.Translate("MissionName");
+
+        static QString instTransFile = "$ISISROOT/appdata/translations/Instruments.trn";
+        static PvlToPvlTranslationManager instrumentXlater(instTransFile);
+        instrumentXlater.SetLabel(label);
+        instrument = instrumentXlater.Translate("InstrumentName");
+      }
+      catch (IException &e) {
+        mission = "";
+        instrument = "";
+      }
+    }
+
+    // A usable instrument-based serial number requires a recognized mission and
+    // instrument.
+    bool instrumentUsable = !mission.isEmpty() && !instrument.isEmpty()
+                            && instrument != "Unknown";
+
+    // Prefer the instrument-based serial number when the cube has a recognized ISIS
+    // instrument: it matches what spiceinit produces for the same cube, and unlike
+    // the CSM serial number (built only from CSMPlatformID, CSMInstrumentId, and
+    // ReferenceTime, which can be identical for multiple framelets of a framing
+    // instrument) it is unique per image. Use the CSM serial number only when there
+    // is no usable instrument serial (for example a generic CSM cube with no ISIS
+    // instrument label).
+    if(label.findObject("IsisCube").hasGroup("CsmInfo") && !instrumentUsable) {
       static QString csmTransFile = "$ISISROOT/appdata/translations/CsmSerialNumber.trn";
       PvlToPvlTranslationManager csmTranslator(label, csmTransFile);
       csmTranslator.Auto(outLabel);
     }
     else {
-      // Get the mission name
-      static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
-      static PvlToPvlTranslationManager missionXlater(missionTransFile);
-      missionXlater.SetLabel(label);
-      QString mission = missionXlater.Translate("MissionName");
-
-      // Get the instrument name
-      static QString instTransFile = "$ISISROOT/appdata/translations/Instruments.trn";
-      static PvlToPvlTranslationManager instrumentXlater(instTransFile);
-      instrumentXlater.SetLabel(label);
-      QString instrument = instrumentXlater.Translate("InstrumentName");
-
       // We want to use this instrument's translation manager. It's much faster for
       //   SerialNumberList if we keep the translation manager in memory, so re-reading
       //   from the disk is not necessary every time. To do this, we'll use a map to store
