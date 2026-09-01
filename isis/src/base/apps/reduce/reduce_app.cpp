@@ -21,15 +21,14 @@ namespace Isis{
       vector<QString> bands;
       Cube inCube;
 
-      // To propogate labels, set input cube,
+      // To propagate labels, set input cube,
       // this cube will be cleared after output cube is set.
       CubeAttributeInput &inputAtt = ui.GetInputAttribute("FROM");
       p.SetInputCube(ui.GetCubeName("FROM"), inputAtt);
 
       // Setup the input and output cubes
-      QString replaceMode = ui.GetAsString("VPER_REPLACE");
-      CubeAttributeInput cai(ui.GetAsString("FROM"));
-      bands = cai.bands();
+      QString replaceMode = ui.GetString("VPER_REPLACE");
+      bands = inputAtt.bands();
 
       QString from = ui.GetCubeName("FROM");
       inCube.setVirtualBands(bands);
