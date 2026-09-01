@@ -20,6 +20,7 @@
 #include "TableField.h"
 #include "TableRecord.h"
 
+
 using json = nlohmann::json;
 
 namespace Isis {
@@ -143,6 +144,7 @@ namespace Isis {
     LineManager line(*demCube);
     double pixelValue;
     double base = demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"];
+    demCube->label()->findObject("IsisCube").findObject("Core").findGroup("Pixels")["Base"] = toString((int)0);
     double xPos = 0.0;
 
     for(line.begin(); !line.end(); line++) {
@@ -165,7 +167,7 @@ namespace Isis {
 
 
   void DemCube::TearDown() {
-    if (demCube->isOpen()) {
+    if (demCube && demCube->isOpen()) {
       demCube->close();
     }
 
@@ -269,11 +271,11 @@ namespace Isis {
 
 
   void DefaultCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
-    if (projTestCube->isOpen()) {
+    if (projTestCube && projTestCube->isOpen()) {
       projTestCube->close();
     }
 
@@ -320,11 +322,11 @@ namespace Isis {
 
 
   void LineScannerCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
-    if (projTestCube->isOpen()) {
+    if (projTestCube && projTestCube->isOpen()) {
       projTestCube->close();
     }
 
@@ -340,7 +342,7 @@ namespace Isis {
 
 
   void OffBodyCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
@@ -355,7 +357,7 @@ namespace Isis {
 
 
   void MiniRFCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 

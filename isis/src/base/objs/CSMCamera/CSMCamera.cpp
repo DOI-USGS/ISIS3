@@ -809,7 +809,7 @@ void sanitize(std::string &input);
   *                                sample, line with respect to
   *                                the ground coordinate.
   */
-  vector<double> CSMCamera::GroundPartials(SurfacePoint groundPoint) {
+  vector<double> CSMCamera::GroundPartials(const SurfacePoint &groundPoint) {
     csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
     vector<double> groundPartials = m_model->computeGroundPartials(groundCoord);
     return groundPartials;
@@ -1097,7 +1097,7 @@ void sanitize(std::string &input);
   }
 
 
-  vector<double> CSMCamera::getSensorPartials(int index, SurfacePoint groundPoint) {
+  vector<double> CSMCamera::getSensorPartials(int index, const SurfacePoint &groundPoint) {
     // csm::SensorPartials holds (line, sample) in order for each parameter
    csm::EcefCoord groundCoord = isisToCsmGround(groundPoint);
    std::pair<double, double> partials = m_model->computeSensorPartials(index, groundCoord);

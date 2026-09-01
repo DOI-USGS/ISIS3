@@ -9,15 +9,16 @@ find files of those names at the top level of this repository. **/
 #include "BundleAdjust.h"
 
 // std lib
+#include <algorithm>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 
 // qt lib
 #include <QCoreApplication>
+#include <QDataStream>
 #include <QDebug>
 #include <QFile>
-#include <QMutex>
 
 // csm lib
 #include <csm/Model.h>
@@ -60,7 +61,10 @@ find files of those names at the top level of this repository. **/
 #include "LidarControlPoint.h"
 #include "Longitude.h"
 #include "MaximumLikelihoodWFunctions.h"
+#include "NaifStatus.h"
 #include "SpecialPixel.h"
+#include "SpicePosition.h"
+#include "SpiceRotation.h"
 #include "StatCumProbDistDynCalc.h"
 #include "SurfacePoint.h"
 #include "Target.h"
@@ -488,7 +492,6 @@ namespace Isis {
    */
   void BundleAdjust::init(Progress *progress) {
     emit(statusUpdate("Initialization"));
-    m_previousNumberImagePartials = 0;
 
     // initialize
     //
@@ -497,6 +500,7 @@ namespace Isis {
     m_iteration = 0;
     m_rank = 0;
     m_iterationSummary = "";
+    m_focalPlaneComputedStored = false;
 
     // Get the cameras set up for all images
     // NOTE - THIS IS NOT THE SAME AS "setImage" as called in BundleAdjust::computePartials
@@ -955,6 +959,24 @@ namespace Isis {
       // start the clock
       clock_t solveStartClock = clock();
 
+      // the residual sweep and the next iteration's partials sweep evaluate the same geometry at
+      // the same parameters, so fuse them unless something changes the normals in between
+      bool fuseResiduals = !m_bundleSettings->outlierRejection()
+                           && m_bundleResults.numberMaximumLikelihoodModels() == 0
+                           && m_bundleLidarControlPoints.isEmpty()
+                           && !hasRejectedMeasures();
+
+      if (fuseResiduals) {
+        m_focalPlaneComputedStored = true;
+
+        if (!formNormalEquations()) {
+          m_bundleResults.setConverged(false);
+          fuseResiduals = false;
+        }
+
+        m_bundleResults.initializeResidualsProbabilityDistribution(101);
+      }
+
       for (;;) {
 
         emit iterationUpdate(m_iteration);
@@ -973,14 +995,16 @@ namespace Isis {
         clock_t iterationStartClock = clock();
 
         // zero normals (after iteration 0)
-        if (m_iteration != 1) {
-          m_sparseNormals.zeroBlocks();
-        }
+        if (!fuseResiduals) {
+          if (m_iteration != 1) {
+            m_sparseNormals.zeroBlocks();
+          }
 
-        // form normal equations -- computePartials is called in here.
-        if (!formNormalEquations()) {
-          m_bundleResults.setConverged(false);
-          break;
+          // form normal equations -- computePartials is called in here.
+          if (!formNormalEquations()) {
+            m_bundleResults.setConverged(false);
+            break;
+          }
         }
 
         // testing
@@ -1020,9 +1044,21 @@ namespace Isis {
         }
         // testing
 
+        // form the next iteration's normal equations at the corrected parameters, which is also
+        // where this iteration's residuals are evaluated
+        if (fuseResiduals) {
+          m_sparseNormals.zeroBlocks();
+          m_focalPlaneComputedStored = true;
+
+          if (!formNormalEquations()) {
+            m_bundleResults.setConverged(false);
+            break;
+          }
+        }
+
         // compute residuals
         emit(statusBarUpdate("Computing Residuals"));
-        computeResiduals();
+        computeResiduals(!fuseResiduals || !m_focalPlaneComputedStored);
 
         // compute vtpv (weighted sum of squares of residuals)
         vtpv = computeVtpv();
@@ -1144,12 +1180,6 @@ namespace Isis {
           m_bundleResults.initializeResidualsProbabilityDistribution(101);
         }
 
-        // if we're using CHOLMOD and still going, release cholmod_factor
-        // (if we don't, memory leaks will occur), otherwise we need it for error propagation
-        if (!m_bundleResults.converged() || !m_bundleSettings->errorPropagation()) {
-          cholmod_l_free_factor(&m_L, &m_cholmodCommon);
-        }
-
         iterationSummary();
 
         m_iteration++;
@@ -1158,6 +1188,14 @@ namespace Isis {
       } // end of bundle iteration loop
 
       if (m_bundleResults.converged() && m_bundleSettings->errorPropagation()) {
+        // the point Q matrices are from the fused sweep at the converged parameters, so factor
+        // those normal equations to match them
+        if (fuseResiduals && !solveSystem()) {
+          outputBundleStatus("\nsolve failed!");
+          m_bundleResults.setConverged(false);
+          return false;
+        }
+
         clock_t errorPropStartClock = clock();
 
         outputBundleStatus("\nStarting Error Propagation");
@@ -1204,14 +1242,38 @@ namespace Isis {
 
 
   /**
+   * Returns whether any photogrammetric measure entered the adjustment already rejected.
+   *
+   * @return @b bool
+   */
+  bool BundleAdjust::hasRejectedMeasures() {
+    for (int i = 0; i < m_bundleControlPoints.size(); i++) {
+      BundleControlPointQsp point = m_bundleControlPoints.at(i);
+
+      if (point->isRejected()) {
+        return true;
+      }
+
+      for (int j = 0; j < point->size(); j++) {
+        if (point->at(j)->isRejected()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+
+  /**
    * Compute image measure residuals.
    */
-  void BundleAdjust::computeResiduals() {
+  void BundleAdjust::computeResiduals(bool computeMillimeters) {
 
     // residuals for photogrammetric measures
     emit(statusBarUpdate("Computing Measure Residuals"));
     for (int i = 0; i < m_bundleControlPoints.size(); i++) {
-      m_bundleControlPoints.at(i)->computeResiduals();
+      m_bundleControlPoints.at(i)->computeResiduals(computeMillimeters);
     }
 
     // residuals for lidar measures
@@ -1259,33 +1321,28 @@ namespace Isis {
     bool status = false;
 
     // Initialize auxilary matrices and vectors.
-    static LinearAlgebra::Matrix coeffTarget;
-    static LinearAlgebra::Matrix coeffImage;
-    static LinearAlgebra::Matrix coeffPoint3D(2, 3);
-    static LinearAlgebra::Vector coeffRHS(2);
-    static LinearAlgebra::MatrixUpperTriangular N22(3);
+    LinearAlgebra::MatrixUpperTriangular N22(3);
     SparseBlockColumnMatrix N12;
-    static LinearAlgebra::Vector n2(3);
+    LinearAlgebra::Vector n2(3);
     LinearAlgebra::VectorCompressed n1(m_rank);
 
     m_RHS.resize(m_rank);
 
-    // if solving for target body parameters, set size of coeffTarget
-    // (note this size will not change through the adjustment).
+    // number of target body partials per measure (note this does not change through the adjustment)
+    int numTargetPartials = 0;
     if (m_bundleSettings->solveTargetBody()) {
-      int numTargetBodyParameters = m_bundleSettings->numberTargetBodyParameters();
       // TODO make sure numTargetBodyParameters is greater than 0
-      coeffTarget.resize(2,numTargetBodyParameters);
+      numTargetPartials = m_bundleSettings->numberTargetBodyParameters();
     }
+
+    // reused by every measure, so its matrices are allocated once for the whole adjustment
+    MeasurePartials partials(numTargetPartials);
 
     // clear N12, n1, and nj
     N12.clear();
     n1.clear();
     m_RHS.clear();
 
-    // clear static matrices
-    coeffPoint3D.clear();
-    coeffRHS.clear();
     N22.clear();
     n2.clear();
 
@@ -1297,6 +1354,7 @@ namespace Isis {
 
     outputBundleStatus("\n\n");
 
+    // serial by necessity: cspice keeps process global state that every camera touches
     for (int i = 0; i < num3DPoints; i++) {
       emit(pointUpdate(i+1));
       BundleControlPointQsp point = m_bundleControlPoints.at(i);
@@ -1305,15 +1363,12 @@ namespace Isis {
         continue;
       }
 
-      if ( i != 0 ) {
-        N22.clear();
-        N12.wipe();
-        n2.clear();
-      }
+      N22.clear();
+      N12.wipe();
+      n2.clear();
 
       // loop over measures for this point
-      int numMeasures = point->size();
-      for (int j = 0; j < numMeasures; j++) {
+      for (int j = 0; j < point->size(); j++) {
         BundleMeasureQsp measure = point->at(j);
 
         // flagged as "JigsawFail" implies this measure has been rejected
@@ -1322,27 +1377,24 @@ namespace Isis {
           continue;
         }
 
-        status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, *measure,
-                                     *point);
+        computePartials(partials, *measure, *point);
 
-        if (!status) {
-          // TODO should status be set back to true? JAM
-          // TODO this measure should be flagged as rejected.
-          continue;
-        }
+        status = true;
+
+        accumulateMeasureStatistics(partials);
 
         // increment number of observations
         numObservations += 2;
 
-        formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
-                             measure->observationIndex());
+        formMeasureNormals(N22, N12, n1, n2, partials.coeffTarget, partials.coeffImage,
+                           partials.coeffPoint3D, partials.coeffRHS, partials.observationIndex);
 
       } // end loop over this points measures
 
       numConstrainedCoordinates += formPointNormals(N22, N12, n2, m_RHS, point);
 
       numGood3DPoints++;
-  } // end loop over 3D points
+    } // end loop over 3D points
 
     m_bundleResults.setNumberConstrainedPointParameters(numConstrainedCoordinates);
     m_bundleResults.setNumberImageObservations(numObservations);
@@ -1354,6 +1406,7 @@ namespace Isis {
     int numLidarPoints = m_bundleLidarControlPoints.size();
     m_numLidarConstraints = 0;
 
+    MeasurePartials lidarPartials(numTargetPartials);
 
     for (int i = 0; i < numLidarPoints; i++) {
       emit(pointUpdate(i+1));
@@ -1376,19 +1429,21 @@ namespace Isis {
           continue;
         }
 
-        status = computePartials(coeffTarget, coeffImage, coeffPoint3D, coeffRHS, *measure,
-                                     *point);
+        status = computePartials(lidarPartials, *measure, *point);
 
         if (!status) {
           // TODO this measure should be flagged as rejected.
           continue;
         }
 
+        accumulateMeasureStatistics(lidarPartials);
+
         // increment number of lidar image "measurement" observations
         numObservations += 2;
 
-        formMeasureNormals(N22, N12, n1, n2, coeffTarget, coeffImage, coeffPoint3D, coeffRHS,
-                             measure->observationIndex());
+        formMeasureNormals(N22, N12, n1, n2, lidarPartials.coeffTarget, lidarPartials.coeffImage,
+                           lidarPartials.coeffPoint3D, lidarPartials.coeffRHS,
+                           measure->observationIndex());
 
       } // end loop over this points measures
 
@@ -1451,20 +1506,20 @@ namespace Isis {
       m_sparseNormals.insertMatrixBlock(0, 0, numTargetPartials, numTargetPartials);
 
       // contribution to N11 matrix for target body
-      (*(*m_sparseNormals[0])[0]) += prod(trans(coeffTarget), coeffTarget);
+      noalias(*(*m_sparseNormals[0])[0]) += prod(trans(coeffTarget), coeffTarget);
 
       m_sparseNormals.insertMatrixBlock(blockIndex, 0,
                                         numTargetPartials, coeffImage.size2());
-      (*(*m_sparseNormals[blockIndex])[0]) += prod(trans(coeffTarget),coeffImage);
+      noalias(*(*m_sparseNormals[blockIndex])[0]) += prod(trans(coeffTarget),coeffImage);
 
       // insert N12 target into N12
       N12.insertMatrixBlock(0, numTargetPartials, 3);
-      *N12[0] += prod(trans(coeffTarget), coeffPoint3D);
+      noalias(*N12[0]) += prod(trans(coeffTarget), coeffPoint3D);
 
       // contribution to n1 vector
       vector_range<LinearAlgebra::VectorCompressed> n1_range(n1, range(0, numTargetPartials));
 
-      n1_range += prod(trans(coeffTarget), coeffRHS);
+      noalias(n1_range) += prod(trans(coeffTarget), coeffRHS);
     }
 
 
@@ -1474,11 +1529,11 @@ namespace Isis {
     m_sparseNormals.insertMatrixBlock(blockIndex, blockIndex,
                                       numImagePartials, numImagePartials);
 
-    (*(*m_sparseNormals[blockIndex])[blockIndex]) += prod(trans(coeffImage), coeffImage);
+    noalias(*(*m_sparseNormals[blockIndex])[blockIndex]) += prod(trans(coeffImage), coeffImage);
 
     // insert N12Image into N12
     N12.insertMatrixBlock(blockIndex, numImagePartials, 3);
-    *N12[blockIndex] += prod(trans(coeffImage), coeffPoint3D);
+    noalias(*N12[blockIndex]) += prod(trans(coeffImage), coeffPoint3D);
 
     // insert n1Image into n1
     vector_range<LinearAlgebra::VectorCompressed> vr(
@@ -1487,13 +1542,13 @@ namespace Isis {
                 m_sparseNormals.at(blockIndex)->startColumn(),
                 m_sparseNormals.at(blockIndex)->startColumn() + numImagePartials));
 
-    vr += prod(trans(coeffImage), coeffRHS);
+    noalias(vr) += prod(trans(coeffImage), coeffRHS);
 
     // form N22 matrix
-    N22 += prod(trans(coeffPoint3D), coeffPoint3D);
+    noalias(N22) += prod(trans(coeffPoint3D), coeffPoint3D);
 
     // form n2 vector
-    n2 += prod(trans(coeffPoint3D), coeffRHS);
+    noalias(n2) += prod(trans(coeffPoint3D), coeffRHS);
 
     return true;
   }
@@ -1762,7 +1817,7 @@ namespace Isis {
       // insert submatrix in Q at block "rowIndex"
       Q.insertMatrixBlock(rowIndex, 3, N12it.value()->size1());
 
-      *(Q[rowIndex]) = prod(N22,trans(*(N12it.value())));
+      noalias(*(Q[rowIndex])) = prod(N22,trans(*(N12it.value())));
     }
 
     return true;
@@ -1806,7 +1861,7 @@ namespace Isis {
         m_sparseNormals.insertMatrixBlock(columnIndex, rowIndex,
                                           N12block->size1(), Qblock->size2());
 
-        (*(*m_sparseNormals[columnIndex])[rowIndex]) -= prod(*N12block,*Qblock);
+        noalias(*(*m_sparseNormals[columnIndex])[rowIndex]) -= prod(*N12block,*Qblock);
       }
       Qit.toFront();
     }
@@ -1842,7 +1897,8 @@ namespace Isis {
       int columnIndex = Qit.key();
       LinearAlgebra::Matrix *Qblock = Qit.value();
 
-      LinearAlgebra::Vector blockProduct = prod(trans(*Qblock),n2);
+      LinearAlgebra::Vector blockProduct(Qblock->size2());
+      noalias(blockProduct) = prod(trans(*Qblock),n2);
 
       numParams = m_sparseNormals.at(columnIndex)->startColumn();
 
@@ -1875,9 +1931,12 @@ namespace Isis {
                                                 m_cholmodTriplet->nnz,
                                                 &m_cholmodCommon);
 
-    // analyze matrix
-    // TODO should we analyze just 1st iteration?
-    m_L = cholmod_l_analyze(m_cholmodNormal, &m_cholmodCommon);
+    // analyze matrix; the sparsity pattern is fixed after the first iteration so the
+    // symbolic factorization is reused for the remainder of the bundle
+    if (m_iteration == 1) {
+      cholmod_l_free_factor(&m_L, &m_cholmodCommon);
+      m_L = cholmod_l_analyze(m_cholmodNormal, &m_cholmodCommon);
+    }
 
     // create cholmod cholesky factor
     // CHOLMOD will choose LLT or LDLT decomposition based on the characteristics of the matrix.
@@ -2098,24 +2157,24 @@ namespace Isis {
    *
    * @throws IException::User "Unable to map apriori surface point for measure"
    */
-  bool BundleAdjust::computePartials(matrix<double> &coeffTarget,
-                                     matrix<double> &coeffImage,
-                                     matrix<double> &coeffPoint3D,
-                                     vector<double> &coeffRHS,
+  bool BundleAdjust::computePartials(MeasurePartials &partials,
                                      BundleMeasure &measure,
                                      BundleControlPoint &point) {
 
+    matrix<double> &coeffTarget = partials.coeffTarget;
+    matrix<double> &coeffImage = partials.coeffImage;
+    matrix<double> &coeffPoint3D = partials.coeffPoint3D;
+    vector<double> &coeffRHS = partials.coeffRHS;
+
     Camera *measureCamera = measure.camera();
     BundleObservationQsp observation = measure.parentBundleObservation();
+    const SurfacePoint &adjustedSurfacePoint = point.adjustedSurfacePoint();
 
     int numImagePartials = observation->numberParameters();
 
-    // we're saving the number of image partials in m_previousNumberImagePartials
-    // to compare to the previous computePartials call to avoid unnecessary resizing of the
-    // coeffImage matrix
-    if (numImagePartials != m_previousNumberImagePartials) {
+    // only resize when this observation's parameter count differs from the last fill
+    if ((int) coeffImage.size2() != numImagePartials) {
       coeffImage.resize(2,numImagePartials);
-      m_previousNumberImagePartials = numImagePartials;
     }
 
     // No need to call SetImage for framing camera
@@ -2133,12 +2192,18 @@ namespace Isis {
       // lat/lon/radius.  As of 05/15/2019, this call no longer does the back-of-planet test. An optional
       // bool argument was added CameraGroundMap::GetXY to turn off the test.
       double computedX, computedY;
-      if (!(measureCamera->GroundMap()->GetXY(point.adjustedSurfacePoint(),
+      if (!(measureCamera->GroundMap()->GetXY(adjustedSurfacePoint,
                                               &computedX, &computedY, false))) {
         QString msg = "Unable to map apriori surface point for measure ";
         msg += measure.cubeSerialNumber() + " on point " + point.id() + " into focal plane";
         throw IException(IException::User, msg, _FILEINFO_);
       }
+
+      // this is what ComputeResiduals_Millimeters would compute for the same parameters
+      measure.setFocalPlaneComputed(computedX, computedY);
+    }
+    else {
+      m_focalPlaneComputedStored = false;
     }
 
     if (m_bundleSettings->solveTargetBody()) {
@@ -2151,7 +2216,7 @@ namespace Isis {
     // Retrieve the coordinate type (latitudinal or rectangular) and compute the partials for
     // the fixed point with respect to each coordinate in Body-Fixed
     SurfacePoint::CoordinateType coordType = m_bundleSettings->controlPointCoordTypeBundle();
-    observation->computePoint3DPartials(coeffPoint3D, measure, coordType);
+    observation->computePoint3DPartials(coeffPoint3D, measure, adjustedSurfacePoint, coordType);
 
     // right-hand side (measured - computed)
     observation->computeRHSPartials(coeffRHS, measure);
@@ -2159,16 +2224,16 @@ namespace Isis {
     double deltaX = coeffRHS(0);
     double deltaY = coeffRHS(1);
 
-    m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaX));
-    m_bundleResults.addResidualsProbabilityDistributionObservation(observation->computeObservationValue(measure, deltaY));
+    // the running distributions are order dependent, so record the observations here and add
+    // them from the thread that owns m_bundleResults
+    partials.residualX = observation->computeObservationValue(measure, deltaX);
+    partials.residualY = observation->computeObservationValue(measure, deltaY);
 
     if (m_bundleResults.numberMaximumLikelihoodModels()
           > m_bundleResults.maximumLikelihoodModelIndex()) {
       // If maximum likelihood estimation is being used
       double residualR2ZScore = sqrt(deltaX * deltaX + deltaY * deltaY) / sqrt(2.0);
-
-      // Dynamically build the cumulative probability distribution of the R^2 residual Z Scores
-      m_bundleResults.addProbabilityDistributionObservation(residualR2ZScore);
+      partials.residualR2ZScore = residualR2ZScore;
 
       int currentModelIndex = m_bundleResults.maximumLikelihoodModelIndex();
       double observationWeight = m_bundleResults.maximumLikelihoodModelWFunc(currentModelIndex)
@@ -2182,7 +2247,22 @@ namespace Isis {
       }
     }
 
+    partials.observationIndex = measure.observationIndex();
+
     return true;
+  }
+
+
+  /** Add a measure's residual observations to the running probability distributions. */
+  void BundleAdjust::accumulateMeasureStatistics(const MeasurePartials &partials) {
+    m_bundleResults.addResidualsProbabilityDistributionObservation(partials.residualX);
+    m_bundleResults.addResidualsProbabilityDistributionObservation(partials.residualY);
+
+    if (m_bundleResults.numberMaximumLikelihoodModels()
+          > m_bundleResults.maximumLikelihoodModelIndex()) {
+      // Dynamically build the cumulative probability distribution of the R^2 residual Z Scores
+      m_bundleResults.addProbabilityDistributionObservation(partials.residualR2ZScore);
+    }
   }
 
 
@@ -2535,38 +2615,133 @@ namespace Isis {
 
 
   /**
-  * This method returns the image list used in the bundle adjust. If a QList<ImageList *> was passed
-  * into the constructor then it uses that list, otherwise it constructs the QList using the
-  * m_serialNumberList
+  * This method returns the image list passed into the constructor, which is empty unless the
+  * bundle adjust was constructed with one.
   *
   * @return QList<ImageList *> The ImageLists used for the bundle adjust
   */
   QList<ImageList *> BundleAdjust::imageLists() {
-
-    if (m_imageLists.count() > 0) {
-      return m_imageLists;
-    }
-    else if (m_serialNumberList->size() > 0) {
-      ImageList *imgList = new ImageList;
-      try {
-        for (int i = 0; i < m_serialNumberList->size(); i++) {
-          Image *image = new Image(m_serialNumberList->fileName(i));
-          imgList->append(image);
-          image->closeCube();
-        }
-        m_imageLists.append(imgList);
-      }
-      catch (IException &e) {
-        QString msg = "Invalid image in serial number list\n";
-        throw IException(IException::Programmer, msg, _FILEINFO_);
-      }
-    }
-    else {
+    // the list is not built from the serial number list when absent, as that opened every cube to
+    // fill an image list nothing reads
+    if (m_imageLists.isEmpty() && m_serialNumberList->size() < 1) {
       QString msg = "No images used in bundle adjust\n";
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
     return m_imageLists;
+  }
+
+
+  /** Compute the inverse of the reduced normal equations on the sparsity pattern of its Cholesky factor, by the Takahashi recurrence. */
+  bool BundleAdjust::computeSelectedInverse() {
+    // the recurrence walks the factor's columns through p/i/x, which only a simplicial factor
+    // stores; a supernodal factor keeps its values in dense supernodes instead
+    if (m_L->is_super) {
+      if ( !cholmod_l_change_factor(CHOLMOD_REAL, m_L->is_ll, FALSE, TRUE, TRUE,
+                                    m_L, &m_cholmodCommon) ) {
+        return false;
+      }
+    }
+
+    long n = (long) m_L->n;
+    long *Lp = (long*) m_L->p;
+    long *Li = (long*) m_L->i;
+    double *Lx = (double*) m_L->x;
+    long *Perm = (long*) m_L->Perm;
+    bool isLL = m_L->is_ll;
+
+    m_selectedInversePinv.assign(n, 0);
+    for (long k = 0; k < n; k++) {
+      m_selectedInversePinv[Perm[k]] = k;
+    }
+
+    m_selectedInverse.assign(Lp[n], 0.0);
+    double *Z = m_selectedInverse.data();
+
+    // maps a row of the current column's below-diagonal pattern to its offset in that pattern
+    std::vector<long> pos(n, -1);
+    std::vector<double> lv;
+    std::vector<double> zv;
+
+    for (long j = n - 1; j >= 0; j--) {
+      long pdiag = Lp[j];
+      long m = Lp[j+1] - pdiag - 1;
+      double djj = Lx[pdiag];
+
+      if (m == 0) {
+        Z[pdiag] = isLL ? 1.0 / (djj*djj) : 1.0 / djj;
+        continue;
+      }
+
+      lv.assign(m, 0.0);
+      for (long t = 0; t < m; t++) {
+        pos[Li[pdiag + 1 + t]] = t;
+        lv[t] = Lx[pdiag + 1 + t];
+      }
+
+      // the pattern below the diagonal of a column is a clique of the filled graph, so every
+      // inverse entry this sum needs was computed by an earlier, higher numbered column
+      zv.assign(m, 0.0);
+      for (long t = 0; t < m; t++) {
+        long c = Li[pdiag + 1 + t];
+        double lvt = lv[t];
+        double acc = 0.0;
+
+        for (long k = Lp[c]; k < Lp[c+1]; k++) {
+          long u = pos[Li[k]];
+          if (u < 0) {
+            continue;
+          }
+          double z = Z[k];
+          acc += z * lv[u];
+          if (u != t) {
+            zv[u] += z * lvt;
+          }
+        }
+        zv[t] += acc;
+      }
+
+      double scale = isLL ? -1.0 / djj : -1.0;
+      double diagonalSum = 0.0;
+      for (long t = 0; t < m; t++) {
+        zv[t] *= scale;
+        Z[pdiag + 1 + t] = zv[t];
+        diagonalSum += lv[t] * zv[t];
+        pos[Li[pdiag + 1 + t]] = -1;
+      }
+
+      Z[pdiag] = isLL ? (1.0/djj) * (1.0/djj - diagonalSum) : 1.0/djj - diagonalSum;
+    }
+
+    return true;
+  }
+
+
+  /** Look up an unpermuted entry of the selected inverse, zero if it lies off the pattern of the factor. */
+  double BundleAdjust::selectedInverseEntry(long row, long column) const {
+    long a = m_selectedInversePinv[row];
+    long b = m_selectedInversePinv[column];
+
+    if (a < b) {
+      std::swap(a, b);
+    }
+
+    long *Lp = (long*) m_L->p;
+    long *Li = (long*) m_L->i;
+
+    if (a == b) {
+      return m_selectedInverse[Lp[b]];
+    }
+
+    long lo = Lp[b] + 1;
+    long hi = Lp[b+1];
+    long *found = std::lower_bound(Li + lo, Li + hi, a);
+
+    if (found != Li + hi && *found == a) {
+      return m_selectedInverse[found - Li];
+    }
+
+    return 0.0;
   }
 
 
@@ -2597,6 +2772,8 @@ namespace Isis {
     cholmod_l_free_sparse(&m_cholmodNormal, &m_cholmodCommon);
 
     LinearAlgebra::Matrix T(3, 3);
+    LinearAlgebra::Matrix TQ(3, 3);
+
     // *** TODO ***
     // Can any of the control point specific code be moved to BundleControlPoint?
 
@@ -2618,12 +2795,14 @@ namespace Isis {
       pointCovariances[d].clear();
     }
 
-    cholmod_dense *x;        // solution vector
-    cholmod_dense *b;        // right-hand side (column vectors of identity)
+    cholmod_dense *x = NULL; // solution vectors
+    cholmod_dense *b = NULL; // right-hand sides (column vectors of identity)
 
-    b = cholmod_l_zeros ( m_rank, 1, CHOLMOD_REAL, &m_cholmodCommon );
-    double *pb = (double*)b->x;
+    // workspace reused by cholmod_l_solve2 across the block column solves below
+    cholmod_dense *ywork = NULL;
+    cholmod_dense *ework = NULL;
 
+    double *pb = NULL;
     double *px = NULL;
 
     SparseBlockColumnMatrix inverseMatrix;
@@ -2637,11 +2816,80 @@ namespace Isis {
     int columnIndex = 0;
     int numColumns = 0;
     int numBlockColumns = m_sparseNormals.size();
+
+    // the accumulation below only reads inverse blocks at positions where two images share a
+    // point, which are exactly the nonzero blocks of the reduced normals, so the inverse entries
+    // on the pattern of the factor are enough. the dense inverse is kept for the correlation
+    // matrix file, which stores every block column in full.
+    bool useSelectedInverse = !m_bundleSettings->createInverseMatrix()
+                              && !m_bundleSettings->denseInverse();
+
+    if (useSelectedInverse) {
+      outputBundleStatus("\rError Propagation: computing selected inverse");
+      if ( !computeSelectedInverse() ) {
+        QString msg = "Failed to compute the selected inverse of the normal equations.";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+      outputBundleStatus("\n\n");
+    }
+
+    // a point only contributes to the block columns its Q matrix has blocks for, so index the
+    // points by block column instead of rescanning every point for every column
+    QVector< QList<int> > pointsInBlockColumn(numBlockColumns);
+    for (j = 0; j < numObjectPoints; j++) {
+      BundleControlPointQsp point = m_bundleControlPoints.at(j);
+      if ( point->isRejected() ) {
+        continue;
+      }
+      QMapIterator< int, LinearAlgebra::Matrix * > qit(point->cholmodQMatrix());
+      while ( qit.hasNext() ) {
+        qit.next();
+        if (qit.key() >= 0 && qit.key() < numBlockColumns) {
+          pointsInBlockColumn[qit.key()].append(j);
+        }
+      }
+    }
+
+    // the inverse is built one block column at a time and the reader expects every block column
+    // in the file, so open it before the loop and append each column as it completes
+    bool writeInverse = false;
+    QFile matrixOutput(matrixFile.expanded());
+    if (m_bundleSettings->createInverseMatrix() && matrixOutput.open(QIODevice::WriteOnly)) {
+      writeInverse = true;
+      m_bundleResults.setCorrMatCovFileName(matrixFile);
+    }
+    QDataStream outStream(&matrixOutput);
+
     for (i = 0; i < numBlockColumns; i++) {
 
       // columns in this column block
       SparseBlockColumnMatrix *normalsColumn = m_sparseNormals.at(i);
-      if (i == 0) {
+
+      if (useSelectedInverse) {
+        numColumns = normalsColumn->numberOfColumns();
+        int startColumn = normalsColumn->startColumn();
+
+        inverseMatrix.wipe();
+
+        QMapIterator< int, LinearAlgebra::Matrix * > nit(*normalsColumn);
+        while ( nit.hasNext() ) {
+          nit.next();
+
+          int rowBlock = nit.key();
+          int numRows = nit.value()->size1();
+          int startRow = m_sparseNormals.at(rowBlock)->startColumn();
+
+          inverseMatrix.insertMatrixBlock(rowBlock, numRows, numColumns);
+          LinearAlgebra::Matrix *block = inverseMatrix.value(rowBlock);
+
+          for (int r = 0; r < numRows; r++) {
+            for (int c = 0; c < numColumns; c++) {
+              (*block)(r,c) = selectedInverseEntry(startRow + r, startColumn + c);
+            }
+          }
+        }
+      }
+      else if (i == 0) {
         numColumns = normalsColumn->numberOfColumns();
         int numRows = normalsColumn->numberOfRows();
         inverseMatrix.insertMatrixBlock(i, numRows, numColumns);
@@ -2669,35 +2917,44 @@ namespace Isis {
         }
       }
 
-      int localCol = 0;
-
-      // solve for inverse for nCols
-      for (j = 0; j < numColumns; j++) {
-        if ( columnIndex > 0 ) {
-          pb[columnIndex - 1] = 0.0;
+      // all of this block column's right-hand sides go through cholmod in one call, which puts
+      // the triangular solves on the blas3 path instead of doing m_rank single column solves
+      if ( !useSelectedInverse ) {
+        if ( b == NULL || (int)b->ncol != numColumns ) {
+          cholmod_l_free_dense ( &b, &m_cholmodCommon );
+          b = cholmod_l_zeros ( m_rank, numColumns, CHOLMOD_REAL, &m_cholmodCommon );
+          pb = (double*)b->x;
         }
-        pb[columnIndex] = 1.0;
 
-        x = cholmod_l_solve ( CHOLMOD_A, m_L, b, &m_cholmodCommon );
+        for (j = 0; j < numColumns; j++) {
+          pb[(columnIndex + j) + j*b->d] = 1.0;
+        }
+
+        cholmod_l_solve2 ( CHOLMOD_A, m_L, b, NULL, &x, NULL, &ywork, &ework,
+                           &m_cholmodCommon );
         px = (double*)x->x;
-        int rp = 0;
 
-        // store solution in corresponding column of inverse
-        for (k = 0; k < inverseMatrix.size(); k++) {
-          LinearAlgebra::Matrix *matrix = inverseMatrix.value(k);
+        // store each solution in the corresponding column of inverse
+        for (j = 0; j < numColumns; j++) {
+          int rp = 0;
 
-          int sz1 = matrix->size1();
+          for (k = 0; k < inverseMatrix.size(); k++) {
+            LinearAlgebra::Matrix *matrix = inverseMatrix.value(k);
 
-          for (int ii = 0; ii < sz1; ii++) {
-            (*matrix)(ii,localCol) = px[ii + rp];
+            int sz1 = matrix->size1();
+
+            for (int ii = 0; ii < sz1; ii++) {
+              (*matrix)(ii,j) = px[ii + rp + j*x->d];
+            }
+            rp += sz1;
           }
-          rp += matrix->size1();
         }
 
-        columnIndex++;
-        localCol++;
+        for (j = 0; j < numColumns; j++) {
+          pb[(columnIndex + j) + j*b->d] = 0.0;
+        }
 
-        cholmod_l_free_dense(&x,&m_cholmodCommon);
+        columnIndex += numColumns;
       }
 
       // save adjusted target body sigmas if solving for target
@@ -2725,30 +2982,30 @@ namespace Isis {
       }
 
       // Output the inverse matrix if requested
-      if (m_bundleSettings->createInverseMatrix()) {
+      if (writeInverse) {
+        outStream << inverseMatrix;
       }
 
-      // now loop over all object points to sum contributions into 3x3 point covariance matrix
-      int pointIndex = 0;
-      for (j = 0; j < numObjectPoints; j++) {
-        emit(pointUpdate(j+1));
-        BundleControlPointQsp point = m_bundleControlPoints.at(pointIndex);
-        if ( point->isRejected() ) {
-          continue;
-        }
+      // now loop over the object points that contribute to this block column, summing
+      // contributions into their 3x3 point covariance matrices
+      QList<int> &contributingPoints = pointsInBlockColumn[i];
 
-        // only update point every 100 points
-        if (j%100 == 0) {
-          QString status = "\rError Propagation: Inverse Block ";
-          status.append(QString::number(i+1));
-          status.append(" of ");
-          status.append(QString::number(numBlockColumns));
-          status.append("; Point ");
-          status.append(QString::number(j+1));
-          status.append(" of ");
-          status.append(QString::number(numObjectPoints));
-          outputBundleStatus(status);
-        }
+      status = "\rError Propagation: Inverse Block ";
+      status.append(QString::number(i+1));
+      status.append(" of ");
+      status.append(QString::number(numBlockColumns));
+      status.append("; Points ");
+      status.append(QString::number(contributingPoints.size()));
+      status.append(" of ");
+      status.append(QString::number(numObjectPoints));
+      outputBundleStatus(status);
+
+      if ( !contributingPoints.isEmpty() ) {
+        emit(pointUpdate(contributingPoints.last()+1));
+      }
+
+      foreach (int pointIndex, contributingPoints) {
+        BundleControlPointQsp point = m_bundleControlPoints.at(pointIndex);
 
         // get corresponding Q matrix
         // NOTE: we are getting a reference to the Q matrix stored
@@ -2762,10 +3019,6 @@ namespace Isis {
 
         // get firstQBlock - index i is the key into Q for firstQBlock
         LinearAlgebra::Matrix *firstQBlock = Q.value(i);
-        if (!firstQBlock) {
-          pointIndex++;
-          continue;
-        }
 
         // iterate over Q
         // secondQBlock is current map value
@@ -2791,8 +3044,8 @@ namespace Isis {
             continue;
           }
 
-          T = prod(*inverseBlock, trans(*firstQBlock));
-          T = prod(*secondQBlock,T);
+          TQ = prod(*inverseBlock, trans(*firstQBlock));
+          noalias(T) = prod(*secondQBlock,TQ);
 
           if (nKey != i) {
             T += trans(T);
@@ -2809,30 +3062,21 @@ namespace Isis {
             throw IException(IException::User, msg, _FILEINFO_);
           }
         }
-        pointIndex++;
       }
     }
 
-    if (m_bundleSettings->createInverseMatrix()) {
-      // Create file handle
-      QFile matrixOutput(matrixFile.expanded());
-      // Open file to write to
-      if (matrixOutput.open(QIODevice::WriteOnly)) {
-        QDataStream outStream(&matrixOutput);
-        outStream << inverseMatrix;
-        
-        // Close the file.
-        matrixOutput.close();
-        // Save the location of the "covariance" matrix
-        m_bundleResults.setCorrMatCovFileName(matrixFile);
-      }
+    if (writeInverse) {
+      matrixOutput.close();
     }
 
     // can free sparse normals now
     m_sparseNormals.wipe();
 
-    // free b (right-hand side vector)
+    // free b (right-hand side vector) and the solve workspace
     cholmod_l_free_dense(&b,&m_cholmodCommon);
+    cholmod_l_free_dense(&x,&m_cholmodCommon);
+    cholmod_l_free_dense(&ywork,&m_cholmodCommon);
+    cholmod_l_free_dense(&ework,&m_cholmodCommon);
 
     outputBundleStatus("\n\n");
 
@@ -2845,10 +3089,9 @@ namespace Isis {
 
     // now loop over points again and set final covariance stuff
     // *** TODO *** Can this loop go into BundleControlPoint
-    int pointIndex = 0;
     for (j = 0; j < numObjectPoints; j++) {
 
-      BundleControlPointQsp point = m_bundleControlPoints.at(pointIndex);
+      BundleControlPointQsp point = m_bundleControlPoints.at(j);
 
       if ( point->isRejected() ) {
         continue;
@@ -2864,7 +3107,7 @@ namespace Isis {
       }
 
       // get corresponding point covariance matrix
-      boost::numeric::ublas::symmetric_matrix<double> &covariance = pointCovariances[pointIndex];
+      boost::numeric::ublas::symmetric_matrix<double> &covariance = pointCovariances[j];
 
       // Update and reset the matrix
       // Get the Limiting Error Propagation uncertainties:  sigmas for coordinate 1, 2, and 3 in meters
@@ -2923,8 +3166,6 @@ namespace Isis {
       //           << recCovar(2,2) << std::endl;
       // }
       // // end debug
-
-      pointIndex++;
     }
 
     return true;

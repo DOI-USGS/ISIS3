@@ -7,7 +7,6 @@ find files of those names at the top level of this repository. **/
 
 #include <QDebug>
 #include <QString>
-#include <QRegularExpression>
 #include "PvlKeyword.h"
 #include "IException.h"
 #include "Message.h"
@@ -15,6 +14,8 @@ find files of those names at the top level of this repository. **/
 #include "PvlFormat.h"
 #include "PvlSequence.h"
 
+#include <algorithm>
+#include <cstring>
 #include <sstream>
 
 using namespace std;
@@ -140,7 +141,9 @@ namespace Isis {
    */
   void PvlKeyword::setName(QString name) {
     QString final = name.trimmed();
-    if (final.contains(QRegularExpression("\\s"))) {
+    // scanned directly rather than with a regular expression, which this would recompile on
+    // every keyword
+    if (std::any_of(final.cbegin(), final.cend(), [](QChar c) { return c.isSpace(); })) {
       QString msg = "[" + name + "] is invalid. Keyword name cannot ";
       msg += "contain whitespace.";
       throw IException(IException::User, msg, _FILEINFO_);
@@ -688,20 +691,35 @@ namespace Isis {
    */
   bool PvlKeyword::stringEqual(const QString &QString1,
                                const QString &QString2) {
-    Isis::IString s1(QString1);
-    Isis::IString s2(QString2);
+    return IString::EqualIgnoringCaseAndSeparators(QString1, QString2);
+  }
 
-    s1.ConvertWhiteSpace();
-    s2.ConvertWhiteSpace();
 
-    s1.Remove(" _");
-    s2.Remove(" _");
+  /**
+   * Checks to see if a QString and a C string are equal. Each is converted to
+   * uppercase and removed of underscores and whitespaces.
+   * @param string1 The QString
+   * @param string2 The C string, which may be NULL
+   * @return <B>bool</B> True or false, depending on whether
+   *          the values are equal.
+   */
+  bool PvlKeyword::stringEqual(const QString &string1,
+                               const char *string2) {
+    return IString::EqualIgnoringCaseAndSeparators(string1, string2);
+  }
 
-    s1.UpCase();
-    s2.UpCase();
 
-    if (s1 == s2) return true;
-    return false;
+  /**
+   * Checks to see if two C strings are equal. Each is converted to uppercase
+   * and removed of underscores and whitespaces.
+   * @param string1 The first C string, which may be NULL
+   * @param string2 The second C string, which may be NULL
+   * @return <B>bool</B> True or false, depending on whether
+   *          the values are equal.
+   */
+  bool PvlKeyword::stringEqual(const char *string1,
+                               const char *string2) {
+    return IString::EqualIgnoringCaseAndSeparators(string1, string2);
   }
 
   /**
@@ -1700,9 +1718,7 @@ namespace Isis {
     }
 
     // check for extraneous data in the keyword ... ,2,3
-    QRegularExpression regex("^,");
-    QRegularExpressionMatch match = regex.match(keyword);
-    if (!keyword.isEmpty() && match.hasMatch()) {
+    if (keyword.startsWith(",")) {
           keywordValues.at(0).first += keyword;
           keyword = "";
     }
@@ -1887,21 +1903,20 @@ namespace Isis {
       // read until \n (works for both \r\n and \n) or */
       while(is.good() &&
             (!lineOfData.size() || lineOfData[lineOfData.size() - 1] != '\n')) {
-        signed char next = is.get();
+        // taken from the stream buffer, as istream::get is not inlined
+        int next = is.rdbuf()->sbumpc();
 
         // if non-ascii found then we're done... immediately
-        if (next <= 0) {
+        if (next == istream::traits_type::eof() || next == 0 || next >= 128) {
+          if (next == istream::traits_type::eof()) {
+            is.setstate(ios::eofbit | ios::failbit);
+          }
           is.seekg(0, ios::end);
           is.get();
           return lineOfData;
         }
 
-        // if any errors (i.e. eof) happen in the get operation then don't
-        //   store this data
-        if (is.good()) {
-          // Cast this back to char to handle signed issues with ARM
-          lineOfData += (char)next;
-        }
+        lineOfData += (char)next;
 
         if (insideComment &&
             lineOfData.size() >= 2 && lineOfData[lineOfData.size() - 2] == '*' &&
@@ -2007,8 +2022,11 @@ namespace Isis {
         m_name = NULL;
       }
 
+      // copied directly, as the name is already trimmed and validated
       if (other.m_name) {
-        setName(other.m_name);
+        size_t length = strlen(other.m_name);
+        m_name = new char[length + 1];
+        memcpy(m_name, other.m_name, length + 1);
       }
 
       m_values = other.m_values;

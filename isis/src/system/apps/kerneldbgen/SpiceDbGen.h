@@ -10,6 +10,7 @@ find files of those names at the top level of this repository. **/
 /* SPDX-License-Identifier: CC0-1.0 */
 
 
+#include <cfloat>
 #include <iostream>
 
 #include <QStringList>
@@ -47,6 +48,11 @@ find files of those names at the top level of this repository. **/
  *                          This information will be use in spiceinit to handle time offsets
  *                          when selecting smithed kernels. References #3363.
  *
+ *   @history 2026-08-06 Kelvin Rodriguez - Added DirectReconSplit, which splits each kernel into
+ *                          a reconstructed and a predicted selection at the delivery date found in
+ *                          the kernel comments. Needed for TGO, where a single SPK holds
+ *                          reconstructed ephemeris followed by predicted ephemeris.
+ *
  */
 class SpiceDbGen {
 
@@ -56,15 +62,27 @@ class SpiceDbGen {
                            std::vector<QString> & filter, double startOffset, double endOffset);
     Isis::PvlObject Direct(QString quality, Isis::FileList fileList,
                            double startOffset, double endOffset);
+    Isis::PvlObject DirectReconSplit(QString location, std::vector<QString> & filter,
+                                     double startOffset, double endOffset, double margin);
+    Isis::PvlObject DirectReconSplit(Isis::FileList fileList,
+                                     double startOffset, double endOffset, double margin);
     void FurnishDependencies(QList<Isis::FileName> sclks, QList<Isis::FileName> fks,
                              QList<Isis::FileName> extras);
     void setCoverageLevel(QString level);
 
   private:
     QStringList GetFiles(Isis::FileName location, QString filter);
-    Isis::PvlGroup AddSelection(Isis::FileName fileIn, double startOffset, double endOffset);
-    Isis::PvlGroup FormatIntervals(SpiceCell &coverage, QString type, double startOffset, double endOffset);
+    QStringList FilterFiles(QString quality, QString location, std::vector<QString> & filter);
+    Isis::PvlGroup AddSelection(Isis::FileName fileIn, double startOffset, double endOffset,
+                                double clipStart = -DBL_MAX, double clipStop = DBL_MAX);
+    Isis::PvlGroup FormatIntervals(SpiceCell &coverage, QString type,
+                                   double startOffset, double endOffset,
+                                   double clipStart = -DBL_MAX, double clipStop = DBL_MAX);
     Isis::PvlGroup GetIntervals(SpiceCell &cover);
+    double DeliveryDate(Isis::FileName fileIn);
+    void AddSplitSelections(Isis::PvlObject &result, Isis::FileName currFile,
+                            double startOffset, double endOffset, double margin);
+    Isis::PvlObject Finalize(Isis::PvlObject &result);
     //private instance variables
     QString p_type;
     QString m_coverageLevel; //! The time coverage level of the database: INTERVAL or SEGMENT

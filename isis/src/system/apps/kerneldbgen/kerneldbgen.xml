@@ -372,6 +372,60 @@
           <item>RECONFILTER</item>
         </exclusions>
       </parameter>
+      <parameter name="RECONSPLIT">
+        <type>string</type>
+        <brief>
+          How to split reconstructed kernels that also contain predicted data
+        </brief>
+        <description>
+          Some projects deliver a single kernel that contains reconstructed data up to the date the
+          kernel was generated and predicted data after it (TGO Cassis). Such a kernel cannot be assigned a
+          single quality. When this parameter is set to DELIVERYDATE, every kernel selected by
+          "RECONDIR"/"RECONFILTER" or "RECONLIST" contributes two selections with complementary
+          time coverage, one reconstructed and one predicted, divided at the kernel's delivery date.
+          The delivery date is read from the kernel comments.
+        </description>
+        <default>
+          <item>NONE</item>
+        </default>
+        <list>
+          <option value="NONE">
+            <brief>Do not split reconstructed kernels</brief>
+            <description>
+              Each reconstructed kernel contributes a single reconstructed selection covering its
+              entire time coverage. This is the behavior for every kernel that contains only
+              reconstructed data.
+            </description>
+            <exclusions>
+              <item>RECONSPLITMARGIN</item>
+            </exclusions>
+          </option>
+          <option value="DELIVERYDATE">
+            <brief>Split at the delivery date in the kernel comments</brief>
+            <description>
+              Each reconstructed kernel contributes a reconstructed selection covering the time
+              before its delivery date and a predicted selection covering the time after it. An
+              error is thrown if a delivery date cannot be found in a kernel's comments.
+            </description>
+          </option>
+        </list>
+      </parameter>
+      <parameter name="RECONSPLITMARGIN">
+        <type>double</type>
+        <brief>
+          Seconds subtracted from the delivery date to place the split
+        </brief>
+        <description>
+          The boundary between the reconstructed and predicted coverage of a split kernel is placed
+          this many seconds before the delivery date read from the kernel comments. The predicted
+          data typically begins somewhat before the delivery date, so a margin keeps predicted data
+          from being labeled reconstructed at the cost of labeling some reconstructed data as
+          predicted. Only used when "RECONSPLIT" is DELIVERYDATE.
+        </description>
+        <default>
+          <item>86400.0</item>
+        </default>
+      </parameter>
     </group>
     <group name="Smithed">
       <parameter name="SMITHEDDIR">

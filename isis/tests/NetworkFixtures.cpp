@@ -244,15 +244,15 @@ namespace Isis {
 
 
   void MiniRFNetwork::TearDown() {
-    if (testCube1->isOpen()) {
+    if (testCube1 && testCube1->isOpen()) {
       testCube1->close();
     }
     delete testCube1;
-    if (testCube2->isOpen()) {
+    if (testCube2 && testCube2->isOpen()) {
       testCube2->close();
     }
     delete testCube2;
-    if (testCube3->isOpen()) {
+    if (testCube3 && testCube3->isOpen()) {
       testCube3->close();
     }
     delete testCube3;
@@ -289,19 +289,19 @@ namespace Isis {
 
 
   void VikThmNetwork::TearDown() {
-    if (testCube1->isOpen()) {
+    if (testCube1 && testCube1->isOpen()) {
       testCube1->close();
     }
     delete testCube1;
-    if (testCube2->isOpen()) {
+    if (testCube2 && testCube2->isOpen()) {
       testCube2->close();
     }
     delete testCube2;
-    if (testCube3->isOpen()) {
+    if (testCube3 && testCube3->isOpen()) {
       testCube3->close();
     }
     delete testCube3;
-    if (testCube4->isOpen()) {
+    if (testCube4 && testCube4->isOpen()) {
       testCube4->close();
     }
     delete testCube4;

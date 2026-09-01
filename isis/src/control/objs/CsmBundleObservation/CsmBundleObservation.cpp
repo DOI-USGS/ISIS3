@@ -160,7 +160,7 @@ namespace Isis {
    *
    * @return @b bool Returns true upon successful application of corrections
    */
-  bool CsmBundleObservation::applyParameterCorrections(LinearAlgebra::Vector corrections) {
+  bool CsmBundleObservation::applyParameterCorrections(const LinearAlgebra::Vector &corrections) {
     // Check that the correction vector is the correct size
     if (corrections.size() != m_paramIndices.size()) {
       QString msg = "Invalid correction vector passed to observation.";
@@ -373,19 +373,19 @@ namespace Isis {
    *                     the ground point.
    * @param measure The measure that the partials are being
    *                computed for.
+   * @param adjustedSurfacePoint The adjusted surface point of the measure's parent point.
    * @param coordType Not used in this class. Coordinates are
    *                  x,y,z
    *
    * @return bool
    */
-  bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType) {
+  bool CsmBundleObservation::computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, const SurfacePoint &adjustedSurfacePoint, SurfacePoint::CoordinateType coordType) {
     coeffPoint3D.clear();
 
     CSMCamera *measureCamera = dynamic_cast<CSMCamera*>(measure.camera());
 
     // do ground partials
-    SurfacePoint groundPoint = measure.parentControlPoint()->adjustedSurfacePoint();
-    vector<double> groundPartials = measureCamera->GroundPartials(groundPoint);
+    vector<double> groundPartials = measureCamera->GroundPartials(adjustedSurfacePoint);
 
     if (coordType == SurfacePoint::Rectangular) {
       // groundPartials is:
@@ -404,9 +404,9 @@ namespace Isis {
       coeffPoint3D(0,2) = groundPartials[5] * 1000;
     }
     else if (coordType == SurfacePoint::Latitudinal) {
-      std::vector<double> latDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::One);
-      std::vector<double> lonDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::Two);
-      std::vector<double> radDerivative = groundPoint.LatitudinalDerivative(SurfacePoint::Three);
+      std::vector<double> latDerivative = adjustedSurfacePoint.LatitudinalDerivative(SurfacePoint::One);
+      std::vector<double> lonDerivative = adjustedSurfacePoint.LatitudinalDerivative(SurfacePoint::Two);
+      std::vector<double> radDerivative = adjustedSurfacePoint.LatitudinalDerivative(SurfacePoint::Three);
 
       // Line w.r.t (lat, lon, radius)
       coeffPoint3D(1,0) = 1000 * (groundPartials[0]*latDerivative[0] + groundPartials[1]*latDerivative[1] + groundPartials[2]*latDerivative[2]);

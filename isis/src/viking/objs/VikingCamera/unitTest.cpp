@@ -26,9 +26,11 @@ using namespace std;
 using namespace Isis;
 
 void TestLineSamp(Camera *cam, double samp, double line);
+void TestExtrapolation(Camera *cam, double samp, double line);
 
 int main(void) {
   Preference::Preferences(true);
+  GDALAllRegister();
 
   cout << "Unit Test for VikingCamera..." << endl;
   /* VIKING: The lon difference tolerance was increased for this
@@ -109,6 +111,23 @@ int main(void) {
       else {
         cout << setprecision(16) << "Longitude off by: " << cam->UniversalLongitude() - knownLon[i] << endl;
       }
+      // Extrapolation past the image edges. The Viking VIS detector is 1204
+      // samples by 1056 lines, so the two pixels below lie well outside the image
+      // box (sample 1300, line 1200 is past the right and bottom edges; sample
+      // -100, line -100 is past the left and top edges). The reseau distortion
+      // map used to reject any point whose fitted position fell outside that box,
+      // so SetImage returned false and these points could not be projected. The
+      // map now extrapolates the local reseau affine smoothly past the edges, so
+      // an off-sensor pixel still projects to the ground and the round trip
+      // closes to within a pixel. This is what lets a ground point that projects
+      // just off the image still yield a residual in bundle adjustment and map
+      // projection, instead of a hard failure at the image boundary. Only
+      // OK/ERROR is printed, so the result is stable across platforms; the
+      // quantitative deformation is illustrated in the project documentation.
+      cout << endl << "Testing extrapolation outside the image box:" << endl << endl;
+      TestExtrapolation(cam, 1300.0, 1200.0);
+      TestExtrapolation(cam, -100.0, -100.0);
+
       cout << endl << "--------------------------------------------" << endl;
     }
 
@@ -155,4 +174,25 @@ void TestLineSamp(Camera *cam, double samp, double line) {
     cout << "DeltaSample = ERROR" << endl;
     cout << "DeltaLine = ERROR" << endl << endl;
   }
+}
+
+// Project an off-image pixel and round trip it back. Prints only OK/ERROR so the
+// result is stable across platforms. SetImage must succeed (it failed before the
+// reseau map could extrapolate) and the image to ground to image round trip must
+// close to within a pixel.
+void TestExtrapolation(Camera *cam, double samp, double line) {
+  bool ok = cam->SetImage(samp, line);
+  cout << "SetImage(" << samp << ", " << line << ") = "
+       << (ok ? "OK" : "ERROR") << endl;
+  if (!ok) {
+    cout << "Round trip within 1 pixel = ERROR" << endl << endl;
+    return;
+  }
+
+  bool roundTrip = cam->SetUniversalGround(cam->UniversalLatitude(),
+                                           cam->UniversalLongitude());
+  roundTrip = roundTrip && (fabs(samp - cam->Sample()) < 1.0)
+                        && (fabs(line - cam->Line()) < 1.0);
+  cout << "Round trip within 1 pixel = " << (roundTrip ? "OK" : "ERROR")
+       << endl << endl;
 }

@@ -12,9 +12,12 @@
   </description>
 
   <history>
-      <change name="Victor Silva" date="2022-06-25">
-          Original Version
-      </change>
+    <change name="Victor Silva" date="2022-06-25">
+        Original Version
+    </change>
+    <change name="Jacob Cain" date="2026-08-06">
+        Added examples, clarified KEEPSPECIALPIXEL description.
+    </change>
   </history>
 
   <category>
@@ -58,13 +61,47 @@
         <type>boolean</type>
         <default><item>True</item></default>
         <brief>
-          Don't replace 0/255 with Special Pixels LIS/HIS
+          Convert 0 and 255 DN to Special Pixels LIS/HIS.
         </brief>
         <description>
-          Don't replace 0/255 with LIS/HIS
-          (default is to replace special pixels)
+          Pixel DNs of 0 and 255 represent low saturation and high saturation.
+          When True, these are converted to Special Pixels.
+          When False, these are left as just 0 or 255.
         </description>
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>Default Import</brief>
+      <description>
+        Importing a raw KPLO ShadowCam EDR image into an ISIS cube.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          from=M091671205SE.cub to=M091671205SE.isis.cub
+        </commandLine>
+        <description>
+          Import a KPLO ShadowCam EDR image into ISIS with default settings.
+        </description>
+      </terminalInterface>
+    </example>
+    <example>
+      <brief>No Special Pixels</brief>
+      <description>
+        Importing a raw KPLO ShadowCam EDR image into an ISIS cube.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          from=M091671205SE.cub to=M091671205SE.isis.cub keepspecialpixels=False
+        </commandLine>
+        <description>
+          Import a KPLO ShadowCam EDR image into ISIS without converting 0 and 255 DNs to Special Pixels.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
 </application>

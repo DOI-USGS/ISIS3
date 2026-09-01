@@ -682,6 +682,11 @@
       solution coordinate type is set to Rectangular. Originally added to UofA
       code on 2019-07-30.
     </change>
+    <change name="Kelvin Rodriguez" date="2026-08-11">
+      Added DENSE_INVERSE to fall back to inverting the entire reduced normal
+      equations during error propagation instead of computing only the entries
+      the point uncertainties require.
+    </change>
   </history>
 
   <groups>
@@ -988,6 +993,24 @@
       <type>boolean</type>
       <default>
         <item>No</item>
+      </default>
+      <inclusions>
+        <item>DENSE_INVERSE</item>
+      </inclusions>
+    </parameter>
+
+    <parameter name="DENSE_INVERSE">
+      <brief> Invert the entire reduced normal equations</brief>
+      <description>
+        By default error propagation computes only the entries of the inverse of the
+        reduced normal equations that the parameter uncertainties actually require,
+        which is a small fraction of the whole matrix on a large network. Select this
+        option to invert the entire matrix instead. The results are the same to
+        round-off, so this is a fallback for comparison and is much slower.
+      </description>
+      <type>boolean</type>
+      <default>
+        <item>Yes</item>
       </default>
     </parameter>
    </group>

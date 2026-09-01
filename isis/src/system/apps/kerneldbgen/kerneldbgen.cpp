@@ -98,6 +98,11 @@ namespace Isis {
       }
     }
 
+    // Some projects deliver reconstructed and predicted data in a single kernel, which is then
+    // split into a selection of each quality at the delivery date in the kernel comments
+    bool splitRecon = (ui.GetString("RECONSPLIT") == "DELIVERYDATE");
+    double reconSplitMargin = ui.GetDouble("RECONSPLITMARGIN");
+
     if (ui.GetString("RECONDIR") != "none" &&
         ui.GetString("RECONFILTER") != "none") {
       QString location = "";
@@ -105,7 +110,9 @@ namespace Isis {
       location.remove("\\");
       std::vector<QString> filter;
       ui.GetString("RECONFILTER", filter);
-      PvlObject result = sdg.Direct("Reconstructed", location, filter, startOffset, endOffset);
+      PvlObject result = splitRecon ?
+          sdg.DirectReconSplit(location, filter, startOffset, endOffset, reconSplitMargin) :
+          sdg.Direct("Reconstructed", location, filter, startOffset, endOffset);
       PvlObject::PvlGroupIterator grp = result.beginGroup();
       while(grp != result.endGroup()) {
         selections.addGroup(*grp);
@@ -114,7 +121,9 @@ namespace Isis {
     }
     else if (ui.WasEntered("RECONLIST")) {
       FileList kernList(ui.GetFileName("RECONLIST"));
-      PvlObject result = sdg.Direct("Reconstructed", kernList, startOffset, endOffset);
+      PvlObject result = splitRecon ?
+          sdg.DirectReconSplit(kernList, startOffset, endOffset, reconSplitMargin) :
+          sdg.Direct("Reconstructed", kernList, startOffset, endOffset);
       PvlObject::PvlGroupIterator grp = result.beginGroup();
       while(grp != result.endGroup()) {
         selections.addGroup(*grp);

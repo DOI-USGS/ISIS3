@@ -54,7 +54,7 @@ namespace Isis {
                                     LinearAlgebra::Vector& n2);
       void computeResiduals();
 
-      virtual void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+      virtual void applyParameterCorrections(const LinearAlgebra::Vector &imageSolution,
                                              SparseBlockMatrix &sparseNormals,
                                              const BundleTargetBodyQsp target);
 

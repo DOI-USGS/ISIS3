@@ -525,6 +525,8 @@ namespace Isis {
     // Don't create the inverse correlation matrix file
     settings->setCreateInverseMatrix(false);
 
+    settings->setDenseInverse(ui.GetBoolean("DENSE_INVERSE"));
+
     settings->setOutlierRejection(ui.GetBoolean("OUTLIER_REJECTION"),
                                  ui.GetDouble("REJECTION_MULTIPLIER"));
 

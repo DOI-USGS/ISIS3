@@ -54,6 +54,7 @@ namespace Isis {
     m_updateCubeLabel      = false;
     m_errorPropagation     = false;
     m_createInverseMatrix  = false;
+    m_denseInverse         = true;
     m_cubeList             =    "";
     m_outlierRejection     = false;
     m_outlierRejectionMultiplier = 3.0;
@@ -104,6 +105,7 @@ namespace Isis {
         m_updateCubeLabel(other.m_updateCubeLabel),
         m_errorPropagation(other.m_errorPropagation),
         m_createInverseMatrix(other.m_createInverseMatrix),
+        m_denseInverse(other.m_denseInverse),
         m_outlierRejection(other.m_outlierRejection),
         m_outlierRejectionMultiplier(other.m_outlierRejectionMultiplier),
         m_globalPointCoord1AprioriSigma(other.m_globalPointCoord1AprioriSigma),
@@ -150,6 +152,7 @@ namespace Isis {
       m_updateCubeLabel = other.m_updateCubeLabel;
       m_errorPropagation = other.m_errorPropagation;
       m_createInverseMatrix = other.m_createInverseMatrix;
+      m_denseInverse = other.m_denseInverse;
       m_outlierRejection = other.m_outlierRejection;
       m_outlierRejectionMultiplier = other.m_outlierRejectionMultiplier;
       m_globalPointCoord1AprioriSigma = other.m_globalPointCoord1AprioriSigma;
@@ -368,6 +371,12 @@ namespace Isis {
   }
 
 
+  /** Indicates if error propagation inverts the full normal equations instead of only the entries it consumes. */
+  bool BundleSettings::denseInverse() const {
+    return m_denseInverse;
+  }
+
+
   /**
    * This method is used to determine whether outlier rejection will be
    * performed on this bundle adjustment.
@@ -440,6 +449,12 @@ namespace Isis {
    */
   void BundleSettings::setCreateInverseMatrix(bool createMatrixFile) {
     m_createInverseMatrix = createMatrixFile;
+  }
+
+
+  /** Sets whether error propagation inverts the full normal equations instead of only the entries it consumes. */
+  void BundleSettings::setDenseInverse(bool denseInverse) {
+    m_denseInverse = denseInverse;
   }
 
 
@@ -1037,6 +1052,7 @@ namespace Isis {
     stream.writeAttribute("updateCubeLabel", toString(updateCubeLabel()));
     stream.writeAttribute("errorPropagation", toString(errorPropagation()));
     stream.writeAttribute("createInverseMatrix", toString(createInverseMatrix()));
+    stream.writeAttribute("denseInverse", toString(denseInverse()));
     stream.writeEndElement();
 
     stream.writeStartElement("aprioriSigmas");
@@ -1158,6 +1174,10 @@ namespace Isis {
             QStringView createInverseMatrix = xmlReader->attributes().value("createInverseMatrix");
             if (!createInverseMatrix.isEmpty()) {
               m_createInverseMatrix = toBool(createInverseMatrix.toString());
+            }
+            QStringView denseInverse = xmlReader->attributes().value("denseInverse");
+            if (!denseInverse.isEmpty()) {
+              m_denseInverse = toBool(denseInverse.toString());
             }
             xmlReader->skipCurrentElement();
           }

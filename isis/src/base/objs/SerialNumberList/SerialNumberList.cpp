@@ -140,7 +140,8 @@ namespace Isis {
    * @throws IException::User "FileName cannot be added to serial number list."
    */
   void SerialNumberList::add(Pvl &p, const QString &filename, bool def2filename) {
-    PvlObject cubeObj = p.findObject("IsisCube");
+    // by reference, as copying the object copies every keyword of the label
+    PvlObject &cubeObj = p.findObject("IsisCube");
 
     try {
 
@@ -204,20 +205,20 @@ namespace Isis {
       // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
       if (cubeObj.hasGroup("CsmInfo")) {
-        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        PvlGroup &csmGroup = cubeObj.findGroup("CsmInfo");
         if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
-          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
-          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+          nextpair.spacecraftName = csmGroup["CSMPlatformID"][0];
+          nextpair.instrumentId = csmGroup["CSMInstrumentId"][0];
         }
       }
 
       // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
       // group for use in bundle adjustment
       else if (cubeObj.hasGroup("Instrument")) {
-        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        PvlGroup &instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
-          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
-          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+          nextpair.spacecraftName = instGroup["SpacecraftName"][0];
+          nextpair.instrumentId = instGroup["InstrumentId"][0];
         }
       }
 
@@ -270,7 +271,8 @@ namespace Isis {
    */
   void SerialNumberList::add(const QString &serialNumber, const QString &filename) {
     Pvl p(Isis::FileName(filename).expanded());
-    PvlObject cubeObj = p.findObject("IsisCube");
+    // by reference, as copying the object copies every keyword of the label
+    PvlObject &cubeObj = p.findObject("IsisCube");
 
     try {
 
@@ -327,7 +329,7 @@ namespace Isis {
                         + " needed for performing bundle adjustment.";
           throw IException(IException::User, msg, _FILEINFO_);
         }
-        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        PvlGroup &instGroup = cubeObj.findGroup("Instrument");
         if (!instGroup.hasKeyword("SpacecraftName") || !instGroup.hasKeyword("InstrumentId")) {
           QString msg = "Unable to find SpacecraftName or InstrumentId keywords in " + filename
                         + " needed for performing bundle adjustment.";
@@ -336,7 +338,7 @@ namespace Isis {
       }
       // Check if CSM label has CSMPlatformID and CSMInstrumentId
       else {
-        PvlGroup csmGroup = cubeObj.findGroup("CSMInfo");
+        PvlGroup &csmGroup = cubeObj.findGroup("CSMInfo");
         if (!csmGroup.hasKeyword("CSMPlatformID") || !csmGroup.hasKeyword("CSMInstrumentId")) {
           QString msg = "Unable to find CSMPlatformID or CSMInstrumentId keywords in " + filename
                         + " needed for performing bundle adjustment.";
@@ -352,20 +354,20 @@ namespace Isis {
       // If a CSM cube, obtain the CSMPlatformID and CSMInstrumentId from the CsmInfo
       // group for use in bundle adjustment
       if (cubeObj.hasGroup("CsmInfo")) {
-        PvlGroup csmGroup = cubeObj.findGroup("CsmInfo");
+        PvlGroup &csmGroup = cubeObj.findGroup("CsmInfo");
         if (csmGroup.hasKeyword("CSMPlatformID") && csmGroup.hasKeyword("CSMInstrumentId")) {
-          nextpair.spacecraftName = cubeObj.findGroup("CsmInfo")["CSMPlatformID"][0];
-          nextpair.instrumentId = cubeObj.findGroup("CsmInfo")["CSMInstrumentId"][0];
+          nextpair.spacecraftName = csmGroup["CSMPlatformID"][0];
+          nextpair.instrumentId = csmGroup["CSMInstrumentId"][0];
         }
       }
 
       // Otherwise obtain the SpacecraftName and InstrumentId from the Instrument
       // group for use in bundle adjustment
       else if (cubeObj.hasGroup("Instrument")) {
-        PvlGroup instGroup = cubeObj.findGroup("Instrument");
+        PvlGroup &instGroup = cubeObj.findGroup("Instrument");
         if (instGroup.hasKeyword("SpacecraftName") && instGroup.hasKeyword("InstrumentId")) {
-          nextpair.spacecraftName = cubeObj.findGroup("Instrument")["SpacecraftName"][0];
-          nextpair.instrumentId = cubeObj.findGroup("Instrument")["InstrumentId"][0];
+          nextpair.spacecraftName = instGroup["SpacecraftName"][0];
+          nextpair.instrumentId = instGroup["InstrumentId"][0];
         }
       }
 

@@ -11,6 +11,9 @@ find files of those names at the top level of this repository. **/
 
 #include <QObject> // parent class
 
+// qt lib
+#include <QVector>
+
 // std lib
 #include <vector>
 #include <fstream>
@@ -401,6 +404,21 @@ namespace Isis {
       void finished();
 
     private:
+      //! Partial derivatives and residual statistics for a single measure.
+      struct MeasurePartials {
+        MeasurePartials(int numTargetPartials = 0) : coeffTarget(2, numTargetPartials),
+            coeffPoint3D(2, 3), coeffRHS(2), residualX(0.0), residualY(0.0),
+            residualR2ZScore(0.0), observationIndex(-1) { }
+        LinearAlgebra::Matrix coeffTarget;
+        LinearAlgebra::Matrix coeffImage;
+        LinearAlgebra::Matrix coeffPoint3D;
+        LinearAlgebra::Vector coeffRHS;
+        double residualX;
+        double residualY;
+        double residualR2ZScore;
+        int observationIndex;
+      };
+
       //TODO Should there be a resetBundle(BundleSettings bundleSettings) method
       //     that allows for rerunning with new settings? JWB
       void readIsdList(const QString &isdList, const QString &cubeList);
@@ -413,7 +431,10 @@ namespace Isis {
       bool computeBundleStatistics();
       void applyParameterCorrections();
       bool errorPropagation();
-      void computeResiduals();
+      bool computeSelectedInverse();
+      double selectedInverseEntry(long row, long column) const;
+      bool hasRejectedMeasures();
+      void computeResiduals(bool computeMillimeters = true);
       double computeVtpv();
       bool computeRejectionLimit();
       bool flagOutliers();
@@ -421,12 +442,10 @@ namespace Isis {
       // normal equation matrices methods
 
       bool formNormalEquations();
-      bool computePartials(LinearAlgebra::Matrix  &coeffTarget,
-                           LinearAlgebra::Matrix  &coeffImage,
-                           LinearAlgebra::Matrix  &coeffPoint3D,
-                           LinearAlgebra::Vector  &coeffRHS,
-                           BundleMeasure          &measure,
-                           BundleControlPoint     &point);
+      void accumulateMeasureStatistics(const MeasurePartials &partials);
+      bool computePartials(MeasurePartials    &partials,
+                           BundleMeasure      &measure,
+                           BundleControlPoint &point);
       bool formMeasureNormals(LinearAlgebra::MatrixUpperTriangular &N22,
                               SparseBlockColumnMatrix              &N12,
                               LinearAlgebra::VectorCompressed      &n1,
@@ -491,6 +510,7 @@ namespace Isis {
       QString m_iterationSummary;                           //!< Most recent iteration summary.
       bool m_printSummary;                                  //!< Print iteration summaries.
       bool m_cleanUp;                                       //!< If destructor deletes serial number lists.
+      bool m_focalPlaneComputedStored;                      //!< If computePartials stored every computed focal plane coordinate.
       int m_rank;                                           //!< The rank of the system.
       int m_iteration;                                      //!< The current iteration.
       double m_iterationTime;                               //!< Time for last iteration
@@ -534,10 +554,13 @@ namespace Isis {
                                                                    cholmod_factorize.*/
       LinearAlgebra::Vector m_imageSolution;                 /**!< The image parameter solution
                                                                    vector.*/
-
-      int m_previousNumberImagePartials;                     /**!< used in ::computePartials method
-                                                                   to avoid unnecessary resizing
-                                                                   of the coeffImage matrix.*/
+      std::vector<double> m_selectedInverse;                 /**!< Entries of the inverse of the
+                                                                   reduced normal equations on the
+                                                                   sparsity pattern of m_L, in the
+                                                                   same order as m_L's columns.*/
+      std::vector<long> m_selectedInversePinv;               /**!< Inverse of m_L->Perm, mapping a
+                                                                   normal equations row or column to
+                                                                   its m_selectedInverse index.*/
   };
 }
 

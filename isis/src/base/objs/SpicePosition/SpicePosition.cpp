@@ -1353,24 +1353,14 @@ namespace Isis {
    *   @history 2011-01-05 Debbie A. Cook - Original version
    */
   void SpicePosition::SetEphemerisTimePolyFunction() {
-    // Create the empty functions
-    Isis::PolynomialUnivariate functionX(p_degree);
-    Isis::PolynomialUnivariate functionY(p_degree);
-    Isis::PolynomialUnivariate functionZ(p_degree);
-
-    // Load the coefficients to define the functions
-    functionX.SetCoefficients(p_coefficients[0]);
-    functionY.SetCoefficients(p_coefficients[1]);
-    functionZ.SetCoefficients(p_coefficients[2]);
-
     // Normalize the time
     double rtime;
     rtime = (p_et - p_baseTime) / p_timeScale;
 
     // Evaluate the polynomials at current et to get position;
-    p_coordinate[0] = functionX.Evaluate(rtime);
-    p_coordinate[1] = functionY.Evaluate(rtime);
-    p_coordinate[2] = functionZ.Evaluate(rtime);
+    p_coordinate[0] = PolynomialUnivariate::Evaluate(p_coefficients[0], rtime);
+    p_coordinate[1] = PolynomialUnivariate::Evaluate(p_coefficients[1], rtime);
+    p_coordinate[2] = PolynomialUnivariate::Evaluate(p_coefficients[2], rtime);
 
     if(p_hasVelocity) {
 

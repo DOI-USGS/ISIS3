@@ -433,7 +433,7 @@ namespace Isis {
    * @return @b vector<double> partialDerivative of body-fixed point with respect to selected 
    *                           ellipsoid axis
    */
-  vector<double> CameraGroundMap::EllipsoidPartial(SurfacePoint spoint, PartialType raxis) {
+  vector<double> CameraGroundMap::EllipsoidPartial(const SurfacePoint &spoint, PartialType raxis) {
     double rlat = spoint.GetLatitude().radians();
     double rlon = spoint.GetLongitude().radians();
     double sinLon = sin(rlon);
@@ -483,7 +483,8 @@ namespace Isis {
    * TODO This method assumes the radii of all points in the adjustment have been set identically
    *            to the  ???
    */
-  vector<double> CameraGroundMap::MeanRadiusPartial(SurfacePoint spoint, Distance meanRadius) {
+  vector<double> CameraGroundMap::MeanRadiusPartial(const SurfacePoint &spoint,
+                                                    Distance meanRadius) {
     double radkm = meanRadius.kilometers();
 
     vector<double> v(3);

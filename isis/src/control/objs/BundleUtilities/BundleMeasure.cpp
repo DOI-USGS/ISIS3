@@ -429,6 +429,17 @@ namespace Isis {
 
 
   /**
+   * Stores the computed focal plane coordinates of this measure.
+   *
+   * @param computedX Computed focal plane x coordinate.
+   * @param computedY Computed focal plane y coordinate.
+   */
+  void BundleMeasure::setFocalPlaneComputed(double computedX, double computedY) {
+    m_controlMeasure->SetFocalPlaneComputed(computedX, computedY);
+  }
+
+
+  /**
    * Sets sigma (i.e. standard deviation or uncertainty) of raw measure in mm and sqrt of weight for bundle
    *
    * @param double sigma

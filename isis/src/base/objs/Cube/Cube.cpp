@@ -312,9 +312,13 @@ namespace Isis {
       }
 
       if (newFileAttributes.propagateMinimumMaximum()) {
-        if(result->pixelType() == Isis::Real) {
-          result->setBaseMultiplier(0.0, 1.0);
+        // For new cubes created as float32 or float64, make the assumption that
+        // float32/64 can handle the data with the default base and multiplier
+        // Even if the data being copied has a base and multiplier (legacy behavior)
+        if (!isIntegerType(result->pixelType())) {
+            result->setBaseMultiplier(0.0, 1.0);
         }
+        // If we are translating between integer types, directly apply the base and multiplier
         else if(result->pixelType() >= pixelType()) {
           result->setBaseMultiplier(base(), multiplier());
         }
@@ -763,7 +767,8 @@ namespace Isis {
     setLabelsAttached(att.labelAttachment());
     if (!att.propagatePixelType())
       setPixelType(att.pixelType());
-    setMinMax(att.minimum(), att.maximum());
+    if (!att.propagateMinimumMaximum())
+      setMinMax(att.minimum(), att.maximum());
 
     // Allocate the cube
     create(cubeFileName);
@@ -1382,9 +1387,22 @@ namespace Isis {
    * @param mult Multiplicative constant.
    */
   void Cube::setBaseMultiplier(double base, double mult) {
-    openCheck();
     m_base = base;
     m_multiplier = mult;
+
+    if (isOpen()) {
+      if (isReadWrite()) {
+        Pvl &cubeLabel = *label();
+        PvlGroup &pixels = cubeLabel.findObject("IsisCube").findObject("Core").findGroup("Pixels");
+        pixels["base"] = toString(m_base);
+        pixels["multiplier"] = toString(m_multiplier);
+        m_ioHandler->setBaseMultiplier(m_base, m_multiplier);
+      }
+      else {
+        QString msg = "Cube opened in Read Mode, cannot set Base and Multiplier";
+        throw IException(IException::Programmer, msg, _FILEINFO_);
+      }
+    }
   }
 
 
@@ -1422,6 +1440,16 @@ namespace Isis {
       x2 = VALID_MAXU2;
       m_multiplier = (max - min) / (x2 - x1);
       m_base = min - m_multiplier * x1;
+    }
+    else if (m_pixelType == Real) {
+      // Apply this conversion to ensure the MIN and MAX do not
+      // retain floating point error
+      x1 = Isis::toDouble(Isis::toString(Isis::VALID_MIN4));
+      x2 = Isis::toDouble(Isis::toString(Isis::VALID_MAX4));
+      if (min < x1 || max > x2) {
+        m_multiplier = (max - min) / (x2 - x1);
+        m_base = min - m_multiplier * x1;
+      }
     }
   }
 

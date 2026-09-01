@@ -25,3 +25,7 @@ Ncoefs = 3
 Vars   = 1
 Variable Derivative = 4.5
 Coefficient 2 Derivative = 4
+---- coefficients only ----
+Evaluate = 1
+Instance = 1
+**PROGRAMMER ERROR** Unable to evaluate the univariate polynomial. No coefficients were given.

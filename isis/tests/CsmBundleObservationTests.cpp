@@ -321,7 +321,7 @@ TEST_F(CSMCameraFixture, CsmBundleComputePoint3DPartials) {
 
   LinearAlgebra::Matrix coeffPoint3D(2, 3);
 
-  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, SurfacePoint::Rectangular));
+  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, testSurfacePoint, SurfacePoint::Rectangular));
 
   EXPECT_EQ(coeffPoint3D(0,0), 4000);
   EXPECT_EQ(coeffPoint3D(0,1), 5000);
@@ -330,7 +330,7 @@ TEST_F(CSMCameraFixture, CsmBundleComputePoint3DPartials) {
   EXPECT_EQ(coeffPoint3D(1,1), 2000);
   EXPECT_EQ(coeffPoint3D(1,2), 3000);
 
-  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, SurfacePoint::Latitudinal));
+  ASSERT_TRUE(observation.computePoint3DPartials(coeffPoint3D, *testBundleMeasure, testSurfacePoint, SurfacePoint::Latitudinal));
 
   EXPECT_EQ(coeffPoint3D(0,0), 6000000);
   EXPECT_EQ(coeffPoint3D(0,1), 5000000);

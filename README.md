@@ -35,8 +35,8 @@ For Development and Contributing, see:
 This repository contains software code that was generated or modified with the
 assistance of artificial intelligence (AI) tools, in accordance with U.S.
 Geological Survey (USGS) disclosure requirements. All AI-generated or AI-assisted
-code has been reviewed and validated by USGS developers. Users are responsible for
-reviewing and testing this code for their specific applications. See [RFC 14](https://github.com/DOI-USGS/ISIS3/discussions/6013)
+code has been reviewed and validated by USGS developers. Contributors using AI tools are responsible for
+reviewing and testing their code. See [RFC 14](https://github.com/DOI-USGS/ISIS3/discussions/6013)
 for more information.
 
 ## In this README:

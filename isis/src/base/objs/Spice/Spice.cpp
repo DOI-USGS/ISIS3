@@ -1137,8 +1137,6 @@ namespace Isis {
     m_uB[0] = uB[0];
     m_uB[1] = uB[1];
     m_uB[2] = uB[2];
-
-    computeSolarLongitude(*m_et);
   }
 
   /**

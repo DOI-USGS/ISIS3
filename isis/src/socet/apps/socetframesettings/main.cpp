@@ -208,6 +208,12 @@ void IsisMain() {
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
+  else if (spacecraftName == "TRACE GAS ORBITER") {
+    if (instrumentId == "CaSSIS") {
+      socetCamFile += "CaSSIS.cam";
+    }
+  }
+  
   // Throw exception for unsupported camera
   else {
     QString msg = QString("The ISIS to SOCET Set translation of input image [%1] is currently "
@@ -435,7 +441,86 @@ void IsisMain() {
     toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
   }
 
-} //End IsisMain
+  // For TGO CaSSIS, write the keywords needed by the USGSAstro FrameOffAxis support file.
+  // SOCET Set ignores these during frame import, but the USGSAstro import_frame program
+  // reads them.
+
+  if (spacecraftName == "TRACE GAS ORBITER") {
+    double originalHalfLines = numLines / 2.0;
+    double originalHalfSamples = numSamples / 2.0;
+
+
+    // Get the image summation
+    double sampleSumming = (int) detectorMap->SampleScaleFactor();
+    double lineSumming = (int) detectorMap->LineScaleFactor();
+
+    // Get the Starting Detector Line/Sample
+    double startingSample = detectorMap->AdjustedStartingSample();
+    double startingLine = detectorMap->AdjustedStartingLine();
+
+    // Get the image plane corrdinates to pixel coordinates transformation matrices
+    const double *iTransS = focalMap->TransS();
+    const double *iTransL = focalMap->TransL();
+
+    // Because of the options for applying light-time correction, capture the pertinent
+    // ISIS keywords as a record to be stored in the settingsfile
+    // Note: these values will not go into the Socet Set support file)
+    QString ikCode;
+    QString swapObserverTarget;
+    QString lightTimeCorrection;
+    QString ltSurfaceCorrect;
+    PvlObject naifKeywordsObject = cube.label()->findObject("NaifKeywords");
+    if (instrumentId == "CaSSIS") {
+      ikCode = "143400";
+      swapObserverTarget = (QString) naifKeywordsObject["INS-143400_SWAP_OBSERVER_TARGET"];
+      lightTimeCorrection = (QString) naifKeywordsObject["INS-143400_LIGHTTIME_CORRECTION"];
+      ltSurfaceCorrect = (QString) naifKeywordsObject["INS-143400_LT_SURFACE_CORRECT"];
+    }
+    else {
+//       ikCode = "236800";
+//       swapObserverTarget = (QString) naifKeywordsObject["INS-236800_SWAP_OBSERVER_TARGET"];
+//       lightTimeCorrection = (QString) naifKeywordsObject["INS-236800_LIGHTTIME_CORRECTION"];
+//       ltSurfaceCorrect = (QString) naifKeywordsObject["INS-236800_LT_SURFACE_CORRECT"];
+    }
+
+    toStrm << "\nSENSOR_TYPE FrameOffAxis" << endl;
+    toStrm << "USE_LENS_DISTORTION 1" << endl;
+    toStrm << "ORIGINAL_HALF_LINES " <<  originalHalfLines << endl;
+    toStrm << "ORIGINAL_HALF_SAMPLES " << originalHalfSamples << endl;
+//     toStrm << "LENSCOX " << lenscoX << endl;
+//     toStrm << "LENSCOY " << lenscoY << endl;
+    toStrm << "SAMPLE_SUMMING  " << sampleSumming << endl;
+    toStrm << "LINE_SUMMING  " << lineSumming << endl;
+    toStrm << "STARTING_DETECTOR_SAMPLE " << setprecision(17) << startingSample << endl;
+    toStrm << "STARTING_DETECTOR_LINE " << startingLine << endl;
+    toStrm << "SAMPLE_BORESIGHT " << detectorSampleOrigin << endl;
+    toStrm << "LINE_BORESIGHT " << detectorLineOrigin << endl;
+    toStrm << "INS_ITRANSS";
+    for (int i = 0; i < 3; i++)
+      toStrm << " " << setprecision(14) << iTransS[i];
+    toStrm << endl;
+    toStrm << "INS_ITRANSL";
+    for (int i = 0; i < 3; i++)
+      toStrm << " " << iTransL[i];
+    toStrm << endl;
+    toStrm << "M_SOCET2ISIS_FOCALPLANE " << setprecision(2) <<
+              isisFocalPlane2SocetPlateTranspose[0][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[0][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[0][2] << endl;
+    toStrm << "                         " <<
+              isisFocalPlane2SocetPlateTranspose[1][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[1][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[1][2] << endl;
+    toStrm << "                         " <<
+              isisFocalPlane2SocetPlateTranspose[2][0] << " " <<
+              isisFocalPlane2SocetPlateTranspose[2][1] << " " <<
+              isisFocalPlane2SocetPlateTranspose[2][2] << endl;
+    toStrm << "INS-" << ikCode << "_SWAP_OBSERVER_TARGET = '" << swapObserverTarget << "'\n";
+    toStrm << "INS-" << ikCode << "_LIGHTTIME_CORRECTION = '" << lightTimeCorrection << "'\n";
+    toStrm << "INS-" << ikCode << "_LT_SURFACE_CORRECT = '" << ltSurfaceCorrect <<"'\n";
+  }
+
+ } //End IsisMain
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -868,6 +953,13 @@ void getCamPosOPK(Spice &spice, QString spacecraftName, SpiceDouble et, Camera *
     isisFocalPlane2SocetPlate[0][1] =  1.0;  // +Yisis => +Xss
     isisFocalPlane2SocetPlate[2][2] = -1.0;  // +Zisis => -Zss
   }
+
+  else if (spacecraftName == "TRACE GAS ORBITER")	{
+    isisFocalPlane2SocetPlate[0][0] =  1;
+    isisFocalPlane2SocetPlate[1][1] =  -1;
+    isisFocalPlane2SocetPlate[2][2] =  -1;
+  }
+																						
 
   // Confirm that matrix is now a rotation matrix
   else {

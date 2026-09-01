@@ -73,8 +73,6 @@ namespace Isis {
       int m_lines;
       int m_samples;
       int m_bands;
-      double m_offset;
-      double m_scale;
       unsigned char *m_maskBuff = nullptr;
       bool m_datasetOwner = false;
       double m_gdalNoDataValue = NULL8;

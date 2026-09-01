@@ -73,6 +73,7 @@ namespace Isis {
       void setNormalsPositionBlockIndex(int index);
       void setNormalsPointingBlockIndex(int index);
       void setFocalPlaneResidualsMillimeters();
+      void setFocalPlaneComputed(double computedX, double computedY);
       void setSigma(double sigma);
       bool isRejected() const;
       Camera *camera() const;

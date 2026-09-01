@@ -15,25 +15,25 @@ namespace Isis {
   class ThreeImageNetwork : public TempTestingFiles {
     protected:
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString networkFile;
 
-      Cube *cube1;
-      Cube *cube2;
-      Cube *cube3;
+      Cube *cube1 = nullptr;
+      Cube *cube2 = nullptr;
+      Cube *cube3 = nullptr;
 
-      Cube *cube1map;
-      Cube *cube2map;
-      Cube *cube3map;
+      Cube *cube1map = nullptr;
+      Cube *cube2map = nullptr;
+      Cube *cube3map = nullptr;
 
-      FileName *isdPath1;
-      FileName *isdPath2;
-      FileName *isdPath3;
+      FileName *isdPath1 = nullptr;
+      FileName *isdPath2 = nullptr;
+      FileName *isdPath3 = nullptr;
 
-      FileName *threeImageOverlapFile;
-      FileName *twoImageOverlapFile;
+      FileName *threeImageOverlapFile = nullptr;
+      FileName *twoImageOverlapFile = nullptr;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
       QString twoCubeListFile;
 
@@ -51,19 +51,19 @@ namespace Isis {
   class ObservationPair : public TempTestingFiles {
     protected:
 
-      Cube *cubeL;
-      Cube *cubeR;
+      Cube *cubeL = nullptr;
+      Cube *cubeR = nullptr;
 
       QString cubeLPath;
       QString cubeRPath;
 
-      FileName *isdPathL;
-      FileName *isdPathR;
+      FileName *isdPathL = nullptr;
+      FileName *isdPathR = nullptr;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString cnetPath;
 
       void SetUp() override;
@@ -76,10 +76,10 @@ namespace Isis {
       QVector<FileName> labelFiles;
       QVector<Cube*> cubes;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString controlNetPath;
 
       void SetUp() override;
@@ -89,16 +89,16 @@ namespace Isis {
     class LidarObservationPair : public TempTestingFiles {
     protected:
 
-      Cube *cube1;
-      Cube *cube2;
+      Cube *cube1 = nullptr;
+      Cube *cube2 = nullptr;
 
       QString cube1Path;
       QString cube2Path;
 
-      FileName *isdPath1;
-      FileName *isdPath2;
+      FileName *isdPath1 = nullptr;
+      FileName *isdPath2 = nullptr;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
       QString csvPath;
@@ -113,7 +113,7 @@ namespace Isis {
       LidarData rangeData;
       QString lidarDataPath;
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString controlNetPath;
 
       void SetUp() override;
@@ -122,14 +122,14 @@ namespace Isis {
 
   class MiniRFNetwork : public TempTestingFiles {
     protected:
-      Cube *testCube1;
-      Cube *testCube2;
-      Cube *testCube3;
+      Cube *testCube1 = nullptr;
+      Cube *testCube2 = nullptr;
+      Cube *testCube3 = nullptr;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString controlNetPath;
 
       void SetUp() override;
@@ -138,15 +138,15 @@ namespace Isis {
 
   class VikThmNetwork : public TempTestingFiles {
     protected:
-      Cube *testCube1;
-      Cube *testCube2;
-      Cube *testCube3;
-      Cube *testCube4;
+      Cube *testCube1 = nullptr;
+      Cube *testCube2 = nullptr;
+      Cube *testCube3 = nullptr;
+      Cube *testCube4 = nullptr;
 
-      FileList *cubeList;
+      FileList *cubeList = nullptr;
       QString cubeListFile;
 
-      ControlNet *network;
+      ControlNet *network = nullptr;
       QString controlNetPath;
 
       void SetUp() override;

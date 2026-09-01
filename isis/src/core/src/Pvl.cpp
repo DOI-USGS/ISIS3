@@ -717,9 +717,9 @@ namespace Isis {
     }
 
     try {
-      PvlKeyword termination("End");
+      static const PvlKeyword termination("End");
 
-      PvlKeyword errorKeywords[] = {
+      static const PvlKeyword errorKeywords[] = {
         PvlKeyword("EndGroup"),
         PvlKeyword("EndObject")
       };
@@ -743,13 +743,13 @@ namespace Isis {
           }
         }
 
-        if(readKeyword == PvlKeyword("Group")) {
+        if(readKeyword.isNamed("Group")) {
           is.seekg(beforeKeywordPos);
           PvlGroup newGroup;
           is >> newGroup;
           pvl.addGroup(newGroup);
         }
-        else if(readKeyword == PvlKeyword("Object")) {
+        else if(readKeyword.isNamed("Object")) {
           is.seekg(beforeKeywordPos);
           PvlObject newObject;
           is >> newObject;

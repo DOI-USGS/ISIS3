@@ -31,6 +31,15 @@ For center pixel position ...
 Latitude OK
 Longitude OK
 
+Testing extrapolation outside the image box:
+
+SetImage(1300.000000000, 1200.000000000) = OK
+Round trip within 1 pixel = OK
+
+SetImage(-100.000000000, -100.000000000) = OK
+Round trip within 1 pixel = OK
+
+
 --------------------------------------------
 
 Testing name methods:

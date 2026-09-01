@@ -44,6 +44,9 @@ namespace Isis {
 
       void Expand(const std::vector<double> &vars);
 
+      using Isis::Basis1VariableFunction::Evaluate;
+      static double Evaluate(const std::vector<double> &coeffs, double var);
+
       double DerivativeVar(const double value);
       double DerivativeCoef(const double value, const int coefIndex);
 

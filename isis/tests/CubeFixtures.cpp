@@ -48,7 +48,7 @@ namespace Isis {
   }
 
   void SmallCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
@@ -78,7 +78,7 @@ namespace Isis {
   }
 
   void LargeCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
@@ -127,7 +127,7 @@ namespace Isis {
   }
 
   void SpecialSmallCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 
@@ -218,13 +218,13 @@ namespace Isis {
 
 
   void SmallGapCube::TearDown() {
-    if (horzCube->isOpen()) {
+    if (horzCube && horzCube->isOpen()) {
       horzCube->close();
     }
-    if (vertCube->isOpen()) {
+    if (vertCube && vertCube->isOpen()) {
       vertCube->close();
     }
-    if (bandCube->isOpen()) {
+    if (bandCube && bandCube->isOpen()) {
       bandCube->close();
     }
 
@@ -259,7 +259,7 @@ namespace Isis {
 
 
   void NullPixelCube::TearDown() {
-    if (testCube->isOpen()) {
+    if (testCube && testCube->isOpen()) {
       testCube->close();
     }
 

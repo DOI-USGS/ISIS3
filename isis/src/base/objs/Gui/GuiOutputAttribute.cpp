@@ -64,6 +64,8 @@ namespace Isis {
     p_unsignedInteger->setToolTip("Unsigned 32-bit integer");
     p_real = new QRadioButton("&Real");
     p_real->setToolTip("Floating point 32-bit pixels");
+    p_double = new QRadioButton("&Double");
+    p_double->setToolTip("Floating point 64-bit pixels");
 
     QButtonGroup *buttonGroup = new QButtonGroup();
     buttonGroup->addButton(p_propagate);
@@ -73,6 +75,7 @@ namespace Isis {
     buttonGroup->addButton(p_unsignedInteger);
     buttonGroup->addButton(p_signedInteger);
     buttonGroup->addButton(p_real);
+    buttonGroup->addButton(p_double);
     buttonGroup->setExclusive(true);
 
     p_minEdit = new QLineEdit();
@@ -93,6 +96,8 @@ namespace Isis {
     connect(p_signedInteger, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setEnabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
     connect(p_real, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
+    connect(p_double, SIGNAL(toggled(bool)), p_minEdit, SLOT(setDisabled(bool)));
+    connect(p_double, SIGNAL(toggled(bool)), p_maxEdit, SLOT(setDisabled(bool)));
     p_minEdit->setValidator(new QDoubleValidator(p_minEdit));
     p_maxEdit->setValidator(new QDoubleValidator(p_maxEdit));
 
@@ -104,6 +109,7 @@ namespace Isis {
     gridLayout->addWidget(p_signedInteger, 4, 0);
     gridLayout->addWidget(p_unsignedInteger, 5, 0);
     gridLayout->addWidget(p_real, 6, 0);
+    gridLayout->addWidget(p_double, 7, 0);
     gridLayout->addWidget(minLabel, 0, 1);
     gridLayout->addWidget(p_minEdit, 1, 1);
     gridLayout->addWidget(maxLabel, 2, 1);
@@ -205,6 +211,7 @@ namespace Isis {
     if(p_attached->isChecked()) att += "+Attached";
     if(p_detached->isChecked()) att += "+Detached";
 
+    if(p_double->isChecked()) att += "+Double";
     if(p_real->isChecked()) att += "+Real";
     if(p_unsignedByte->isChecked()) att += "+UnsignedByte";
     if(p_signedWord->isChecked()) att += "+SignedWord";
@@ -269,8 +276,11 @@ namespace Isis {
     else if(att.pixelType() == Isis::UnsignedInteger) {
       p_unsignedInteger->setChecked(true);
     }
-    else {
+    else if(att.pixelType() == Isis::Real) {
       p_real->setChecked(true);
+    }
+    else {
+      p_double->setChecked(true);
     }
 
     if(!att.propagateMinimumMaximum()) {

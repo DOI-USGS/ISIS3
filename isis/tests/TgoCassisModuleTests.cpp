@@ -2200,7 +2200,6 @@ TEST(TgoCassisModuleTests, TgoCassisUncontrolledSingleColorMosaic) {
 
 TEST_F(TgoCassisModuleKernels, TgoCassisTestProjSingleStitchedFrame) {
   QTemporaryDir prefix;
-  prefix.setAutoRemove(false);
 
   // run tgocassis2isis and spiceinit on pan framelet.
   QString panFileName = prefix.path() + "/panframelet.cub";

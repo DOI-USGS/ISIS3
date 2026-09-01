@@ -233,15 +233,15 @@ namespace Isis {
    
       //! Compute partial derivative of conversion from body-fixed coordinates to the specified
       //    coordinate type with respect to the indicated coordinate (specified by index).     
-      std::vector<double> Partial(CoordinateType type, CoordIndex index);
+      std::vector<double> Partial(CoordinateType type, CoordIndex index) const;
       
 // Output methods
-      double GetCoord(CoordinateType type, CoordIndex index, CoordUnits units);
+      double GetCoord(CoordinateType type, CoordIndex index, CoordUnits units) const;
       // Consider making this GetSigmaDistance and use the Distance methods to specify units for
       // maximum flexibility and safety. ***TBD***
-      double GetSigma(CoordinateType type, CoordIndex index, CoordUnits units);
-      Distance GetSigmaDistance(CoordinateType type, CoordIndex index);
-      double GetWeight(CoordinateType type, CoordIndex index);
+      double GetSigma(CoordinateType type, CoordIndex index, CoordUnits units) const;
+      Distance GetSigmaDistance(CoordinateType type, CoordIndex index) const;
+      double GetWeight(CoordinateType type, CoordIndex index) const;
       Displacement GetX() const;
       Displacement GetY() const;
       Displacement GetZ() const;
@@ -269,14 +269,14 @@ namespace Isis {
             (SurfacePoint::CoordUnits units = SurfacePoint::Meters) const;
 
 // Conversion methods (for convenience)
-      double DisplacementToDouble(Displacement disp, CoordUnits units);
-      double DistanceToDouble(Distance dist, CoordUnits units);
-      double MetersToLatitude(double latLength);
-      double MetersToLongitude(double lonLength);
+      double DisplacementToDouble(Displacement disp, CoordUnits units) const;
+      double DistanceToDouble(Distance dist, CoordUnits units) const;
+      double MetersToLatitude(double latLength) const;
+      double MetersToLongitude(double lonLength) const;
       double LatitudeToMeters(double latitude) const;
       double LongitudeToMeters(double longitude) const;
-      double LatToDouble(Latitude lat, CoordUnits units);
-      double LonToDouble(Longitude lon, CoordUnits units);
+      double LatToDouble(Latitude lat, CoordUnits units) const;
+      double LonToDouble(Longitude lon, CoordUnits units) const;
       static CoordinateType stringToCoordinateType(QString type);
       static QString coordinateTypeToString(CoordinateType type);
         
@@ -284,8 +284,8 @@ namespace Isis {
       Distance GetDistanceToPoint(const SurfacePoint &other) const;
       Distance GetDistanceToPoint(const SurfacePoint &other,
           const Distance &sphereRadius) const;
-      std::vector<double> LatitudinalDerivative(CoordIndex index);
-      std::vector<double> RectangularDerivative(CoordIndex index);
+      std::vector<double> LatitudinalDerivative(CoordIndex index) const;
+      std::vector<double> RectangularDerivative(CoordIndex index) const;
 
 // Misc methods
       void ToNaifArray(double naifOutput[3]) const;

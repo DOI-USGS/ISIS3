@@ -76,7 +76,7 @@ namespace Isis {
 
       virtual const BundleObservationSolveSettingsQsp solveSettings() = 0;
       virtual int numberParameters() = 0;
-      virtual bool applyParameterCorrections(LinearAlgebra::Vector corrections) = 0;
+      virtual bool applyParameterCorrections(const LinearAlgebra::Vector &corrections) = 0;
 
       virtual void bundleOutputString(std::ostream &fpOut,bool errorPropagation) = 0;
       virtual QString bundleOutputCSV(bool errorPropagation) = 0;
@@ -87,7 +87,7 @@ namespace Isis {
       virtual bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure,
                                          BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody) = 0;
       virtual bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure) = 0;
-      virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType = SurfacePoint::Rectangular) = 0;
+      virtual bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, const SurfacePoint &adjustedSurfacePoint, SurfacePoint::CoordinateType coordType = SurfacePoint::Rectangular) = 0;
       virtual bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure) = 0;
       virtual double computeObservationValue(BundleMeasure &measure, double deltaVal) = 0;
 

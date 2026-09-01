@@ -11,6 +11,7 @@ find files of those names at the top level of this repository. **/
 #include <algorithm>
 
 #include <QDir>
+#include <QRegularExpression>
 
 #include "SpiceDbGen.h"
 #include "NaifStatus.h"
@@ -63,8 +64,37 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
                              std::vector<QString> &filter, double startOffset, double endOffset) {
   PvlObject result;
 
+  QStringList files = FilterFiles(quality, location, filter);
+
+  for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
+    FileName currFile(files[fileNum]);
+    PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
+    selection += PvlKeyword("Type", quality);
+    result.addGroup(selection);
+  }
+
+  return Finalize(result);
+}
+
+
+/**
+ * Expands the given filters into a list of kernel files.
+ *
+ * @param quality  The quality of the kernels being filtered, used for error reporting.
+ *
+ * @param location The directory in which the method searches for kernels.
+ *
+ * @param filter   Vector of QStrings containing regular expressions used to match kernels.
+ *
+ * @return QStringList The matching files, each prefixed with the location
+ *
+ * @throws Isis::iException::Message
+ */
+QStringList SpiceDbGen::FilterFiles(QString quality, QString location,
+                                    std::vector<QString> &filter) {
+  QStringList results;
+
   for (unsigned int i = 0; i < filter.size(); ++i) {
-    //Create a list of all of the files matching the current filter
     QStringList files = GetFiles(FileName(location), filter[i]);
 
     // Throw an error if no files are being added to this database for
@@ -76,13 +106,25 @@ PvlObject SpiceDbGen::Direct(QString quality, QString location,
     }
 
     for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
-      FileName currFile((QString) location + "/" + files[fileNum]);
-      PvlGroup selection = AddSelection(currFile, startOffset, endOffset);
-      selection += PvlKeyword("Type", quality);
-      result.addGroup(selection);
+      results.append(location + "/" + files[fileNum]);
     }
   }
 
+  return results;
+}
+
+
+/**
+ * Verifies every selection is of the expected kernel type, drops the selections with no time
+ * coverage, and names the object after the kernel type.
+ *
+ * @param result The object of selections to finalize
+ *
+ * @return PvlObject
+ *
+ * @throws Isis::iException::Message
+ */
+PvlObject SpiceDbGen::Finalize(PvlObject &result) {
   // Check each group to make sure it is the same type as others
   PvlObject::PvlGroupIterator grp = result.beginGroup();
 
@@ -149,33 +191,169 @@ PvlObject SpiceDbGen::Direct(QString quality, FileList fileList,
     result.addGroup(selection);
   }
 
-  // Check each group to make sure it is the same type as others
-  PvlObject::PvlGroupIterator grp = result.beginGroup();
+  return Finalize(result);
+}
 
-  while (grp != result.endGroup()) {
-    // The kernel did not have any time coverage, so ignore it
-    if (grp->name() == "No coverage" || grp->name() == "Null") {
-      result.deleteGroup(grp->name());
-    }
-    else if (grp->name() == p_type) {
-      grp->setName("Selection");
-      grp++;
-    }
-    else {
-      QString message = "A kernel of type [" + grp->name() + "] has been found in a directory for type [" + p_type + "]" ;
-      throw IException(IException::Programmer, message, _FILEINFO_);
-      break;
+
+/**
+ * Creates a Pvl object in which every kernel matching the filters is split into a reconstructed
+ * and a predicted selection at its delivery date.
+ *
+ * Some projects deliver a single kernel that holds reconstructed data up to the date the kernel
+ * was generated and predicted data after it. Such a kernel cannot be assigned a single quality,
+ * so each one contributes two selections with complementary time coverage.
+ *
+ * @param location    The directory in which the method searches for kernels.
+ *
+ * @param filter      Vector of QStrings containing regular expressions used to match kernels.
+ *
+ * @param margin      Seconds subtracted from the delivery date to place the boundary between the
+ *                    reconstructed and predicted coverage.
+ *
+ * @return PvlObject
+ *
+ * @throws Isis::iException::Message
+ */
+PvlObject SpiceDbGen::DirectReconSplit(QString location, std::vector<QString> &filter,
+                                       double startOffset, double endOffset, double margin) {
+  PvlObject result;
+
+  QStringList files = FilterFiles("Reconstructed", location, filter);
+
+  for (int fileNum = 0 ; fileNum < files.size() ; fileNum++) {
+    AddSplitSelections(result, FileName(files[fileNum]), startOffset, endOffset, margin);
+  }
+
+  return Finalize(result);
+}
+
+
+/**
+ * Creates a Pvl object in which every kernel in the list is split into a reconstructed and a
+ * predicted selection at its delivery date.
+ *
+ * @param fileList  The list of files to create a database for, ordered in ascending priority.
+ *
+ * @param margin    Seconds subtracted from the delivery date to place the boundary between the
+ *                  reconstructed and predicted coverage.
+ *
+ * @return PvlObject
+ *
+ * @throws Isis::iException::Message
+ */
+PvlObject SpiceDbGen::DirectReconSplit(FileList fileList, double startOffset, double endOffset,
+                                       double margin) {
+  PvlObject result;
+
+  if (fileList.empty()) {
+    QString message = "Input filelist is empty!";
+    throw IException(IException::User, message, _FILEINFO_);
+  }
+
+  for (int fileNum = 0 ; fileNum < fileList.size() ; fileNum++) {
+    AddSplitSelections(result, fileList[fileNum], startOffset, endOffset, margin);
+  }
+
+  return Finalize(result);
+}
+
+
+/**
+ * Adds the reconstructed and predicted selections for a single kernel to the given object.
+ *
+ * @param result      The object to add the selections to
+ *
+ * @param currFile    The kernel to split
+ *
+ * @param margin      Seconds subtracted from the delivery date to place the boundary
+ *
+ * @throws Isis::iException::Message
+ */
+void SpiceDbGen::AddSplitSelections(PvlObject &result, FileName currFile,
+                                    double startOffset, double endOffset, double margin) {
+  double boundary = DeliveryDate(currFile) - margin;
+
+  PvlGroup recon = AddSelection(currFile, startOffset, endOffset, -DBL_MAX, boundary);
+  if (recon.name() != "No coverage" && recon.name() != "Null") {
+    recon += PvlKeyword("Type", "Reconstructed");
+    result.addGroup(recon);
+  }
+
+  PvlGroup predicted = AddSelection(currFile, startOffset, endOffset, boundary, DBL_MAX);
+  if (predicted.name() != "No coverage" && predicted.name() != "Null") {
+    predicted += PvlKeyword("Type", "Predicted");
+    result.addGroup(predicted);
+  }
+}
+
+
+/**
+ * Reads the delivery date out of a kernel's comment area.
+ *
+ * Projects that deliver mixed reconstructed and predicted data in a single kernel record the date
+ * the source ephemeris was provided by the flight dynamics team in the comments. The data before
+ * that date is reconstructed and the data after it is predicted. This is meant to support TGO 
+ * Casis which has a delivery date in the comments of its SPK kernels. Anything after that 
+ * delivery date is predicted and anything before it is reconstructed.
+ *
+ * @param fileIn The kernel to read
+ *
+ * @return double The delivery date as an ephemeris time
+ *
+ * @throws Isis::iException::Message
+ */
+double SpiceDbGen::DeliveryDate(FileName fileIn) {
+  NaifStatus::CheckErrors();
+
+  QString tmp = fileIn.expanded();
+  SpiceQL::load(tmp.toLatin1().data());
+
+  SpiceChar fileType[32], source[2048];
+  SpiceInt handle;
+  SpiceBoolean found;
+  kinfo_c(tmp.toLatin1().data(), 32, 2048, fileType, source, &handle, &found);
+
+  QString dateString = "";
+
+  if (found == SPICETRUE) {
+    // The date follows the phrase, which itself may be broken across two comment lines, so each
+    // line is tested joined to the one before it as well as on its own
+    QRegularExpression re("Flight Dynamics team on\\s+"
+                          "([A-Z][a-z]+\\s+\\d{1,2},\\s*\\d{4})");
+    SpiceChar commnt[1001];
+    SpiceBoolean done(SPICEFALSE);
+    SpiceInt n;
+    QString prev = "";
+
+    while (!done) {
+      dafec_c(handle, 1, sizeof(commnt), &n, commnt, &done);
+      QString cmmt(commnt);
+
+      if (dateString.isEmpty()) {
+        QRegularExpressionMatch match = re.match(prev.simplified() + " " + cmmt.simplified());
+        if (match.hasMatch()) {
+          dateString = match.captured(1);
+        }
+      }
+      prev = cmmt;
     }
   }
 
-  if (p_type == "SPK") {
-    result.setName("SpacecraftPosition");
-  }
-  else if (p_type == "CK") {
-    result.setName("SpacecraftPointing");
+  unload_c(tmp.toLatin1().data());
+  NaifStatus::CheckErrors();
+
+  if (dateString.isEmpty()) {
+    QString message = "Could not find a delivery date in the comments of ["
+                      + fileIn.original() + "]. A kernel cannot be split into reconstructed and "
+                      "predicted coverage without one.";
+    throw IException(IException::User, message, _FILEINFO_);
   }
 
-  return result;
+  SpiceDouble et;
+  str2et_c(dateString.toLatin1().data(), &et);
+  NaifStatus::CheckErrors();
+
+  return et;
 }
 
 
@@ -218,13 +396,18 @@ void SpiceDbGen::setCoverageLevel(QString level) {
 /**
   * Format a single kernel file to include the file.
   *
-  * @param fileIn   The file name being added
+  * @param fileIn     The file name being added
+  *
+  * @param clipStart  Coverage before this ephemeris time is excluded
+  *
+  * @param clipStop   Coverage after this ephemeris time is excluded
   *
   * @return PvlGroup
   *
   * @throws Isis::iException::Message
   */
-PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double endOffset) {
+PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double endOffset,
+                                  double clipStart, double clipStop) {
   NaifStatus::CheckErrors();
 
   //finalize the filename so that it may be used in spice routines
@@ -308,7 +491,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
         NaifStatus::CheckErrors();
 
-        result = FormatIntervals(cover, currFile, startOffset, endOffset);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset, clipStart, clipStop);
       }
       else if (currFile == "CK") {
         //  200,000 is the max coverage window size for a CK kernel
@@ -325,7 +508,7 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
         }
 
         NaifStatus::CheckErrors();
-        result = FormatIntervals(cover, currFile, startOffset, endOffset);
+        result = FormatIntervals(cover, currFile, startOffset, endOffset, clipStart, clipStop);
       }
     }
   }
@@ -354,18 +537,37 @@ PvlGroup SpiceDbGen::AddSelection(FileName fileIn, double startOffset, double en
 
 
 PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
-                                     double startOffset, double endOffset) {
+                                     double startOffset, double endOffset,
+                                     double clipStart, double clipStop) {
   NaifStatus::CheckErrors();
+
+  bool clipped = (clipStart > -DBL_MAX) || (clipStop < DBL_MAX);
+
+  // Restrict the coverage to the requested interval, which is how a kernel holding more than one
+  // quality of data is divided into a selection per quality
+  SPICEDOUBLE_CELL(clip, 200000);
+  SPICEDOUBLE_CELL(bounds, 2);
+  if (clipped) {
+    ssize_c(0, &bounds);
+    ssize_c(2, &bounds);
+    wninsd_c(clipStart, clipStop, &bounds);
+
+    ssize_c(0, &clip);
+    ssize_c(200000, &clip);
+    wnintd_c(&coverage, &bounds, &clip);
+    NaifStatus::CheckErrors();
+  }
+  SpiceCell &window = clipped ? clip : coverage;
 
   PvlGroup result(type);
   SpiceChar begStr[35], endStr[35];
   //Get the number of intervals in the object.
-  int niv = card_c(&coverage) / 2;
+  int niv = card_c(&window) / 2;
   //Convert the coverage interval start and stop times to TDB
   double begin, end;
   for(int j = 0;  j < niv;  j++) {
     //Get the endpoints of the jth interval.
-    wnfetd_c(&coverage, j, &begin, &end);
+    wnfetd_c(&window, j, &begin, &end);
     //Convert the endpoints to TDB calendar
     begin -= startOffset;
     end += endOffset;
@@ -377,6 +579,12 @@ PvlGroup SpiceDbGen::FormatIntervals(SpiceCell &coverage, QString type,
   }
 
   NaifStatus::CheckErrors();
+
+  // A selection with no Time keyword matches every image, so a kernel clipped down to nothing
+  // must not produce one
+  if (clipped && (niv == 0)) {
+    return PvlGroup("No coverage");
+  }
 
   return result;
 }

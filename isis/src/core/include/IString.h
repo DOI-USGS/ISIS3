@@ -291,6 +291,13 @@ namespace Isis {
       bool Equal(const std::string &str) const;
       static bool Equal(const std::string &str1, const std::string &str2);
 
+      static bool EqualIgnoringCaseAndSeparators(const QString &string1,
+                                                 const QString &string2);
+      static bool EqualIgnoringCaseAndSeparators(const QString &string1,
+                                                 const char *string2);
+      static bool EqualIgnoringCaseAndSeparators(const char *string1,
+                                                 const char *string2);
+
       static std::string ToStd(const QString &str);
 
       static QStringList ToQt(const std::vector<std::string> &sl);

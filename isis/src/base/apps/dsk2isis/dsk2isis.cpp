@@ -56,7 +56,7 @@ namespace Isis {
     delete proj;
 
     // Create the cube from the projection parameters
-    Cube *ocube = p.SetOutputCube("TO", ns, nl, 1);
+    Cube *ocube = p.SetOutputCube(ui.GetCubeName("TO"), ui.GetOutputAttribute("TO"), ns, nl, 1);
     ocube->putGroup(cleanMap);
     TProjection *tproj = (TProjection *) ocube->projection();
 

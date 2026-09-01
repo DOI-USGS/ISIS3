@@ -337,6 +337,27 @@ endfunction(build_object_docs)
 
 
 
+# Generate llms.txt and llms-full.txt for LLM consumption
+function(build_llms_txt)
+
+  find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+  execute_process(COMMAND ${Python3_EXECUTABLE}
+                  ${PROJECT_SOURCE_DIR}/scripts/build_llms_txt.py
+                  --src-dir ${PROJECT_SOURCE_DIR}/src
+                  --out-dir ${docInstallFolder}/${docVersion}
+                  --version ${docVersion}
+                  RESULT_VARIABLE llmsResult)
+
+  if(NOT llmsResult EQUAL 0)
+    message(FATAL_ERROR "Failed to generate llms.txt (exit ${llmsResult})")
+  endif()
+
+endfunction(build_llms_txt)
+
+
+
+
 # Build all the documentation
 function(build_docs)
 
@@ -376,6 +397,9 @@ function(build_docs)
 
   message("Building additional TOCs...")
   add_extra_tocs()
+
+  message("Building llms.txt...")
+  build_llms_txt()
 
   # This step requires Latex and Doxygen
   message("Building object documentation")

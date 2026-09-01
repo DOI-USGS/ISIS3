@@ -129,8 +129,8 @@ namespace Isis {
       QString getParameterUnits(int index);
       double getParameterValue(int index);
 
-      std::vector<double> getSensorPartials(int index, SurfacePoint groundPoint);
-      virtual std::vector<double> GroundPartials(SurfacePoint groundPoint);
+      std::vector<double> getSensorPartials(int index, const SurfacePoint &groundPoint);
+      virtual std::vector<double> GroundPartials(const SurfacePoint &groundPoint);
       virtual std::vector<double> GroundPartials();
 
       QString getModelState() const;

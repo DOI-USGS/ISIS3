@@ -74,6 +74,9 @@ namespace Isis {
     p_fullCacheStartTime = 0;
     p_fullCacheEndTime = 0;
     p_fullCacheSize = 0;
+    m_cachedCJ.clear();
+    m_cachedAngles.clear();
+    m_cachedAxes.clear();
     m_frameType = UNKNOWN;
     m_tOrientationAvailable = false;
     m_orientation = NULL;
@@ -114,6 +117,9 @@ namespace Isis {
     p_fullCacheEndTime = 0;
 
     p_fullCacheSize = 0;
+    m_cachedCJ.clear();
+    m_cachedAngles.clear();
+    m_cachedAxes.clear();
     m_frameType = DYN;
     m_tOrientationAvailable = false;
     m_orientation = NULL;
@@ -1304,15 +1310,27 @@ namespace Isis {
   std::vector<double> SpiceRotation::Angles(int axis3, int axis2, int axis1) {
     NaifStatus::CheckErrors();
 
+    // the decomposition only depends on p_CJ and the axis order, and the partials request it once
+    // per solved coefficient without changing either
+    if (m_cachedAxes.size() == 3 && m_cachedAxes[0] == axis3 && m_cachedAxes[1] == axis2
+        && m_cachedAxes[2] == axis1 && m_cachedCJ == p_CJ) {
+      return m_cachedAngles;
+    }
+
     SpiceDouble ang1, ang2, ang3;
     m2eul_c((SpiceDouble *) &p_CJ[0], axis3, axis2, axis1, &ang3, &ang2, &ang1);
 
-    std::vector<double> angles;
-    angles.push_back(ang1);
-    angles.push_back(ang2);
-    angles.push_back(ang3);
+    std::vector<double> angles(3);
+    angles[0] = ang1;
+    angles[1] = ang2;
+    angles[2] = ang3;
 
     NaifStatus::CheckErrors();
+
+    m_cachedCJ = p_CJ;
+    m_cachedAngles = angles;
+    m_cachedAxes = {axis3, axis2, axis1};
+
     return angles;
   }
 
@@ -3395,21 +3413,11 @@ namespace Isis {
    * @return @b vector<double> Vector containing the three rotation angles.
    */
   std::vector<double> SpiceRotation::EvaluatePolyFunction() {
-   Isis::PolynomialUnivariate function1(p_degree);
-   Isis::PolynomialUnivariate function2(p_degree);
-   Isis::PolynomialUnivariate function3(p_degree);
-
-   // Load the functions with the coefficients
-   function1.SetCoefficients(p_coefficients[0]);
-   function2.SetCoefficients(p_coefficients[1]);
-   function3.SetCoefficients(p_coefficients[2]);
-
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
+   double rtime = (p_et - p_baseTime) / p_timeScale;
    std::vector<double> angles;
-   angles.push_back(function1.Evaluate(rtime));
-   angles.push_back(function2.Evaluate(rtime));
-   angles.push_back(function3.Evaluate(rtime));
+   angles.push_back(PolynomialUnivariate::Evaluate(p_coefficients[0], rtime));
+   angles.push_back(PolynomialUnivariate::Evaluate(p_coefficients[1], rtime));
+   angles.push_back(PolynomialUnivariate::Evaluate(p_coefficients[2], rtime));
 
    // Get the first angle back into the range Naif expects [-180.,180.]
    if (angles[0] <= -1 * pi_c()) {
@@ -3430,20 +3438,11 @@ namespace Isis {
    */
   void SpiceRotation::setEphemerisTimePolyFunction() {
    NaifStatus::CheckErrors();
-   Isis::PolynomialUnivariate function1(p_degree);
-   Isis::PolynomialUnivariate function2(p_degree);
-   Isis::PolynomialUnivariate function3(p_degree);
 
-   // Load the functions with the coefficients
-   function1.SetCoefficients(p_coefficients[0]);
-   function2.SetCoefficients(p_coefficients[1]);
-   function3.SetCoefficients(p_coefficients[2]);
-
-   std::vector<double> rtime;
-   rtime.push_back((p_et - p_baseTime) / p_timeScale);
-   double angle1 = function1.Evaluate(rtime);
-   double angle2 = function2.Evaluate(rtime);
-   double angle3 = function3.Evaluate(rtime);
+   double rtime = (p_et - p_baseTime) / p_timeScale;
+   double angle1 = PolynomialUnivariate::Evaluate(p_coefficients[0], rtime);
+   double angle2 = PolynomialUnivariate::Evaluate(p_coefficients[1], rtime);
+   double angle3 = PolynomialUnivariate::Evaluate(p_coefficients[2], rtime);
 
    // Get the first angle back into the range Naif expects [-180.,180.]
    if (angle1 < -1 * pi_c()) {

@@ -408,6 +408,9 @@ namespace Isis {
       else if (pixelTypeAtt == "32INT" || pixelTypeAtt == "32-INT" || pixelTypeAtt == "SIGNEDINTEGER") {
         result = SignedInteger;
       }
+      else if (pixelTypeAtt == "64BIT" || pixelTypeAtt == "64-BIT" || pixelTypeAtt == "DOUBLE") {
+        result = Double;
+      }
     }
 
     return result;
@@ -458,7 +461,8 @@ namespace Isis {
 
   bool CubeAttributeOutput::isPixelType(QString attribute) const {
     QString expressions = "(8-?BIT|16-?BIT|32-?BIT|UNSIGNEDBYTE|SIGNEDWORD|UNSIGNEDWORD|REAL";
-    expressions += "|32-?UINT|32-?INT|UNSIGNEDINTEGER|SIGNEDINTEGER)";
+    expressions += "|32-?UINT|32-?INT|UNSIGNEDINTEGER|SIGNEDINTEGER";
+    expressions += "|64-?BIT|DOUBLE)";
     return QRegularExpression(expressions).match(attribute).hasMatch();
 
   }

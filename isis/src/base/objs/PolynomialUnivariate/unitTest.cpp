@@ -7,6 +7,7 @@ find files of those names at the top level of this repository. **/
 #include "PolynomialUnivariate.h"
 #include <iostream>
 
+#include "IException.h"
 #include "IString.h"
 
 using namespace Isis;
@@ -63,4 +64,16 @@ int main() {
   cout << "Vars   = " << c.Variables() << endl;
   cout << "Variable Derivative = " << c.DerivativeVar(2.0) << endl;
   cout << "Coefficient 2 Derivative = " << c.DerivativeCoef(2.0, 2) << endl;
+
+  //  Test evaluating the coefficients directly, without an expansion
+  cout << "---- coefficients only ----" << endl;
+  cout << "Evaluate = " << PolynomialUnivariate::Evaluate(coefs, vars[0]) << endl;
+  cout << "Instance = " << c.Evaluate(vars) << endl;
+
+  try {
+    PolynomialUnivariate::Evaluate(vector<double>(), 2.0);
+  }
+  catch (IException &e) {
+    e.print();
+  }
 }

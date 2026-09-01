@@ -278,12 +278,6 @@ namespace Isis {
       //! The format of each DN in the cube.
       PixelType m_pixelType;
 
-      //! The additive offset of the data on disk.
-      double m_base;
-
-      //! The multiplicative factor of the data on disk.
-      double m_multiplier;
-
       //! The byte order (endianness) of the data on disk.
       ByteOrder m_byteOrder;
 

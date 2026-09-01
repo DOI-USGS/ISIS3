@@ -108,7 +108,7 @@ namespace Isis {
 
       // mutators
       BundleMeasureQsp addMeasure(ControlMeasure *controlMeasure);
-      void computeResiduals();
+      void computeResiduals(bool computeMillimeters = true);
       void setAdjustedSurfacePoint(SurfacePoint surfacePoint);
       void setNumberOfRejectedMeasures(int numRejected);
       void setRejected(bool reject);
@@ -120,8 +120,8 @@ namespace Isis {
                           SparseBlockMatrix &sparseNormals,
                           // boost::numeric::ublas::bounded_vector< double, 3 >  &v2,
                           // SparseBlockRowMatrix                                &Q,
-                          LinearAlgebra::Vector                               &v1);
-      virtual void applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+                          const LinearAlgebra::Vector                         &v1);
+      virtual void applyParameterCorrections(const LinearAlgebra::Vector &imageSolution,
                                              SparseBlockMatrix &sparseNormals,
                                              const BundleTargetBodyQsp target);
       double vtpv();
@@ -133,7 +133,7 @@ namespace Isis {
       int numberOfMeasures() const;
       int numberOfRejectedMeasures() const;
       double residualRms() const;
-      SurfacePoint adjustedSurfacePoint() const;
+      const SurfacePoint &adjustedSurfacePoint() const;
       QString id() const;
       ControlPoint::PointType type() const;
       SurfacePoint::CoordinateType coordTypeReports() const;

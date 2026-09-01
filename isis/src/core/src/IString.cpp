@@ -709,6 +709,112 @@ namespace Isis {
   }
 
 
+  //! Returns true if the character is whitespace or an underscore
+  static inline bool isSeparator(ushort c) {
+    return c == ' ' || c == '_' || c == '\n' || c == '\r' ||
+           c == '\t' || c == '\f' || c == '\v' || c == '\b';
+  }
+
+  //! Returns the ASCII upper case of the character
+  static inline ushort upperChar(ushort c) {
+    return (c >= 'a' && c <= 'z') ? c - 32 : c;
+  }
+
+  //! Returns the number of characters in the string
+  static inline int stringLength(const QString &s) {
+    return s.size();
+  }
+
+  //! Returns the number of characters in the C string, which may be NULL
+  static inline int stringLength(const char *s) {
+    return s ? (int) strlen(s) : 0;
+  }
+
+  //! Returns the character at the given index of the string
+  static inline ushort charAt(const QString &s, int i) {
+    return s.at(i).unicode();
+  }
+
+  //! Returns the character at the given index of the C string
+  static inline ushort charAt(const char *s, int i) {
+    return (unsigned char) s[i];
+  }
+
+  /**
+   * Compares two strings a character at a time, skipping separators and folding
+   * case as it goes, so that neither string has to be normalized into a copy.
+   *
+   * @param string1 [in] The first string to compare
+   * @param string2 [in] The second string to compare
+   *
+   * @return True if the two strings are equal ignoring case and separators
+   */
+  template <typename S1, typename S2>
+  static bool equalIgnoringCaseAndSeparators(const S1 &string1, const S2 &string2) {
+    const int length1 = stringLength(string1);
+    const int length2 = stringLength(string2);
+    int i = 0;
+    int j = 0;
+
+    while (true) {
+      while (i < length1 && isSeparator(charAt(string1, i))) i++;
+      while (j < length2 && isSeparator(charAt(string2, j))) j++;
+
+      if (i == length1 || j == length2) break;
+
+      if (upperChar(charAt(string1, i)) != upperChar(charAt(string2, j))) return false;
+
+      i++;
+      j++;
+    }
+
+    return i == length1 && j == length2;
+  }
+
+  /**
+   * Compares two strings, ignoring case, whitespace and underscores.
+   *
+   * @param string1 [in] The first string to compare
+   * @param string2 [in] The second string to compare
+   *
+   * @return True if the two strings are equal ignoring case and separators
+   */
+  bool IString::EqualIgnoringCaseAndSeparators(const QString &string1,
+                                               const QString &string2) {
+    return equalIgnoringCaseAndSeparators(string1, string2);
+  }
+
+
+  /**
+   * Compares a string and a C string, ignoring case, whitespace and underscores.
+   * A NULL C string is treated as empty.
+   *
+   * @param string1 [in] The string to compare
+   * @param string2 [in] The C string to compare, which may be NULL
+   *
+   * @return True if the two strings are equal ignoring case and separators
+   */
+  bool IString::EqualIgnoringCaseAndSeparators(const QString &string1,
+                                               const char *string2) {
+    return equalIgnoringCaseAndSeparators(string1, string2);
+  }
+
+
+  /**
+   * Compares two C strings, ignoring case, whitespace and underscores. A NULL C
+   * string is treated as empty.
+   *
+   * @param string1 [in] The first C string to compare, which may be NULL
+   * @param string2 [in] The second C string to compare, which may be NULL
+   *
+   * @return True if the two strings are equal ignoring case and separators
+   */
+  bool IString::EqualIgnoringCaseAndSeparators(const char *string1,
+                                               const char *string2) {
+    return equalIgnoringCaseAndSeparators(string1, string2);
+  }
+
+
   /**
    * Returns the object string as an integer.
    *

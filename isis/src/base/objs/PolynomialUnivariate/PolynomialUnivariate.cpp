@@ -56,6 +56,39 @@ namespace Isis {
 
 
   /**
+   * Evaluate the polynomial defined by the given coefficients at the given value. The
+   * degree is taken from the number of coefficients, and the terms are accumulated
+   * directly rather than expanded into a term vector, so no PolynomialUnivariate has
+   * to be constructed to evaluate a polynomial whose coefficients are already known.
+   *
+   * @param [in] coeffs  (const std::vector<double> &) The coefficients in increasing
+   *                                                   degree, so the first element is
+   *                                                   the constant coefficient
+   * @param [in] var     (double)                      value at which to evaluate
+   *
+   * @return    (double) The polynomial evaluated at the given value
+   */
+  double PolynomialUnivariate::Evaluate(const std::vector<double> &coeffs, double var) {
+
+    if (coeffs.empty()) {
+      QString msg = "Unable to evaluate the univariate polynomial. "
+                    "No coefficients were given.";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
+
+    double result = 0.0;
+    double term = 1.0;
+
+    for (int i = 0; i < (int) coeffs.size(); i++) {
+      result += coeffs[i] * term;
+      term *= var;
+    }
+
+    return result;
+  }
+
+
+  /**
    * This will take the Derivative with respect to the variable and evaluate at
    * given value.
    *

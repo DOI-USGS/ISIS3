@@ -115,8 +115,8 @@ namespace Isis {
       virtual bool GetdXYdPoint(std::vector<double> d_pB,
                                 double *dx, double *dy);
       std::vector<double> PointPartial(SurfacePoint spoint, PartialType wrt);
-      std::vector<double> EllipsoidPartial(SurfacePoint spoint, PartialType raxis);
-      std::vector<double> MeanRadiusPartial(SurfacePoint spoint, Distance meanRadius);
+      std::vector<double> EllipsoidPartial(const SurfacePoint &spoint, PartialType raxis);
+      std::vector<double> MeanRadiusPartial(const SurfacePoint &spoint, Distance meanRadius);
       double DQuotient(std::vector<double> &look, std::vector<double> &dlook,
                        int index);
 

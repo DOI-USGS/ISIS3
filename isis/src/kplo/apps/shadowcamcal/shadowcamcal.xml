@@ -77,6 +77,9 @@
       Refactored for better testability, simplified code where possible, and improved readability.
       Changed INTRCPTCOEFF parameter to INTERCEPTCOEFF for clarity and consistency.
     </change>
+    <change name="Jacob Cain" date="2026-08-06">
+      Added doc examples.
+    </change>
   </history>
 
   <groups>
@@ -301,4 +304,37 @@
       </parameter>
     </group>
   </groups>
+
+  <examples>
+    <example>
+      <brief>Default Calibration</brief>
+      <description>
+        Calibrate a KPLO ShadowCam EDR image.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          from=M091671205SE.cub to=M091671205SE.cal.cub
+        </commandLine>
+        <description>
+          Calibrate a KPLO ShadowCam EDR image with default settings.
+        </description>
+      </terminalInterface>
+    </example>
+    <example>
+      <brief>Calibration with Intermediate Cubes</brief>
+      <description>
+        Calibrate a KPLO ShadowCam EDR image and output a cube at each calibration step.
+      </description>
+
+      <terminalInterface>
+        <commandLine>
+          from=M091671205SE.cub to=M091671205SE.cal.cub WriteOutSteps=True
+        </commandLine>
+        <description>
+          Calibrate and output step-cubes.
+        </description>
+      </terminalInterface>
+    </example>
+  </examples>
 </application>

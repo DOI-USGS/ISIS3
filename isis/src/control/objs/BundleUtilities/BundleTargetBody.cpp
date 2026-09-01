@@ -578,7 +578,7 @@ namespace Isis {
    * @see setSolveSettings
    */
   void BundleTargetBody::applyParameterCorrections(
-      LinearAlgebra::Vector corrections) {
+      const LinearAlgebra::Vector &corrections) {
     if (corrections.size() != m_parameterSolveCodes.size()) {
       QString msg = "In BundleTargetBody::applyParameterCorrections: "
                     "correction and m_targetParameter vectors sizes don't match.\n";

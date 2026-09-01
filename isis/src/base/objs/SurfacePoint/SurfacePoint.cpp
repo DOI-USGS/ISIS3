@@ -770,7 +770,7 @@ namespace Isis {
    *
    * @return void
    */
-  std::vector<double> SurfacePoint::Partial(CoordinateType type, CoordIndex index) {
+  std::vector<double> SurfacePoint::Partial(CoordinateType type, CoordIndex index) const {
     std::vector<double> derivative(3);
     switch (type) {
       case Latitudinal:
@@ -795,7 +795,7 @@ namespace Isis {
    *
    * @return @b std::vector<double>  The derivative of the latitudinal to body-fixed vector
    */
-  std::vector<double> SurfacePoint::LatitudinalDerivative(CoordIndex index) {
+  std::vector<double> SurfacePoint::LatitudinalDerivative(CoordIndex index) const {
     std::vector<double> derivative(3);
     double rlat = GetLatitude().radians();
     double rlon = GetLongitude().radians();
@@ -837,7 +837,7 @@ namespace Isis {
    *
    * @return @b std::vector<double>  The derivative of the body-fixed vector
    */
-  std::vector<double> SurfacePoint::RectangularDerivative(CoordIndex index) {
+  std::vector<double> SurfacePoint::RectangularDerivative(CoordIndex index) const {
     std::vector<double> derivative(3,0.0);
 
     switch (index) {
@@ -959,7 +959,7 @@ namespace Isis {
    * @param units The units in which to return the coordinate value (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::GetCoord(CoordinateType type, CoordIndex index, CoordUnits units) {
+  double SurfacePoint::GetCoord(CoordinateType type, CoordIndex index, CoordUnits units) const {
     // TODO *** Is there a better way to satisfy the compiler that a value will be initialized? 
     //                 Don't the enums take care of preventing any other possibilities? no
     double value = 0.;
@@ -1026,7 +1026,7 @@ namespace Isis {
    * @param units The units in which to return the coordinate value (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::GetSigma(CoordinateType type, CoordIndex index, CoordUnits units) {
+  double SurfacePoint::GetSigma(CoordinateType type, CoordIndex index, CoordUnits units) const {
     double value = 0;  // See first TODO in GetCoord
     
     switch (type) {
@@ -1092,7 +1092,7 @@ namespace Isis {
    *
    */
   Distance SurfacePoint::GetSigmaDistance(CoordinateType type,
-                                                         CoordIndex index) {
+                                                         CoordIndex index) const {
     Distance dist = Distance();  // See first TODO in GetCoord
     
     switch (type) {
@@ -1157,7 +1157,7 @@ namespace Isis {
    * @param units The units in which to return the displacement (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::DisplacementToDouble(Displacement disp, CoordUnits units) {
+  double SurfacePoint::DisplacementToDouble(Displacement disp, CoordUnits units) const {
     double value;
     
     switch (units) {
@@ -1185,7 +1185,7 @@ namespace Isis {
    * @param units The units in which to return the distance (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::DistanceToDouble(Distance dist, CoordUnits units) {
+  double SurfacePoint::DistanceToDouble(Distance dist, CoordUnits units) const {
     double value;
     
     switch (units) {
@@ -1213,7 +1213,7 @@ namespace Isis {
    * @param units The units in which to return the latitude (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::LatToDouble(Latitude lat, CoordUnits units) {
+  double SurfacePoint::LatToDouble(Latitude lat, CoordUnits units) const {
     double value;
     
     switch (units) {
@@ -1245,7 +1245,7 @@ namespace Isis {
    * @return @b LatDispAngle The converted linear measure in radian units
    *
    */
-  double SurfacePoint::MetersToLatitude(double latLength) {
+  double SurfacePoint::MetersToLatitude(double latLength) const {
     if (Valid() && !IsSpecial(latLength)) {
       // Convert angle measure in meters to radians relative to latitude of SurfacePoint.
       return latLength / GetLocalRadius().meters();
@@ -1273,7 +1273,7 @@ namespace Isis {
    *                                            small distances on fixed or tightly constrained points 
    *                                            occurring during error propagation in jigsaw.
    */
-  double SurfacePoint::MetersToLongitude(double deltaLonMeters) {
+  double SurfacePoint::MetersToLongitude(double deltaLonMeters) const {
     
     if (Valid() && !IsSpecial(deltaLonMeters)) {
       double convFactor = cos((double)GetLatitude().radians());
@@ -1412,7 +1412,7 @@ namespace Isis {
    * @param units The units in which to return the longitude (see CoordinateUnits in .h file)
    *
    */
-  double SurfacePoint::LonToDouble(Longitude lon, CoordUnits units) {
+  double SurfacePoint::LonToDouble(Longitude lon, CoordUnits units) const {
     double value;
     
     switch (units) {
@@ -1488,7 +1488,7 @@ namespace Isis {
    *
    *
    */
-  double SurfacePoint::GetWeight(CoordinateType type, CoordIndex index) {
+  double SurfacePoint::GetWeight(CoordinateType type, CoordIndex index) const {
     double value = 0;  // See first TODO in GetCoord
     
     switch (type) {

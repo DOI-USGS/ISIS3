@@ -208,8 +208,6 @@ namespace Isis {
     void print(std::ostream& outstream);
     void printClean(std::ostream& outstream);
     bool write(std::ofstream &fp_out, bool binary=true);
-    int getLeadingColumnsForBlock(int nblockColumn);
-    int getLeadingRowsForBlock(int nblockRow);
   };
 
   // operators to read/write SparseBlockMatrix to/from binary disk file

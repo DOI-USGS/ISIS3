@@ -214,18 +214,11 @@ namespace Isis {
    */
   int SparseBlockColumnMatrix::numberOfRows() {
 
-    // iterate to last block (the diagonal one)
-    QMapIterator<int, LinearAlgebra::Matrix *> it(*this);
-    while ( it.hasNext() ) {
-      it.next();
+    // the last block in the column is the diagonal one
+    if ( isEmpty() || !last() )
+      return 0;
 
-      if( !it.value() )
-        continue;
-    }
-
-    int nRows = it.value()->size1();
-
-    return nRows;
+    return last()->size1();
   }
 
 
@@ -369,7 +362,7 @@ namespace Isis {
       // fill with data
       for ( r = 0; r < nRows; r++ ) {
         for ( c = 0; c < nCols; c++ ) {
-          int nLocation = r*nRows + c;
+          int nLocation = r*nCols + c;
           (*matrix)(r,c) = data[nLocation];
         }
       }
@@ -751,7 +744,7 @@ namespace Isis {
       // fill with data
       for ( r = 0; r < nRows; r++ ) {
         for ( c = 0; c < nCols; c++ ) {
-          int nLocation = r*nRows + c;
+          int nLocation = r*nCols + c;
           (*matrix)(r,c) = data[nLocation];
         }
       }
@@ -1041,76 +1034,6 @@ namespace Isis {
         outstream << "NULL column pointer at column[" << IString(i)
                   << "]!" << std::endl;
     }
-  }
-
-
-  /**
-   * Sums and returns the number of columns in each matrix block prior to nblockColumn
-   *
-   * @param nblockColumn
-   *
-   * @return int Number of leading column elements for block at nblockColumn
-   */
-  int SparseBlockMatrix::getLeadingColumnsForBlock(int nblockColumn) {
-
-    if ( nblockColumn == 0 )
-      return 0;
-
-    int nLeadingColumnsElements = 0;
-
-    int nCol = 0;
-
-    while ( nCol < nblockColumn ) {
-      if ( !(*this)[nCol] )
-        continue;
-
-      int ncolumns = (*this)[nCol]->numberOfColumns();
-
-      if ( ncolumns == -1 )
-        continue;
-
-      nLeadingColumnsElements += ncolumns;
-
-      nCol++;
-    }
-
-    return nLeadingColumnsElements;
-  }
-
-
-  /**
-   * Sums and returns the number of rows in each matrix block prior to nblockRow
-   *
-   * @param nblockRow
-   *
-   * @return int Number of leading row elements for block at nblockRow
-   */
-  int SparseBlockMatrix::getLeadingRowsForBlock(int nblockRow) {
-
-    if ( nblockRow == 0 )
-      return 0;
-
-    int i = 0;
-    int nLeadingRows = 0;
-
-    while ( i < nblockRow ) {
-      SparseBlockColumnMatrix* column = at(i);
-
-      if ( !column )
-        continue;
-
-      QMapIterator<int, LinearAlgebra::Matrix *> it(*column);
-      // iterate to last element in column
-      while ( it.hasNext() ) {
-        it.next();
-
-        if( it.key() == i )
-          nLeadingRows += it.value()->size1();
-      }
-      i++;
-    }
-
-    return nLeadingRows;
   }
 
 

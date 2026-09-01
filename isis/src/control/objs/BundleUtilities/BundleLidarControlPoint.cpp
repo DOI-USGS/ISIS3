@@ -113,7 +113,7 @@ namespace Isis {
    * Apply the parameter corrections to the lidar range.
    */
   void BundleLidarControlPoint::applyParameterCorrections(
-        LinearAlgebra::Vector imageSolution,
+        const LinearAlgebra::Vector &imageSolution,
         SparseBlockMatrix &sparseNormals,
         const BundleTargetBodyQsp target) {
     // Call parent class method to apply point corrections

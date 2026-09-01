@@ -695,9 +695,9 @@ namespace Isis {
    *
    */
   std::istream &operator>>(std::istream &is, PvlObject &result) {
-    PvlKeyword termination("EndObject");
+    static const PvlKeyword termination("EndObject");
 
-    PvlKeyword errorKeywords[] = {
+    static const PvlKeyword errorKeywords[] = {
       PvlKeyword("EndGroup")
     };
 
@@ -706,7 +706,7 @@ namespace Isis {
     istream::pos_type beforeKeywordPos = is.tellg();
     is >> readKeyword;
 
-    if(readKeyword != PvlKeyword("Object")) {
+    if(!readKeyword.isNamed("Object")) {
       if(is.eof() && !is.bad()) {
         is.clear();
       }
@@ -765,13 +765,13 @@ namespace Isis {
         }
       }
 
-      if(readKeyword == PvlKeyword("Group")) {
+      if(readKeyword.isNamed("Group")) {
         is.seekg(beforeKeywordPos);
         PvlGroup newGroup;
         is >> newGroup;
         result.addGroup(newGroup);
       }
-      else if(readKeyword == PvlKeyword("Object")) {
+      else if(readKeyword.isNamed("Object")) {
         is.seekg(beforeKeywordPos);
         PvlObject newObject;
         is >> newObject;

@@ -802,9 +802,14 @@ namespace Isis {
 
     action->started(true);
 
+    int initialRequestCount = 2;
+    if (p_viewport && p_viewport->cube() && p_viewport->cube()->format() == Cube::Bsq) {
+      initialRequestCount = 20;
+    }
+
     requestCubeLine(action);
 
-    if(action->shouldRequestMore()) {
+    for (int i = 1; i < initialRequestCount && action->shouldRequestMore(); i++) {
       requestCubeLine(action);
     }
   }

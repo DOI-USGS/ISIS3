@@ -397,6 +397,122 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenSpk) {
 }
 
 
+TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplit) {
+  QTemporaryDir prefix;
+  QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=tgoSplit.bsp",
+                           "reconsplit=DELIVERYDATE",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    kerneldbgen(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to generate kernel db: " << e.what() << std::endl;
+  }
+
+  Pvl kerneldbPvl(options.GetFileName("TO"));
+
+  EXPECT_TRUE(kerneldbPvl.hasObject("SpacecraftPosition"));
+  PvlObject &scPosition = kerneldbPvl.findObject("SpacecraftPosition");
+
+  ASSERT_EQ(scPosition.groups(), 3);
+
+  PvlGroup recon = scPosition.group(1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon.findKeyword("Type"), "Reconstructed");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon.findKeyword("Time")[1], "2026 JAN 19 00:01:09.184464 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon.findKeyword("File"), "data/kerneldbgen/tgoSplit.bsp");
+
+  PvlGroup predicted = scPosition.group(2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Type"), "Predicted");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[0], "2026 JAN 19 00:01:09.184464 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("File"), "data/kerneldbgen/tgoSplit.bsp");
+}
+
+
+TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplitMarginBeforeCoverage) {
+  QTemporaryDir prefix;
+  QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=tgoSplit.bsp",
+                           "reconsplit=DELIVERYDATE",
+                           "reconsplitmargin=3000000",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    kerneldbgen(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to generate kernel db: " << e.what() << std::endl;
+  }
+
+  Pvl kerneldbPvl(options.GetFileName("TO"));
+  PvlObject &scPosition = kerneldbPvl.findObject("SpacecraftPosition");
+
+  ASSERT_EQ(scPosition.groups(), 2);
+
+  PvlGroup predicted = scPosition.group(1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Type"), "Predicted");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
+}
+
+
+TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplitDefaultOff) {
+  QTemporaryDir prefix;
+  QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=tgoSplit.bsp",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    kerneldbgen(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to generate kernel db: " << e.what() << std::endl;
+  }
+
+  Pvl kerneldbPvl(options.GetFileName("TO"));
+  PvlObject &scPosition = kerneldbPvl.findObject("SpacecraftPosition");
+
+  ASSERT_EQ(scPosition.groups(), 2);
+
+  PvlGroup select = scPosition.group(1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Type"), "Reconstructed");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, select.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
+}
+
+
+TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplitNoDeliveryDate) {
+  QTemporaryDir prefix;
+  QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=thmIR.bsp",
+                           "reconsplit=DELIVERYDATE",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options(APP_XML, args);
+  try {
+    kerneldbgen(options);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Could not find a delivery date in the comments of [data/kerneldbgen/thmIR.bsp]"));
+  }
+}
+
+
 TEST(Kerneldbgen, FunctionalTestKerneldbgenSmithedCkOffsets) {
   QTemporaryDir prefix;
   QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",

@@ -137,8 +137,8 @@ namespace Isis {
    *
    * @see ControlPoint::ComputeResiduals()
    */
-  void BundleControlPoint::computeResiduals() {
-    m_controlPoint->ComputeResiduals();
+  void BundleControlPoint::computeResiduals(bool computeMillimeters) {
+    m_controlPoint->ComputeResiduals(computeMillimeters);
 
     // compute and store focal plane residuals in millimeters
     for (int i = 0; i < size(); i++) {
@@ -366,7 +366,7 @@ namespace Isis {
    */
   void BundleControlPoint::productAlphaAV(double alpha,
                                     SparseBlockMatrix &sparseNormals,
-                                    LinearAlgebra::Vector &v1) {
+                                    const LinearAlgebra::Vector &v1) {
 
     QMapIterator< int, LinearAlgebra::Matrix * > Qit(m_cholmodQMatrix);
 
@@ -392,7 +392,7 @@ namespace Isis {
    * @param factor The unit conversion factor to use on lat and lon rad or x/y/z km.
    * @param target The BundleTargetBody.
    */
-  void BundleControlPoint::applyParameterCorrections(LinearAlgebra::Vector imageSolution,
+  void BundleControlPoint::applyParameterCorrections(const LinearAlgebra::Vector &imageSolution,
                                                SparseBlockMatrix &sparseNormals,
                                                const BundleTargetBodyQsp target) {
     if (!isRejected()) {
@@ -479,9 +479,9 @@ namespace Isis {
   /**
    * Accesses the adjusted SurfacePoint associated with this BundleControlPoint.
    *
-   * @return @b SurfacePoint The adjusted surface point.
+   * @return @b const SurfacePoint& The adjusted surface point.
    */
-  SurfacePoint BundleControlPoint::adjustedSurfacePoint() const {
+  const SurfacePoint &BundleControlPoint::adjustedSurfacePoint() const {
     return m_controlPoint->GetAdjustedSurfacePoint();
   }
 

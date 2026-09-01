@@ -351,8 +351,11 @@ namespace Isis {
   PvlContainer::PvlKeywordIterator PvlContainer::findKeyword(const QString &name,
       PvlContainer::PvlKeywordIterator beg,
       PvlContainer::PvlKeywordIterator end) {
-    PvlKeyword temp(name);
-    return find(beg, end, temp);
+    // compared by name, as constructing a PvlKeyword to compare against allocates
+    for (PvlKeywordIterator it = beg; it != end; it++) {
+      if (it->isNamed(name)) return it;
+    }
+    return end;
   };
 
 
@@ -366,8 +369,11 @@ namespace Isis {
   PvlContainer::ConstPvlKeywordIterator PvlContainer::findKeyword(const QString &name,
       PvlContainer::ConstPvlKeywordIterator beg,
       PvlContainer::ConstPvlKeywordIterator end) const {
-    PvlKeyword temp(name);
-    return find(beg, end, temp);
+    // compared by name, as constructing a PvlKeyword to compare against allocates
+    for (ConstPvlKeywordIterator it = beg; it != end; it++) {
+      if (it->isNamed(name)) return it;
+    }
+    return end;
   };
 
 

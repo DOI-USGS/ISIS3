@@ -137,7 +137,8 @@ namespace Isis {
     // compute the min and max value in the actual cube.
     else if (cube.pixelType() == UnsignedInteger ||
              cube.pixelType() == SignedInteger ||
-             cube.pixelType() == Real) {
+             cube.pixelType() == Real ||
+             cube.pixelType() == Double) {
       if (nbins == 0) {
         nbins = 65536;
       }

@@ -386,12 +386,12 @@ namespace Isis {
       bool useWeb = Preference::Preferences().useWebSpice();
 
       inst.findKeyword("StartTime").setValue(firstEt.UTC());
-      auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "chandrayaan1", useWeb);
+      auto [startClockString, kernels] = SpiceQL::doubleEtToSclk(sclkCode, firstEt.Et(), "m3", useWeb);
       QString startClock = QString::fromStdString(startClockString);
       inst.findKeyword("SpacecraftClockStartCount").setValue(startClock);
 
       inst.findKeyword("StopTime").setValue(lastEt.UTC());
-      auto [stopClockString, kernels2]= SpiceQL::doubleEtToSclk(sclkCode, lastEt.Et(), "chandrayaan1", useWeb);
+      auto [stopClockString, kernels2]= SpiceQL::doubleEtToSclk(sclkCode, lastEt.Et(), "m3", useWeb);
       QString stopClock = QString::fromStdString(stopClockString);
       inst.findKeyword("SpacecraftClockStopCount").setValue(stopClock);
     }

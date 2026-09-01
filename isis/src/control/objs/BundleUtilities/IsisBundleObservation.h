@@ -64,7 +64,7 @@ namespace Isis {
 
       const BundleObservationSolveSettingsQsp solveSettings();
 
-      bool applyParameterCorrections(LinearAlgebra::Vector corrections);
+      bool applyParameterCorrections(const LinearAlgebra::Vector &corrections);
       bool initializeExteriorOrientation();
       void initializeBodyRotation();
       void updateBodyRotation();
@@ -80,7 +80,7 @@ namespace Isis {
 
       bool computeTargetPartials(LinearAlgebra::Matrix &coeffTarget, BundleMeasure &measure, BundleSettingsQsp &bundleSettings, BundleTargetBodyQsp &bundleTargetBody);
       bool computeImagePartials(LinearAlgebra::Matrix &coeffImage, BundleMeasure &measure);
-      bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, SurfacePoint::CoordinateType coordType);
+      bool computePoint3DPartials(LinearAlgebra::Matrix &coeffPoint3D, BundleMeasure &measure, const SurfacePoint &adjustedSurfacePoint, SurfacePoint::CoordinateType coordType);
       bool computeRHSPartials(LinearAlgebra::Vector &coeffRHS, BundleMeasure &measure);
       double computeObservationValue(BundleMeasure &measure, double deltaVal);
 

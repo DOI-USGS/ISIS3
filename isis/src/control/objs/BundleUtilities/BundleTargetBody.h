@@ -148,7 +148,7 @@ namespace Isis {
       int numberRadiusParameters();
       virtual int numberParameters();
 
-      void applyParameterCorrections(LinearAlgebra::Vector corrections);
+      void applyParameterCorrections(const LinearAlgebra::Vector &corrections);
 
       double vtpv();
 

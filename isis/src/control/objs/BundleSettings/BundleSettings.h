@@ -155,11 +155,13 @@ namespace Isis {
                                double multiplier = 1.0);
       void setObservationSolveOptions(QList<BundleObservationSolveSettings> obsSolveSettingsList);
       void setCreateInverseMatrix(bool createMatrix);
+      void setDenseInverse(bool denseInverse);
 
       // accessors
       SurfacePoint::CoordinateType controlPointCoordTypeReports() const;
       SurfacePoint::CoordinateType controlPointCoordTypeBundle() const;
       bool createInverseMatrix() const;
+      bool denseInverse() const;
       bool solveObservationMode() const;
       bool solveRadius() const;
       bool updateCubeLabel() const;
@@ -302,6 +304,7 @@ namespace Isis {
       bool m_updateCubeLabel; //!< Indicates whether to update cubes.
       bool m_errorPropagation; //!< Indicates whether to perform error propagation.
       bool m_createInverseMatrix; //!< Indicates whether to create the inverse matrix file.
+      bool m_denseInverse; //!< Indicates whether error propagation inverts the full normal equations.
       bool m_outlierRejection; /**< Indicates whether to perform automatic
                                     outlier detection/rejection.*/
       double m_outlierRejectionMultiplier; /**< The multiplier value for outlier rejection.

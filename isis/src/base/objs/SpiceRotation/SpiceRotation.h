@@ -477,6 +477,9 @@ namespace Isis {
       std::vector<double> p_av;           //!< Angular velocity for rotation at time p_et
       bool p_hasAngularVelocity;          /**< Flag indicating whether the rotation
                                                includes angular velocity*/
+      std::vector<double> m_cachedCJ;     //!< p_CJ the cached Euler angles were decomposed from
+      std::vector<double> m_cachedAngles; //!< Euler angles cached by Angles()
+      std::vector<int> m_cachedAxes;      //!< Axis order the cached Euler angles use
       std::vector<double> StateTJ();      /**< State matrix (6x6) for rotating state
                                                vectors from J2000 to target frame*/
       // The remaining items are only used for PCK frame types.  In this case the

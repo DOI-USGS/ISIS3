@@ -520,8 +520,6 @@ try {
     cerr << "    # diagonal matrix blocks: " << sbm.numberOfDiagonalBlocks() << endl;
     cerr << "# off-diagonal matrix blocks: " << sbm.numberOfOffDiagonalBlocks() << endl;
     cerr << "           # matrix elements: " << sbm.numberOfElements() << endl;
-    cerr << "# leading columns for block2: " << sbm.getLeadingColumnsForBlock(2) << endl;
-    cerr << "   # leading rows for block1: " << sbm.getLeadingRowsForBlock(1) << endl;
     sbm.print(std::cerr);
   }
   catch(IException &e) {

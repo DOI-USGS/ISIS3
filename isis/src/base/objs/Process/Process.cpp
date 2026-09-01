@@ -355,20 +355,23 @@ Isis::Cube *Process::SetOutputCubeStretch(const QString &parameter, const int ns
       }
 
       if(att.propagateMinimumMaximum()) {
-        if(cube->pixelType() == Isis::Real) {
+        if(InputCubes.size() == 0) {
           cube->setBaseMultiplier(0.0, 1.0);
         }
-        else if(InputCubes.size() == 0) {
-          QString msg = "You told me to propagate base/multiplier from input to output";
-          msg += " cube but there are no input cubes loaded";
-          throw IException(IException::Programmer, msg, _FILEINFO_);
+        // For new cubes created as float32 or float64, make the assumption that
+        // float32/64 can handle the data with the default base and multiplier
+        // Even if the data being copied has a base and multiplier (legacy behavior)
+        else if (!isIntegerType(cube->pixelType())) {
+            cube->setBaseMultiplier(0.0, 1.0);
         }
+        // If we are translating between integer types, directly apply the base and multiplier
         else if(cube->pixelType() >= InputCubes[0]->pixelType()) {
           double base = InputCubes[0]->base();
           double mult = InputCubes[0]->multiplier();
           cube->setBaseMultiplier(base, mult);
         }
-        else if((cube->pixelType() != Isis::Real) &&
+        else if((cube->pixelType() != Isis::Double) &&
+                (cube->pixelType() != Isis::Real) &&
                 (cube->pixelType() != Isis::UnsignedByte) &&
                 (cube->pixelType() != Isis::UnsignedWord) &&
                 (cube->pixelType() != Isis::SignedWord) &&

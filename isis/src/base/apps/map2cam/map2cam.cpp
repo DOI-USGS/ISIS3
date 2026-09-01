@@ -46,10 +46,16 @@ namespace Isis{
     rub.PropagateLabels(false);
     fname = ui.GetCubeName("TO");
     Isis::CubeAttributeOutput &outputAtt = ui.GetOutputAttribute("TO");
+
+    // When MATCH is single-band, reproject every band of a multi-band FROM 
+    // instead of only band 1. Multi-band MATCH is left unchanged and 
+    // deferred to a future major release.
+    int outputBands = (mcube->bandCount() > 1) ? mcube->bandCount()
+                                               : icube->bandCount();
     rub.SetOutputCube(fname, outputAtt,
                       transform->OutputSamples(),
                       transform->OutputLines(),
-                      mcube->bandCount());
+                      outputBands);
     rub.PropagateLabels(match.expanded());
     rub.PropagateTables(match.expanded());
 
@@ -127,6 +133,8 @@ namespace Isis{
   }
 
   void BandChange(const int band) {
-    outcam->SetBand(band);
+    // Clamp the requested band to the MATCH band range
+    int cameraBand = (band <= mcube->bandCount()) ? band : mcube->bandCount();
+    outcam->SetBand(cameraBand);
   }
 }

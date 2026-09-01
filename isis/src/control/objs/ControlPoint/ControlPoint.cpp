@@ -1021,7 +1021,7 @@ namespace Isis {
    *                           points in a control net AFTER bundle adjustment. References #2591.
    *
    */
-  ControlPoint::Status ControlPoint::ComputeResiduals() {
+  ControlPoint::Status ControlPoint::ComputeResiduals(bool computeMillimeters) {
     if (IsIgnored()) {
       return Failure;
     }
@@ -1030,6 +1030,15 @@ namespace Isis {
 
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
+
+    // Map the coordinates of the control point through the Spice of the
+    // measurement sample/line to get the computed sample/line.  This must be
+    // done manually because the camera will compute a new time for line scanners,
+    // instead of using the measured time.
+    // this fills every measure at once, so it is called before the loop rather than in it
+    if (computeMillimeters) {
+      ComputeResiduals_Millimeters();
+    }
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
@@ -1042,12 +1051,6 @@ namespace Isis {
       double cuSamp;
       double cuLine;
       CameraFocalPlaneMap *fpmap = m->Camera()->FocalPlaneMap();
-
-      // Map the coordinates of the control point through the Spice of the
-      // measurement sample/line to get the computed sample/line.  This must be
-      // done manually because the camera will compute a new time for line scanners,
-      // instead of using the measured time.
-      ComputeResiduals_Millimeters();
 
       // Convert the residuals in millimeters to undistorted pixels
       if (cam->GetCameraType()  ==  Isis::Camera::Radar) {
@@ -1194,6 +1197,7 @@ namespace Isis {
 
     // Loop for each measure to compute the error
     QList<QString> keys = measures->keys();
+    const SurfacePoint &adjusted = GetAdjustedSurfacePoint();
 
     for (int j = 0; j < keys.size(); j++) {
       ControlMeasure *m = (*measures)[keys[j]];
@@ -1214,7 +1218,7 @@ namespace Isis {
       // This does not work with CSM as it does not have a focal plane so
       // just use the sample and line
       if (cam->GetCameraType() == Camera::Csm) {
-        cam->SetGround(GetAdjustedSurfacePoint());
+        cam->SetGround(adjusted);
         cudx = cam->Sample();
         cudy = cam->Line();
         // Reset to measure
@@ -1226,7 +1230,7 @@ namespace Isis {
           cam->SetImage(m->GetSample(), m->GetLine());
         }
         // The default bool value is true.  Turn back-of-planet test off for bundle adjustment.
-        cam->GroundMap()->GetXY(GetAdjustedSurfacePoint(), &cudx, &cudy, false);
+        cam->GroundMap()->GetXY(adjusted, &cudx, &cudy, false);
       }
 
       m->SetFocalPlaneComputed(cudx, cudy);
@@ -1275,7 +1279,9 @@ namespace Isis {
   }
 
 
-  SurfacePoint ControlPoint::GetAdjustedSurfacePoint() const {
+  // returned by reference to avoid the SurfacePoint copy, which heap allocates
+  // its coordinates and covariance
+  const SurfacePoint &ControlPoint::GetAdjustedSurfacePoint() const {
     return adjustedSurfacePoint;
   }
 

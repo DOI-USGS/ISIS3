@@ -129,8 +129,11 @@ namespace Isis {
       PvlGroupIterator findGroup(const QString &name,
                                  PvlGroupIterator beg,
                                  PvlGroupIterator end) {
-        Isis::PvlGroup temp(name);
-        return std::find(beg, end, temp);
+        // compared by name, as constructing a PvlGroup to compare against allocates
+        for (PvlGroupIterator it = beg; it != end; it++) {
+          if (it->isNamed(name)) return it;
+        }
+        return end;
       }
 
 
@@ -143,8 +146,11 @@ namespace Isis {
       ConstPvlGroupIterator findGroup(const QString &name,
                                       ConstPvlGroupIterator beg,
                                       ConstPvlGroupIterator end) const {
-        Isis::PvlGroup temp(name);
-        return std::find(beg, end, temp);
+        // compared by name, as constructing a PvlGroup to compare against allocates
+        for (ConstPvlGroupIterator it = beg; it != end; it++) {
+          if (it->isNamed(name)) return it;
+        }
+        return end;
       }
 
 
@@ -274,8 +280,11 @@ namespace Isis {
       PvlObjectIterator findObject(const QString &name,
                                    PvlObjectIterator beg,
                                    PvlObjectIterator end) {
-        PvlObject temp(name);
-        return std::find(beg, end, temp);
+        // compared by name, as constructing a PvlObject to compare against allocates
+        for (PvlObjectIterator it = beg; it != end; it++) {
+          if (it->isNamed(name)) return it;
+        }
+        return end;
       }
 
 
@@ -289,8 +298,11 @@ namespace Isis {
       ConstPvlObjectIterator findObject(const QString &name,
                                         ConstPvlObjectIterator beg,
                                         ConstPvlObjectIterator end) const {
-        PvlObject temp(name);
-        return std::find(beg, end, temp);
+        // compared by name, as constructing a PvlObject to compare against allocates
+        for (ConstPvlObjectIterator it = beg; it != end; it++) {
+          if (it->isNamed(name)) return it;
+        }
+        return end;
       }
 
 

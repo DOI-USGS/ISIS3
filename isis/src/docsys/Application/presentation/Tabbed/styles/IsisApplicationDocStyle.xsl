@@ -48,6 +48,10 @@
         <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/common.css" />
         <link rel="stylesheet" href="{$menuPath}assets/styles/usgs/custom.css" />
 
+        <!-- llms.txt -->
+        <link rel="alternate" type="text/plain" title="llms.txt" href="{$menuPath}llms.txt"/>
+        <link rel="alternate" type="text/plain" title="llms-full.txt" href="{$menuPath}llms-full.txt"/>
+
         <!-- ISIS Docs -->
         <link rel="stylesheet" href="{$menuPath}assets/styles/IsisStyleCommon.css"></link>
         <link rel="stylesheet" href="../styles/IsisApplicationDocStyle.css"></link>
