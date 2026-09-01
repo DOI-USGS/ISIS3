@@ -188,6 +188,23 @@ namespace Isis {
       const char *metadataJsonString = metadata[0];
       nlohmann::ordered_json metadataAsJson = nlohmann::ordered_json::parse(metadataJsonString);
       readObject(*this, metadataAsJson);
+      
+      if (this->hasObject("IsisCube")) {
+        PvlObject &core = this->findObject("IsisCube").findObject("Core");
+
+        PvlGroup &dims = core.findGroup("Dimensions");
+        dims["Samples"] = toString(dataset->GetRasterXSize());
+        dims["Lines"] = toString(dataset->GetRasterYSize());
+        dims["Bands"] = toString(dataset->GetRasterCount());
+
+        GDALRasterBand *band = dataset->GetRasterBand(1);
+
+        PvlGroup &ptype = core.findGroup("Pixels");
+        ptype["Type"] = PixelTypeName(GdalPixelToIsis(band->GetRasterDataType()));
+
+        ptype["Base"] = toString(band->GetOffset());
+        ptype["Multiplier"] = toString(band->GetScale());
+      }
     }
     else {
       // Setup the PVL
