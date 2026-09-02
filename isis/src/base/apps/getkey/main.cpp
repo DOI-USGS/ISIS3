@@ -34,8 +34,7 @@ void IsisMain() {
   QString labelFile = ui.GetCubeName("FROM");
 
   // Open the file ... it must be a label-type file
-  Pvl lab;
-  lab.read(labelFile);
+  Pvl lab(labelFile);
   bool recursive = ui.GetBoolean("RECURSIVE");
 
   // Set up the requested object
