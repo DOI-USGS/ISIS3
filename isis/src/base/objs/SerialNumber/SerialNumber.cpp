@@ -116,12 +116,8 @@ namespace Isis {
         instrument = instrumentXlater.Translate("InstrumentName");
       }
       catch (IException &e) {
-        // The instrument label could not be translated. Fall back to the CSM
-        // serial number below only if the cube has a CsmInfo group. Otherwise
-        // there is no other source for a serial number, so re-throw the
-        // original error rather than continuing with an empty mission and
-        // instrument, which would fail later with a confusing message about a
-        // missing translation file.
+        // Re-throw if there is no CSM fallback, rather than continuing with an
+        // empty mission and instrument.
         if (!label.findObject("IsisCube").hasGroup("CsmInfo")) {
           throw IException(e, IException::Unknown,
                            "Unable to find a serial number translation for this cube.",
