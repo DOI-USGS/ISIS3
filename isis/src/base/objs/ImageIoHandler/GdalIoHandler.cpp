@@ -23,7 +23,7 @@ namespace Isis {
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_geodataSetPath.c_str(), eAccess));
     if (!m_geodataSet) {
       QString msg = "Constructing GdalIoHandler failed. Unable to open [" + dataFilePath + "]";
-      throw IException(IException::Programmer, msg, _FILEINFO_);
+      throw IException(IException::Io, msg, _FILEINFO_);
     }
     m_datasetOwner = true;
     m_pixelType = pixelType;
@@ -47,6 +47,14 @@ namespace Isis {
     m_lines = m_geodataSet->GetRasterYSize();
     m_bands = m_geodataSet->GetRasterCount();
 
+    if (m_samples <= 0 || m_lines <= 0 || m_bands <= 0) {
+      QString msg = "Unable to initialize GdalIoHandler, one of samples, lines, or bands "
+                    "(" + m_samples + ", " + m_lines + ", " + m_bands + ") is non-positive."
+                    "The image attempting to be processed is likely a vector dataset rather than"
+                    "a raster dataset";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
+
     m_driverName = std::string(m_geodataSet->GetDriverName());
 
     // Check if we need to create the mask band
@@ -58,24 +66,20 @@ namespace Isis {
       }
     }
 
-    if (m_bands >= 1) {
-      GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
-      setBaseMultiplier(band->GetOffset(), band->GetScale());
-      int *pbSuccess = new int;
-      m_gdalNoDataValue = band->GetNoDataValue(pbSuccess);
-      if (!pbSuccess) {
-        m_gdalNoDataValue = NULL8;
-      }
-      delete pbSuccess;
+    GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
+    setBaseMultiplier(band->GetOffset(), band->GetScale());
+    int *pbSuccess = new int;
+    m_gdalNoDataValue = band->GetNoDataValue(pbSuccess);
+    if (!pbSuccess) {
+      m_gdalNoDataValue = NULL8;
     }
+    delete pbSuccess;
   }
 
   GdalIoHandler::~GdalIoHandler() {
-    if (m_bands >= 1) {
-      GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
-      band->SetOffset(m_base);
-      band->SetScale(m_multiplier);
-    }
+    GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
+    band->SetOffset(m_base);
+    band->SetScale(m_multiplier);
     clearCache();
     if (m_maskBuff) {
       delete m_maskBuff;
