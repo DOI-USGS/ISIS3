@@ -21,6 +21,10 @@ namespace Isis {
                  ImageIoHandler(virtualBandList) {
     m_geodataSetPath = dataFilePath.toUtf8().constData();
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_geodataSetPath.c_str(), eAccess));
+    if (!m_geodataSet) {
+      QString msg = "Constructing GdalIoHandler failed. Unable to open [" + dataFilePath + "]";
+      throw IException(IException::Programmer, msg, _FILEINFO_);
+    }
     m_datasetOwner = true;
     m_pixelType = pixelType;
     init();
