@@ -540,11 +540,10 @@ namespace Isis {
       core.addGroup(ptype);
     }
     else if (labelsAttached() == LabelAttachment::ExternalLabel) {
-      imageFile = imageFile.addExtension("ecub");
+      m_labelFileName = new FileName(imageFile.addExtension("ecub"));
+      m_labelFile = new QFile(m_labelFileName->expanded());
       if (!m_dataFileName) {
         if (format() == Bsq || format() == Tile) {
-          imageFile = imageFile.setExtension("cub");
-
           Pvl dnLabel;
           PvlObject isiscube("IsisCube");
           PvlObject dnCore(core);
@@ -557,6 +556,7 @@ namespace Isis {
           isiscube.addObject(dnCore);
           dnLabel.addObject(isiscube);
 
+          imageFile = imageFile.setExtension("cub");
           Cube dnCube;
           dnCube.fromLabel(imageFile, dnLabel, "rw");
           dnCube.close();
@@ -565,18 +565,10 @@ namespace Isis {
           imageFile = imageFile.setExtension("tif");
         }
         m_dataFileName = new FileName(imageFile);
-        
-        imageFile = imageFile.setExtension("ecub");
-        FileName labelFileName(imageFile);
-        m_labelFileName = new FileName(labelFileName);
-        m_labelFile = new QFile(m_labelFileName->expanded());
       }
 
       core += PvlKeyword("^DnFile", m_dataFileName->name());
       m_dataFile = new QFile(m_dataFileName->expanded());
-
-      m_labelFileName = new FileName(imageFile);
-      m_labelFile = new QFile(m_labelFileName->expanded());
     }
     else {
       QString msg = "Label type [" + LabelAttachmentName(labelsAttached()) + "] not supported";
@@ -1069,6 +1061,7 @@ namespace Isis {
         QMutexLocker locker2(m_ioHandler->dataFileMutex());
         blob.Read(cubeFile.toString(), *label(), keywords);
       }
+      m_blobMap[blob.Key()] = blob;
     }
   }
 
@@ -2261,26 +2254,11 @@ namespace Isis {
           m_label->deleteObject(i);
           QString key = BlobType + "_" + BlobName;
 
-          if (gdalDataset()) {
-            CPLStringList metadata = CPLStringList(gdalDataset()->GetMetadata("json:ISIS3"), false);
-            const char *metadataJsonString = metadata[0];
-            nlohmann::ordered_json jsonblob = nlohmann::ordered_json::parse(metadataJsonString);
-
-            bool keyErased = jsonblob.erase(key.toStdString());
-            string jsonblobstr = jsonblob.dump();
-
-            char **outputMetadata = new char*[1];
-            outputMetadata[0] = jsonblobstr.data();
-            gdalDataset()->SetMetadata(outputMetadata, "json:ISIS3");
-            delete []outputMetadata;
-            
-            return keyErased;
-          }
-
           if (m_blobMap.contains(key)) {
             m_blobMap.remove(key);
             m_blobQueue.removeOne(key);
           }
+
           return true;
         }
       }
@@ -2472,6 +2450,9 @@ namespace Isis {
 
     delete m_virtualBandList;
     m_virtualBandList = NULL;
+
+    m_blobMap.clear();
+    m_blobQueue.clear();
 
     initialize();
   }
@@ -2975,25 +2956,9 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
     
-    if (m_format == Format::GTiff) {
+    if (m_format == Format::GTiff && labelsAttached() == LabelAttachment::AttachedLabel) {
 
-      nlohmann::ordered_json jsonOut;
-
-      // Check for existing data, if there is data update it
-      CPLStringList metadata = CPLStringList(gdalDataset()->GetMetadata("json:ISIS3"), false);
-
-      if (metadata[0] != nullptr) {
-        const char *metadataJsonString = metadata[0];
-        jsonOut = nlohmann::ordered_json::parse(metadataJsonString);
-      }
-
-      // update metadata
       nlohmann::ordered_json jsonblob = this->label()->toJson()["Root"];
-      for (auto& [key, val] : jsonblob.items()) {
-        if (!val.contains("Bytes") || key == "Label") {
-          jsonOut[key] = val;
-        }
-      }
 
       for (QString blobKey : m_blobQueue) {
         Blob &blob = m_blobMap[blobKey];
@@ -3001,11 +2966,11 @@ namespace Isis {
         std::string blobJsonStr = "{}";
         blob.WriteGdal(blobJsonStr);
         nlohmann::ordered_json blobJson = nlohmann::ordered_json::parse(blobJsonStr);
-        jsonOut.update(blobJson);
+        jsonblob.update(blobJson);
       }
-      m_blobMap.clear();
+
       m_blobQueue.clear();
-      std::string jsonOutStr = jsonOut.dump();
+      std::string jsonOutStr = jsonblob.dump();
 
       char ** outputMetadata = new char*[1];
       outputMetadata[0] = jsonOutStr.data();
@@ -3104,7 +3069,6 @@ namespace Isis {
         }
         stream.flush();
       }
-      m_blobMap.clear();
       m_blobQueue.clear();
       stream.close();
 

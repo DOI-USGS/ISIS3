@@ -850,6 +850,30 @@ TEST_F(CSMCubeFixture, TestCubeDeleteBlob) {
   EXPECT_FALSE(testCube->hasBlob("CSMState", "String"));
 }
 
+TEST_F(SmallCube, TestCubeAltDeleteBlob) {
+  EXPECT_FALSE(testCube->hasBlob("UnitTest", "Blob"));
+
+  Blob b("UnitTest", "Blob");
+  char buf[] = {"ABCD"};
+  b.setData(buf, 4);
+  testCube->write(b);
+  EXPECT_TRUE(testCube->hasBlob("UnitTest", "Blob"));
+  testCube->deleteBlob("UnitTest", "Blob");
+  EXPECT_FALSE(testCube->hasBlob("UnitTest", "Blob"));
+
+  testCube->write(b);
+  EXPECT_TRUE(testCube->hasBlob("UnitTest", "Blob"));
+
+  testCube->reopen("rw");
+  EXPECT_TRUE(testCube->hasBlob("UnitTest", "Blob"));
+
+  testCube->deleteBlob("UnitTest", "Blob");
+  EXPECT_FALSE(testCube->hasBlob("UnitTest", "Blob"));
+
+  testCube->reopen("rw");
+  EXPECT_FALSE(testCube->hasBlob("UnitTest", "Blob"));
+}
+
 TEST_F(TempTestingFiles, TestCubeCreateWriteCopy) {
   Cube out;
   QString file = "";
