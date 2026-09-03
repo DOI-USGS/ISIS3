@@ -58,17 +58,24 @@ namespace Isis {
       }
     }
 
-    GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
-    setBaseMultiplier(band->GetOffset(), band->GetScale());
-    int *pbSuccess = new int;
-    m_gdalNoDataValue = band->GetNoDataValue(pbSuccess);
-    if (!pbSuccess) {
-      m_gdalNoDataValue = NULL8;
+    if (m_bands >= 1) {
+      GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
+      setBaseMultiplier(band->GetOffset(), band->GetScale());
+      int *pbSuccess = new int;
+      m_gdalNoDataValue = band->GetNoDataValue(pbSuccess);
+      if (!pbSuccess) {
+        m_gdalNoDataValue = NULL8;
+      }
+      delete pbSuccess;
     }
-    delete pbSuccess;
   }
 
   GdalIoHandler::~GdalIoHandler() {
+    if (m_bands >= 1) {
+      GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
+      band->SetOffset(m_base);
+      band->SetScale(m_multiplier);
+    }
     clearCache();
     if (m_maskBuff) {
       delete m_maskBuff;
