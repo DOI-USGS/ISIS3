@@ -21,6 +21,10 @@ namespace Isis {
                  ImageIoHandler(virtualBandList) {
     m_geodataSetPath = dataFilePath.toUtf8().constData();
     m_geodataSet = GDALDataset::FromHandle(GDALOpen(m_geodataSetPath.c_str(), eAccess));
+    if (!m_geodataSet) {
+      QString msg = "Constructing GdalIoHandler failed. Unable to open [" + dataFilePath + "]";
+      throw IException(IException::Io, msg, _FILEINFO_);
+    }
     m_datasetOwner = true;
     m_pixelType = pixelType;
     init();
@@ -42,6 +46,14 @@ namespace Isis {
     m_samples = m_geodataSet->GetRasterXSize();
     m_lines = m_geodataSet->GetRasterYSize();
     m_bands = m_geodataSet->GetRasterCount();
+
+    if (m_samples <= 0 || m_lines <= 0 || m_bands <= 0) {
+      QString msg = "Unable to initialize GdalIoHandler, one of samples, lines, or bands "
+                    "(" + m_samples + ", " + m_lines + ", " + m_bands + ") is non-positive."
+                    "The dataset attempting to be processed is likely a vector dataset rather than"
+                    "a raster dataset";
+      throw IException(IException::Unknown, msg, _FILEINFO_);
+    }
 
     m_driverName = std::string(m_geodataSet->GetDriverName());
 

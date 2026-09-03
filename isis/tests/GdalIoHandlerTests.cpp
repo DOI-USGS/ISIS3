@@ -17,6 +17,18 @@ using json = nlohmann::json;
 #include "gmock/gmock.h"
 
 using namespace Isis;
+using ::testing::HasSubstr;
+
+TEST(GdalIoHandler, GdalIoTestsOpenBadFile) {
+  try {
+    QString file = "Badfile.tiff";
+    GdalIoHandler handler(file, nullptr, GDT_Byte, GA_Update);
+    FAIL() << "Should throw an exception" << std::endl;
+  }
+  catch (IException &e) {
+    EXPECT_THAT(e.what(), HasSubstr("Constructing GdalIoHandler failed. Unable to open [Badfile.tiff]"));
+  }
+}
 
 TEST_F(ReadWriteTiff, GdalIoTestsDefaulWrite) {
   PixelType isisPixelType = Double;
