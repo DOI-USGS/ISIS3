@@ -156,6 +156,10 @@ namespace Isis {
 
   CubeAttributeOutput::CubeAttributeOutput(const FileName &fileName)
       : CubeAttribute<CubeAttributeOutput>(testers(), fileName) {
+    if (propagateFileFormat()) {
+      QString ext = fileName.extension().toLower();
+      setFileFormat(ext);
+    }
   }
 
 
@@ -317,6 +321,18 @@ namespace Isis {
     }
   }
 
+  void CubeAttributeOutput::setFileFormat(const QString &ext) {
+    if (!Preference::Preferences().autodetectFileFormat()) {
+      return;
+    }
+
+    if (ext == "cub") {
+      setFileFormat(Cube::Tile);
+    }
+    else if (ext == "tiff" || ext == "tif") {
+      setFileFormat(Cube::GTiff);
+    }
+  }
 
   double CubeAttributeOutput::minimum() const {
     double result = Null;

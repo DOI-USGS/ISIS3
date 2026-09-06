@@ -63,8 +63,7 @@ void IsisMain() {
   utcTime = (QString)pdsLabel["START_TIME"];
 
   // Setup the output cube attributes for a 16-bit unsigned tiff
-  Isis::CubeAttributeOutput cao;
-  cao.setPixelType(Isis::Real);
+  Isis::CubeAttributeOutput cao = ui.GetOutputAttribute("TO");
   p.SetOutputCube(toFile.expanded(), cao);
 
   // Import image
