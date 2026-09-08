@@ -26,8 +26,8 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraNacTest) {
 
   // Upper Left
   EXPECT_TRUE(cam->SetImage(1, 1));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), -11.78444755310951);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 65.533947871409154);
+  EXPECT_NEAR(cam->UniversalLatitude(), -11.78444755310951, 1e-12);
+  EXPECT_NEAR(cam->UniversalLongitude(), 65.533947871409154, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 1, 0.001);
   EXPECT_NEAR(cam->Line(), 1, 0.001);
@@ -42,16 +42,16 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraNacTest) {
 
   // Lower Right
   EXPECT_TRUE(cam->SetImage(4096, 1000));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), -15.365515626386125);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 64.055880485639165);
+  EXPECT_NEAR(cam->UniversalLatitude(), -15.365515626386125, 1e-12);
+  EXPECT_NEAR(cam->UniversalLongitude(), 64.055880485639165, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 4096, 0.001);
   EXPECT_NEAR(cam->Line(), 1000, 0.001);
 
   // Lower Left
   EXPECT_TRUE(cam->SetImage(4096, 1));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), -15.402769964247618);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 64.134350621554276);
+  EXPECT_NEAR(cam->UniversalLatitude(), -15.402769964247618, 1e-12);
+  EXPECT_NEAR(cam->UniversalLongitude(), 64.134350621554276, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 4096, 0.001);
   EXPECT_NEAR(cam->Line(), 1, 0.001);
@@ -77,8 +77,8 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraWacTest) {
 
   // Top
   EXPECT_TRUE(cam->SetImage(2130, 30));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(),  -15.171650787132243);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 64.211656461414719);
+  EXPECT_NEAR(cam->UniversalLatitude(),  -15.171650787132243, 1e-12);
+  EXPECT_NEAR(cam->UniversalLongitude(), 64.211656461414719, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 2130, 0.001);
   EXPECT_NEAR(cam->Line(), 30, 0.0035);
@@ -93,8 +93,8 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraWacTest) {
 
   // Right
   EXPECT_TRUE(cam->SetImage(3580, 1024));
-  EXPECT_DOUBLE_EQ(cam->UniversalLatitude(), -48.907947401273326);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 45.124328413917269);
+  EXPECT_NEAR(cam->UniversalLatitude(), -48.907947401273326, 1e-12);
+  EXPECT_NEAR(cam->UniversalLongitude(), 45.124328413917269, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 3580, 0.001);
   EXPECT_NEAR(cam->Line(), 1024, 0.037);
@@ -102,7 +102,7 @@ TEST_F(ClipperPbCube, ClipperPushBroomCameraWacTest) {
   // Left
   EXPECT_TRUE(cam->SetImage(544, 1024));
   EXPECT_NEAR(cam->UniversalLatitude(), 21.737113033236419, 4.3e-14);
-  EXPECT_DOUBLE_EQ(cam->UniversalLongitude(), 78.157998184264912);
+  EXPECT_NEAR(cam->UniversalLongitude(), 78.157998184264912, 1e-12);
   EXPECT_TRUE(cam->SetUniversalGround(cam->UniversalLatitude(), cam->UniversalLongitude()));
   EXPECT_NEAR(cam->Sample(), 544, 0.001);
   EXPECT_NEAR(cam->Line(), 1024, 0.034);
