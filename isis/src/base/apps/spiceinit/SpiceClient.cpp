@@ -4,6 +4,9 @@
 
 #include <QDomElement>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -207,7 +210,28 @@ namespace Isis {
         }
       }
       catch(IException &) {
-        if (reply->error() != QNetworkReply::NoError) {
+        // The response wasn't hex-encoded XML or PVL. The current web
+        // service reports errors as JSON: {"body": {"error": "..."}}.
+        // Try to pull that message out before falling back to a generic
+        // network-error description.
+        QString serverError;
+        QJsonParseError jsonError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(p_rawResponse->toUtf8(), &jsonError);
+        if (jsonError.error == QJsonParseError::NoError && jsonDoc.isObject()) {
+          QJsonValue body = jsonDoc.object().value("body");
+          if (body.isObject()) {
+            serverError = body.toObject().value("error").toString();
+            std::cout << "serverError=" << serverError << std::endl;
+          }
+        }
+
+        if (!serverError.isEmpty()) {
+          std::cout << "serverError is not empty" << std::endl;
+          *p_error = "spiceserver was unable to initialize the cube.  "
+                     "The error reported was: ";
+          *p_error += serverError;
+        }
+        else if (reply->error() != QNetworkReply::NoError) {
           *p_error = "An error occurred when talking to the server";
 
           switch (reply->error()) {
@@ -350,6 +374,14 @@ namespace Isis {
               break;
           }
 
+          // Include the raw server response, which often carries the actual
+          // cause and a request hash for correlating with the server logs.
+          if (!p_rawResponse->isEmpty()) {
+            std::cout << "p_rawResponse is not empty" << std::endl;
+            *p_error += " [";
+            *p_error += *p_rawResponse;
+            *p_error += "]";
+          }
         }
         else {
           // Well, we really don't know what this is.
