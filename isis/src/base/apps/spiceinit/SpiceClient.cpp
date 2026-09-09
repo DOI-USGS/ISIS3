@@ -372,8 +372,8 @@ namespace Isis {
               break;
           }
 
-          // Include the raw server response, which often carries the actual
-          // cause and a request hash for correlating with the server logs.
+          // As a last resort, include the raw server response, which may
+          // carry the actual cause when the body wasn't parseable.
           if (!p_rawResponse->isEmpty()) {
             *p_error += " [";
             *p_error += *p_rawResponse;
