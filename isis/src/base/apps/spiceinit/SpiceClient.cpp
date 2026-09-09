@@ -221,12 +221,10 @@ namespace Isis {
           QJsonValue body = jsonDoc.object().value("body");
           if (body.isObject()) {
             serverError = body.toObject().value("error").toString();
-            std::cout << "serverError=" << serverError << std::endl;
           }
         }
 
         if (!serverError.isEmpty()) {
-          std::cout << "serverError is not empty" << std::endl;
           *p_error = "spiceserver was unable to initialize the cube.  "
                      "The error reported was: ";
           *p_error += serverError;
@@ -377,7 +375,6 @@ namespace Isis {
           // Include the raw server response, which often carries the actual
           // cause and a request hash for correlating with the server logs.
           if (!p_rawResponse->isEmpty()) {
-            std::cout << "p_rawResponse is not empty" << std::endl;
             *p_error += " [";
             *p_error += *p_rawResponse;
             *p_error += "]";
