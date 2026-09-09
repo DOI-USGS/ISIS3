@@ -611,7 +611,8 @@ namespace Isis {
                                       QMessageBox::Ok | QMessageBox::Abort,
                                       QMessageBox::Ok);
     p_errorString.clear();
-    return status;
+    bool shouldExit = status != QMessageBox::Ok;
+    return shouldExit;
   }
 
   //! Write text to the gui log
