@@ -99,14 +99,14 @@ namespace Isis {
    *
    * @param model DSK plate model from an existing NaidDskPlateModel (see the
    *              model() method
+   * @param target Pass a target to enable full implementation of this shape
+   *               model using this constructor
    */
-  NaifDskShape::NaifDskShape(const NaifDskPlateModel &model) :
-                                       m_model(model), m_intercept(NULL) {
-
-    // TODO create valid Target
-    // Using this constructor, ellipsoidNormal(),
-    // calculateSurfaceNormal(), and setLocalNormalFromIntercept()
-    // methods can not be called
+  NaifDskShape::NaifDskShape(const NaifDskPlateModel &model, Target *target ) :
+                             ShapeModel( target ), 
+                             m_model(model), 
+                             m_intercept(NULL) {
+    setName("DSK");  // Really is used as type in the system at present!
   }
 
 
@@ -142,6 +142,7 @@ namespace Isis {
     if (success) {
       SurfacePoint point = m_intercept->location();
       setSurfacePoint(point); // sets ShapeModel::m_hasIntersection=t, ShapeModel::m_hasNormal=f
+      setLocalNormalFromIntercept();
     }
     return ( success );
   }
@@ -294,6 +295,33 @@ namespace Isis {
    */
   const Intercept *NaifDskShape::intercept() const {
     return ( m_intercept.data() );
+  }
+
+  /**
+   * @brief Returns the plate index (0-based for consistency) of the intercept
+   * 
+   * This method will return the plate index of the surface intercept facet
+   * determined from the NAIF toolkit. 
+   * 
+   * A 0-based index is returned to maintain consistency with other shape models
+   * that return a 0-based index. To convert this to a real plate ID you can add
+   * 1 to the value returned. 
+   * 
+   * Returned values greater that 0 and less or equal to the number of plates
+   * minus 1 are valid numbers (see NaifDskShapeModel::isPlateIdValid).
+   * 
+   * @return int Returns the plate index of the intercept. Returns a -1 if there
+   *               is no intercept or its invalid.
+   */
+  int NaifDskShape::plate_index() const {
+    if ( nullptr != this->intercept() ) {
+      const TriangularPlate *dsk_plate = dynamic_cast<const TriangularPlate *> ( this->intercept()->shape() );
+      if ( nullptr != dsk_plate ) {
+        return ( dsk_plate->id() - 1 );
+      }
+    }
+
+    return ( -1 );
   }
 
 }; // namespace Isis 
