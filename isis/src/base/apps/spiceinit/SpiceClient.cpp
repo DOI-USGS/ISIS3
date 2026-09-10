@@ -4,6 +4,9 @@
 
 #include <QDomElement>
 #include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -207,7 +210,32 @@ namespace Isis {
         }
       }
       catch(IException &) {
-        if (reply->error() != QNetworkReply::NoError) {
+        // The response wasn't hex-encoded XML or PVL. The current web
+        // service reports errors as JSON: {"body": {"error": "..."}}.
+        // Try to pull that message out before falling back to a generic
+        // network-error description.
+        QString serverError;
+        QJsonParseError jsonError;
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(p_rawResponse->toUtf8(), &jsonError);
+        if (jsonError.error == QJsonParseError::NoError && jsonDoc.isObject()) {
+          QJsonValue body = jsonDoc.object().value("body");
+          if (body.isObject()) {
+            serverError = body.toObject().value("error").toString();
+          }
+        }
+
+        int httpStatusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
+        if (!serverError.isEmpty()) {
+          *p_error = "spiceserver was unable to initialize the cube.  "
+                     "The error reported was: ";
+          *p_error += serverError;
+
+          if (httpStatusCode > 0) {
+            *p_error += QString(" (HTTP status code %1)").arg(httpStatusCode);
+          }
+        }
+        else if (reply->error() != QNetworkReply::NoError) {
           *p_error = "An error occurred when talking to the server";
 
           switch (reply->error()) {
@@ -350,6 +378,17 @@ namespace Isis {
               break;
           }
 
+          if (httpStatusCode > 0) {
+            *p_error += QString(" (HTTP status code %1)").arg(httpStatusCode);
+          }
+
+          // As a last resort, include the raw server response, which may
+          // carry the actual cause when the body wasn't parseable.
+          if (!p_rawResponse->isEmpty()) {
+            *p_error += " [";
+            *p_error += *p_rawResponse;
+            *p_error += "]";
+          }
         }
         else {
           // Well, we really don't know what this is.
