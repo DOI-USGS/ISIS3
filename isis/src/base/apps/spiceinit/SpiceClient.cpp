@@ -224,10 +224,16 @@ namespace Isis {
           }
         }
 
+        int httpStatusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+
         if (!serverError.isEmpty()) {
           *p_error = "spiceserver was unable to initialize the cube.  "
                      "The error reported was: ";
           *p_error += serverError;
+
+          if (httpStatusCode > 0) {
+            *p_error += QString(" (HTTP status code %1)").arg(httpStatusCode);
+          }
         }
         else if (reply->error() != QNetworkReply::NoError) {
           *p_error = "An error occurred when talking to the server";
@@ -370,6 +376,10 @@ namespace Isis {
             case QNetworkReply::UnknownServerError:
               *p_error += ". An unknown error related to the server occurred.";
               break;
+          }
+
+          if (httpStatusCode > 0) {
+            *p_error += QString(" (HTTP status code %1)").arg(httpStatusCode);
           }
 
           // As a last resort, include the raw server response, which may
