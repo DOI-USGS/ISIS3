@@ -47,7 +47,8 @@ namespace Isis{
     *  @history 2016-09-19 Victor Silva - Adapted from lrowacpho written by Kris Becker
     *	 @history 2021-03-12 Victor Silva - Updates"PostCall" include ability to run with default values
     * 																			Added new values for 2019 version of LROC Empirical function.
-    *  @history 2022-04-18 Victor Silva - Refactored to make callable for GTest framework                                   
+    *  @history 2022-04-18 Victor Silva - Refactored to make callable for GTest framework
+    *  @history 2026-09-11 Cordell Michaud - Fixed error when opening a backplane cube.
     *
     * @param iCube The input cube to be photometrically corrected.
     * @param ui The user interfact to parse the parameters from. 
@@ -64,7 +65,7 @@ namespace Isis{
       CubeAttributeInput backplaneCai = ui.GetInputAttribute("BACKPLANE");
 
       Cube bpCube;
-      bpCube.open(ui.GetFileName("BACKPLANE"));
+      bpCube.open(ui.GetCubeName("BACKPLANE"));
       int bpBands = bpCube.bandCount();
       bpCube.close();
 
@@ -81,11 +82,11 @@ namespace Isis{
 
       CubeAttributeInput cai;
       bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[0]) : cai.setAttributes("+1" ) ;
-      p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+      p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
       bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[1]) : cai.setAttributes("+2" ) ;
-      p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+      p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
       bpCaiBands == 3 ? cai.setAttributes("+" + backplaneCai.bands()[2]) : cai.setAttributes("+3" ) ;
-      p.SetInputCube(ui.GetFileName("BACKPLANE"), cai);
+      p.SetInputCube(ui.GetCubeName("BACKPLANE"), cai);
 
       useBackplane = true;
     }
