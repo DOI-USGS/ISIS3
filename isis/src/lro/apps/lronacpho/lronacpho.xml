@@ -129,6 +129,9 @@
       Included ability to run with default pvl values
       Added new values for 2019 version of LROC Empirical function
     </change>
+    <change name="Cordell Michaud" date="2026-09-11">
+      Fixed error when opening a backplane cube.
+    </change>
   </history>
 
   <category>
