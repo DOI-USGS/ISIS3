@@ -179,9 +179,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitBullet ) {
   const psmrts::PsmrtsPriorityTracer &priority_t = psmrts_t->tracer();
   ASSERT_EQ( priority_t.size(), 1 );
   
-  EXPECT_STREQ( priority_t.tracers()[0].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[0].model().c_str(), "bullet" );
-  EXPECT_EQ( priority_t.tracers()[0].name(),  bennu_t);
+  EXPECT_STREQ( priority_t.tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[0]->model().c_str(), "bullet" );
+  EXPECT_EQ( priority_t.tracers()[0]->name(),  bennu_t);
 
 }
 
@@ -217,9 +217,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitNaifDsk ) {
   const psmrts::PsmrtsPriorityTracer &priority_t = psmrts_t->tracer();
   ASSERT_EQ( priority_t.size(), 1 );
   
-  EXPECT_STREQ( priority_t.tracers()[0].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[0].model().c_str(), "naifdsk" );
-  // EXPECT_EQ( priority_t.tracers()[0].name(),  bennu_t.toStdString() );
+  EXPECT_STREQ( priority_t.tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[0]->model().c_str(), "naifdsk" );
+  // EXPECT_EQ( priority_t.tracers()[0]->name(),  bennu_t.toStdString() );
 
 }
 
@@ -254,9 +254,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitEllipsoid ) {
   const psmrts::PsmrtsPriorityTracer &priority_t = psmrts_t->tracer();
   ASSERT_EQ( priority_t.size(), 1 );
   
-  EXPECT_STREQ( priority_t.tracers()[0].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[0].model().c_str(), "ellipsoid" );
-  EXPECT_EQ( priority_t.tracers()[0].name(),  bennu_t.toStdString() );
+  EXPECT_STREQ( priority_t.tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[0]->model().c_str(), "ellipsoid" );
+  EXPECT_EQ( priority_t.tracers()[0]->name(),  bennu_t.toStdString() );
 
 }
 
@@ -291,9 +291,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitSpheroid ) {
   const psmrts::PsmrtsPriorityTracer &priority_t = psmrts_t->tracer();
   ASSERT_EQ( priority_t.size(), 1 );
   
-  EXPECT_STREQ( priority_t.tracers()[0].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[0].model().c_str(), "ellipsoid" );
-  EXPECT_EQ( priority_t.tracers()[0].name(),  bennu_t.toStdString() );
+  EXPECT_STREQ( priority_t.tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[0]->model().c_str(), "ellipsoid" );
+  EXPECT_EQ( priority_t.tracers()[0]->name(),  bennu_t.toStdString() );
 
 }
 
@@ -409,17 +409,17 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitPriorityTest ) {
   const psmrts::PsmrtsPriorityTracer &priority_t = psmrts_t->tracer();
   ASSERT_EQ( priority_t.size(), 3 );
   
-  EXPECT_STREQ( priority_t.tracers()[0].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[1].type().c_str(),  "tracer" );
-  EXPECT_STREQ( priority_t.tracers()[2].type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[1]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( priority_t.tracers()[2]->type().c_str(),  "tracer" );
 
-  EXPECT_STREQ( priority_t.tracers()[0].model().c_str(), "naifdsk" );
-  EXPECT_STREQ( priority_t.tracers()[1].model().c_str(), "bullet" );
-  EXPECT_STREQ( priority_t.tracers()[2].model().c_str(), "ellipsoid" );
+  EXPECT_STREQ( priority_t.tracers()[0]->model().c_str(), "naifdsk" );
+  EXPECT_STREQ( priority_t.tracers()[1]->model().c_str(), "bullet" );
+  EXPECT_STREQ( priority_t.tracers()[2]->model().c_str(), "ellipsoid" );
 
-  // EXPECT_EQ( priority_t.tracers()[0].name(),  bennu_list[1].toStdString() );
-  EXPECT_EQ( priority_t.tracers()[1].name(),  bennu_list[2].toStdString() );
-  EXPECT_EQ( priority_t.tracers()[2].name(),  bennu_list[3].toStdString() );
+  // EXPECT_EQ( priority_t.tracers()[0]->name(),  bennu_list[1].toStdString() );
+  EXPECT_EQ( priority_t.tracers()[1]->name(),  bennu_list[2].toStdString() );
+  EXPECT_EQ( priority_t.tracers()[2]->name(),  bennu_list[3].toStdString() );
 
   // Lets trace the center pixel and see which tracer we get
   EXPECT_TRUE( camera_t->SetImage( 512.0, 512.0 ) );
@@ -427,7 +427,7 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitPriorityTest ) {
   EXPECT_TRUE( ray_sl.hasHit() );
   EXPECT_TRUE( ray_sl.isValid() );
   auto tracer_at_intercept = psmrts_t->tracer().get_tracer( ray_sl.trace() );
-  EXPECT_EQ( tracer_at_intercept.model(), "bullet" );
+  EXPECT_EQ( tracer_at_intercept->model(), "bullet" );
 
   // Now go the other way
   Eigen::Vector3d llr = psmrts::xyz_to_lonlatrad_d (ray_sl.trace().xyz() );
@@ -436,7 +436,7 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitPriorityTest ) {
   EXPECT_TRUE( ray_llr.hasHit() );
   EXPECT_TRUE( ray_llr.isValid() );
   auto tracer_at_intercept_llr = psmrts_t->tracer().get_tracer( ray_llr.trace() );
-  EXPECT_EQ( tracer_at_intercept_llr.model(), "bullet" );
+  EXPECT_EQ( tracer_at_intercept_llr->model(), "bullet" );
   EXPECT_TRUE( ray_sl.trace().isNear( ray_llr.trace(), 0.00001 ) );
 
   EXPECT_NEAR( camera_t->Sample(), 512.0, 0.00001 );

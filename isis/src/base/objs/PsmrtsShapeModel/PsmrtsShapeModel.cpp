@@ -274,12 +274,12 @@ namespace Isis {
       std::cout << "ShapeRayCount:  " << m_shape_ray_t.tracker().count() << std::endl;
       std::cout << "LatLotRayCount: " << m_latlon_ray_t.tracker().count() << std::endl;
       for ( const auto &tracer : m_tracer.tracers() ) {
-        auto uid = tracer.uid();
+        auto uid = tracer->uid();
         std::cout << "\nTracerUid:   " << uid << std::endl;
-        std::cout << "Name:        " << tracer.name() << std::endl;
-        std::cout << "Type:        " << tracer.type() << std::endl;
-        std::cout << "Model:       " << tracer.model() << std::endl;
-        auto tracker_t = tracer.product().timestamp();
+        std::cout << "Name:        " << tracer->name() << std::endl;
+        std::cout << "Type:        " << tracer->type() << std::endl;
+        std::cout << "Model:       " << tracer->model() << std::endl;
+        auto tracker_t = tracer->product().timestamp();
         std::cout << "TraceCount:  " << tracker_t.count() << std::endl;
         std::cout << "RunTime (s): " << tracker_t.runtime_s() << std::endl;
       }      
@@ -863,10 +863,10 @@ namespace Isis {
       return ( nullptr );
     }
 
-    auto print_vector = [&] ( const std::string &tag, auto &v ) { 
+    auto print_vector = [&] ( const std::string &tag, const auto &v ) { 
       std::cout << tag;
       for ( const auto &v_t : v ) {
-        std::cout << " " << v_t.uid();
+        std::cout << " " << v_t->uid();
       }
       std::cout << std::endl;
     };
@@ -874,17 +874,17 @@ namespace Isis {
     // Success! Return the shape model.
     if ( model_t->isDebug() || pref_shapemodel_override ) {
       std::cout << "PsmrtsShapeModel::create() done!" << std::endl;
-      std::cout << "FactoryShapeCount:  " << psmrts::PsmrtsFactory().shapes().size() << std::endl;
-      std::cout << "FactoryTracerCount: " << psmrts::PsmrtsFactory().tracers().size() << std::endl;
+      std::cout << "FactoryShapeCount:  " << psmrts::PsmrtsFactory().shape_count() << std::endl;
+      std::cout << "FactoryTracerCount: " << psmrts::PsmrtsFactory().tracer_count() << std::endl;
       print_vector( "TracerIds: ", model_t->tracer().tracers() );
       for ( const auto &tracer : model_t->tracer().tracers() ) {
-        auto uid = tracer.uid();
+        auto uid = tracer->uid();
         std::cout << "\nTracerUid: " << uid << std::endl;
-        std::cout << "Name:      " << tracer.name() << std::endl;
-        std::cout << "Type:      " << tracer.type() << std::endl;
-        std::cout << "Model:     " << tracer.model() << std::endl;
-        std::cout << "Config:    " << tracer.config().to_json().dump(-1) << std::endl;
-        std::cout << "Tracer:    " << model_t->tracer().inventory().find( uid ).name() << std::endl << std::endl;
+        std::cout << "Name:      " << tracer->name() << std::endl;
+        std::cout << "Type:      " << tracer->type() << std::endl;
+        std::cout << "Model:     " << tracer->model() << std::endl;
+        std::cout << "Config:    " << tracer->config().to_json().dump(-1) << std::endl;
+        std::cout << "Tracer:    " << model_t->tracer().get_tracer( uid )->name() << std::endl << std::endl;
       }
     }
 
