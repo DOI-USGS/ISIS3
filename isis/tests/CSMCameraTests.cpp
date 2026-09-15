@@ -492,6 +492,30 @@ TEST(CSMSerialNumber, SerialNumberListNoDuplicateFromCsmInfo) {
 }
 
 
+// Some cubes have a recognized ISIS instrument label but no matching
+// <mission><instrument>SerialNumber.trn (for example Rosetta Osiris or Hayabusa
+// Nirs). The instrument-based serial number then cannot be built. When such a cube
+// also has a CSM sensor model, the serial number must fall back to the CSM serial
+// number rather than yield "Unknown" and be rejected by jigsaw. This test gives an
+// MGS cube a recognized-but-untranslatable instrument (Rosetta Osiris) together with
+// a CsmInfo group and checks the CSM serial number is produced.
+TEST(CSMSerialNumber, FallBackToCsmWhenInstrumentHasNoTranslation) {
+  Pvl label(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
+  PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");
+  inst.addKeyword(PvlKeyword("SpacecraftName", "ROSETTA-ORBITER"), PvlContainer::Replace);
+  inst.addKeyword(PvlKeyword("InstrumentId", "OSINAC"), PvlContainer::Replace);
+
+  PvlGroup csmInfo("CsmInfo");
+  csmInfo += PvlKeyword("CSMPlatformID", "TestPlatform");
+  csmInfo += PvlKeyword("CSMInstrumentId", "TestInstrument");
+  csmInfo += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816");
+  label.findObject("IsisCube").addGroup(csmInfo);
+
+  QString sn = SerialNumber::Compose(label);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, sn, "TestPlatform/TestInstrument/2000-01-01T11:58:55.816");
+}
+
+
 TEST_F(CSMCameraFixture, CameraState) {
   std::string testString = "MockSensorModel\nTestModelState";
   EXPECT_CALL(mockModel, getModelState())
