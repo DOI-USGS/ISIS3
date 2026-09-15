@@ -432,6 +432,37 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplit) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[0], "2026 JAN 19 00:01:09.184464 TDB");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("File"), "data/kerneldbgen/tgoSplit.bsp");
+
+  // Test different datetime format
+  args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=tgoSplit_2.bsp",
+                           "reconsplit=DELIVERYDATE",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options2(APP_XML, args);
+  try {
+    kerneldbgen(options2);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to generate kernel db: " << e.what() << std::endl;
+  }
+
+  Pvl kerneldbPvl2(options2.GetFileName("TO"));
+
+  EXPECT_TRUE(kerneldbPvl2.hasObject("SpacecraftPosition"));
+  PvlObject &scPosition2 = kerneldbPvl2.findObject("SpacecraftPosition");
+
+  ASSERT_EQ(scPosition2.groups(), 2);
+
+  // Only predicted since the SPK comment datetime is 2016 Aug 19 which is outside
+  // the actual coverage window
+  PvlGroup predicted2 = scPosition2.group(1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("Type"), "Predicted");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("File"), "data/kerneldbgen/tgoSplit_2.bsp");
 }
 
 
