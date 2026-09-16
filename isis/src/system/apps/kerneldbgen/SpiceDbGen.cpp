@@ -318,8 +318,15 @@ double SpiceDbGen::DeliveryDate(FileName fileIn) {
   if (found == SPICETRUE) {
     // The date follows the phrase, which itself may be broken across two comment lines, so each
     // line is tested joined to the one before it as well as on its own
-    QRegularExpression re("Flight Dynamics team on\\s+"
-                          "(\\d{4}\\s+[A-Z][a-z]+\\s+\\d{1,2}|[A-Z][a-z]+\\s+\\d{1,2},\\s*\\d{4})");
+    // Acceptable formats:
+    // - Flight Dynamics team on August 19, 2016
+    // - Flight Dynamics team on 2016 Aug 19
+    // - OEM2SPK RUN DATE/TIME: 2016-08-19
+    QRegularExpression re("(?:Flight Dynamics team on\\s+|OEM2SPK RUN DATE/TIME:\\s+)"
+                          "([A-Z][a-z]+\\s+\\d{1,2},\\s*\\d{4}|"
+                          "\\d{4}\\s+[A-Z][a-z]+\\s+\\d{1,2}|"
+                          "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})");
+    
     SpiceChar commnt[1001];
     SpiceBoolean done(SPICEFALSE);
     SpiceInt n;

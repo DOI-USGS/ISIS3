@@ -399,6 +399,8 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenSpk) {
 
 TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplit) {
   QTemporaryDir prefix;
+
+  // Test datetime string: "Flight Dynamics team on January 20, 2026"
   QVector<QString> args = {"to="+ prefix.path() + "/kernel.db.pvl",
                            "type=SPK",
                            "recondir=data/kerneldbgen",
@@ -433,7 +435,7 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplit) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted.findKeyword("File"), "data/kerneldbgen/tgoSplit.bsp");
 
-  // Test different datetime format
+  // Test datetime string: "Flight Dynamics team on 2016 Aug 19"
   args = {"to="+ prefix.path() + "/kernel.db.pvl",
                            "type=SPK",
                            "recondir=data/kerneldbgen",
@@ -463,6 +465,42 @@ TEST(Kerneldbgen, FunctionalTestKerneldbgenReconSplit) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted2.findKeyword("File"), "data/kerneldbgen/tgoSplit_2.bsp");
+
+  // Test datetime format: "OEM2SPK RUN DATE/TIME: 2026-01-26"
+  args = {"to="+ prefix.path() + "/kernel.db.pvl",
+                           "type=SPK",
+                           "recondir=data/kerneldbgen",
+                           "reconfilter=tgoSplit_3.bsp",
+                           "reconsplit=DELIVERYDATE",
+                           "lsk=$base/kernels/lsk/naif0012.tls"};
+
+  UserInterface options3(APP_XML, args);
+  try {
+    kerneldbgen(options3);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to generate kernel db: " << e.what() << std::endl;
+  }
+
+  Pvl kerneldbPvl3(options3.GetFileName("TO"));
+
+  EXPECT_TRUE(kerneldbPvl3.hasObject("SpacecraftPosition"));
+  PvlObject &scPosition3 = kerneldbPvl3.findObject("SpacecraftPosition");
+
+  
+  ASSERT_EQ(scPosition3.groups(), 3);
+
+  PvlGroup recon3 = scPosition3.group(1);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon3.findKeyword("Type"), "Reconstructed");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon3.findKeyword("Time")[0], "2026 JAN 01 00:01:09.183920 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon3.findKeyword("Time")[1], "2026 JAN 19 10:00:41.184475 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, recon3.findKeyword("File"), "data/kerneldbgen/tgoSplit_3.bsp");
+
+  PvlGroup predicted3 = scPosition3.group(2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted3.findKeyword("Type"), "Predicted");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted3.findKeyword("Time")[0], "2026 JAN 19 10:00:41.184475 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted3.findKeyword("Time")[1], "2026 FEB 01 00:01:09.184785 TDB");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, predicted3.findKeyword("File"), "data/kerneldbgen/tgoSplit_3.bsp");
 }
 
 
