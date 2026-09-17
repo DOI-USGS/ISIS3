@@ -463,14 +463,8 @@ TEST_F(CSMCameraSetFixture, SerialNumber) {
 }
 
 
-// jigsaw reads its input cubes into a SerialNumberList, which requires a unique serial
-// number per cube. A cube run through csminit gains a CsmInfo group. If the serial
-// number is taken from that group (CSMPlatformID, CSMInstrumentId, ReferenceTime), two
-// images that share a reference time, as sub-images of a framing instrument do, receive
-// the same serial number, and SerialNumberList reports "Duplicate serial number" - the
-// failure jigsaw reports when reading such cubes (ISIS #5482, #4240). This test
-// replicates that mechanism: two distinct cubes given the same CsmInfo must still get
-// distinct, instrument-based serial numbers and both be added to the list.
+// Two distinct cubes given the same CsmInfo must still get distinct, instrument-based
+// serial numbers (ISIS #5482, #4240), else SerialNumberList reports a duplicate.
 TEST(CSMSerialNumber, SerialNumberListNoDuplicateFromCsmInfo) {
   Pvl labelA(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
   Pvl labelB(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub").expanded());
@@ -492,13 +486,8 @@ TEST(CSMSerialNumber, SerialNumberListNoDuplicateFromCsmInfo) {
 }
 
 
-// Some cubes have a recognized ISIS instrument label but no matching
-// <mission><instrument>SerialNumber.trn (for example Rosetta Osiris or Hayabusa
-// Nirs). The instrument-based serial number then cannot be built. When such a cube
-// also has a CSM sensor model, the serial number must fall back to the CSM serial
-// number rather than yield "Unknown" and be rejected by jigsaw. This test gives an
-// MGS cube a recognized-but-untranslatable instrument (Rosetta Osiris) together with
-// a CsmInfo group and checks the CSM serial number is produced.
+// A cube with a recognized instrument but no SerialNumber.trn (e.g. Rosetta Osiris)
+// plus a CSM model must fall back to the CSM serial number, not yield "Unknown".
 TEST(CSMSerialNumber, FallBackToCsmWhenInstrumentHasNoTranslation) {
   Pvl label(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
   PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");

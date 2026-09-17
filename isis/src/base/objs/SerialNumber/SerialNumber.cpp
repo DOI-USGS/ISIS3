@@ -116,8 +116,7 @@ namespace Isis {
         instrument = instrumentXlater.Translate("InstrumentName");
       }
       catch (IException &e) {
-        // Re-throw if there is no CSM fallback. Otherwise leave the mission and
-        // instrument empty so the CSM serial number is used below.
+        // No CSM fallback: re-throw. Otherwise fall through to the CSM serial number.
         if (!label.findObject("IsisCube").hasGroup("CsmInfo")) {
           throw IException(e, IException::Unknown,
                            "Unable to find a serial number translation for this cube.",
@@ -126,18 +125,12 @@ namespace Isis {
       }
     }
 
-    // A usable instrument-based serial number requires a recognized mission and
-    // instrument.
+    // A usable instrument serial number needs a recognized mission and instrument.
     bool instrumentUsable = !mission.isEmpty() && !instrument.isEmpty()
                             && instrument != "Unknown";
 
-    // Prefer the instrument-based serial number when the cube has a recognized ISIS
-    // instrument: it matches what spiceinit produces for the same cube, and unlike
-    // the CSM serial number (built only from CSMPlatformID, CSMInstrumentId, and
-    // ReferenceTime, which can be identical for multiple framelets of a framing
-    // instrument) it is unique per image. Use the CSM serial number only when there
-    // is no usable instrument serial: either no recognized ISIS instrument label, or
-    // a recognized instrument that has no serial number translation table.
+    // Prefer the per-image instrument serial number; the CSM serial number is not
+    // unique. Use CSM only when there is no usable instrument serial.
     bool hasCsm = label.findObject("IsisCube").hasGroup("CsmInfo");
     bool useCsm = hasCsm && !instrumentUsable;
 
