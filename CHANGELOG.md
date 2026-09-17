@@ -51,7 +51,6 @@ then run the `towncrier` utility to compile the change fragments into a chagelog
 
 ### Fixed
 
-- Fixed serial number generation for CSM cubes so jigsaw can read them ([#5482](https://github.com/DOI-USGS/ISIS3/issues/5482), [#4240](https://github.com/DOI-USGS/ISIS3/issues/4240))
 - Fixed missing exception throw in the UniversalGroundMap constructor ([#6036](https://github.com/DOI-USGS/ISIS3/issues/6036))
 - Fixes most of the `isiscore` wrapper to handle any `QString const &` argument, and exposes the ISIS `Table` interface. ([#6045](https://github.com/DOI-USGS/ISIS3/issues/6045))
 - Fixed `spiceinit` issue where users would get an error when web=true. ([#6027](https://github.com/DOI-USGS/ISIS3/pull/6027))
