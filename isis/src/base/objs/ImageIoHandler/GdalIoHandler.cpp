@@ -49,9 +49,9 @@ namespace Isis {
 
     if (m_samples <= 0 || m_lines <= 0 || m_bands <= 0) {
       QString msg = "Unable to initialize GdalIoHandler, one of samples, lines, or bands "
-                    "(" + m_samples + ", " + m_lines + ", " + m_bands + ") is non-positive."
-                    "The dataset attempting to be processed is likely a vector dataset rather than"
-                    "a raster dataset";
+                    "(" + QString::number(m_samples) + ", " + QString::number(m_lines) + ", " 
+                    + QString::number(m_bands) + ") is non-positive. The dataset attempting "
+                    "to be processed is likely a vector dataset rather than a raster dataset";
       throw IException(IException::Unknown, msg, _FILEINFO_);
     }
 
