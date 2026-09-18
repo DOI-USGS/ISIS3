@@ -199,12 +199,10 @@ namespace Isis {
           dims["Bands"] = toString(dataset->GetRasterCount());
         }
 
-        if (core.hasGroup("Pixels")) {
-          GDALRasterBand *band = dataset->GetRasterBand(1);
-
+        GDALRasterBand *band = dataset->GetRasterBand(1);
+        if (band != nullptr && core.hasGroup("Pixels")) {
           PvlGroup &ptype = core.findGroup("Pixels");
           ptype["Type"] = PixelTypeName(GdalPixelToIsis(band->GetRasterDataType()));
-
           ptype["Base"] = toString(band->GetOffset());
           ptype["Multiplier"] = toString(band->GetScale());
         }
