@@ -1,8 +1,9 @@
 #######################################################
 # This file allows the user to customize their Isis
 # configuration.  See the Isis Preference Dictionary
-# on our website isis.astrogeology.usgs.gov for a
-# full description of each group.
+# on our website for a full description of each group.
+# https://astrogeology.usgs.gov/docs/concepts/
+# isis-fundamentals/preference-dictionary/
 ########################################################
 
 ########################################################
@@ -40,6 +41,7 @@ EndGroup
 #
 # FileLine = On | Off
 # Format = Standard | Pvl
+# ShowDeprecated = On | Off
 # StackTrace = On | Off
 ########################################################
 
@@ -78,7 +80,7 @@ EndGroup
 ########################################################
 
 Group = ShapeModelWeb
- URL = "https://stac.astrogeology.usgs.gov/api/search/"
+  URL = "https://stac.astrogeology.usgs.gov/api/search/"
 EndGroup
 
 ########################################################
@@ -205,7 +207,6 @@ Group = SpiceQL
   UseSpiceQL = "false"
 EndGroup
 
-
 ########################################################
 # Customize the location of mission specific data
 # files (calibration and spice kernels).  Usually this
@@ -220,6 +221,7 @@ Group = DataDirectory
   Cassini      = $ISISDATA/cassini
   Chan1        = $ISISDATA/chan1
   Chandrayaan1 = $ISISDATA/chandrayaan1
+  Chandrayaan2 = $ISISDATA/chandrayaan2
   Clementine1  = $ISISDATA/clementine1
   Clipper      = $ISISDATA/../datalocal/clipper
   Control      = $ISISDATA/control

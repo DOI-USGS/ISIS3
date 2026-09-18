@@ -1,8 +1,9 @@
 #######################################################
 # This file allows the user to customize their Isis
 # configuration.  See the Isis Preference Dictionary
-# on our website astrogeology.usgs.gov/docs for a
-# full description of each group.
+# on our website for a full description of each group.
+# https://astrogeology.usgs.gov/docs/concepts/
+# isis-fundamentals/preference-dictionary/
 ########################################################
 
 ########################################################
@@ -74,7 +75,8 @@ EndGroup
 #EndGroup
 
 ########################################################
-# For Future Work: Not currently being implemented
+# For Future Work: 
+# Not currently being implemented in code but used in tests
 ########################################################
 
 # Group = ShapeModelWeb
@@ -191,7 +193,8 @@ Group = Plugins
   CSMDirectory = ("$ISISROOT/lib/csmplugins/", -
                   "$ISISROOT/lib/isis/csm3.0.3/", -
                   "$ISISROOT/csmlibs/3.0.3/", -
-                  "$HOME/.Isis/csm3.0.3/")
+                  "$HOME/.Isis/csm3.0.3/", -
+                  "$CONDA_PREFIX/lib/csmplugins/")
 EndGroup
 
 ########################################################
