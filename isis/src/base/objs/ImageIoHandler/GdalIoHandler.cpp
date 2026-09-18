@@ -65,6 +65,9 @@ namespace Isis {
   }
 
   GdalIoHandler::~GdalIoHandler() {
+    GDALRasterBand *band = m_geodataSet->GetRasterBand(1);
+    band->SetOffset(m_base);
+    band->SetScale(m_multiplier);
     clearCache();
     if (m_maskBuff) {
       delete m_maskBuff;
