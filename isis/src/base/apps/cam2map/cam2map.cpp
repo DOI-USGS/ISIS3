@@ -91,7 +91,7 @@ namespace Isis {
         throw IException(IException::User, msg, _FILEINFO_);
       }
 
-      mappingGroup.addKeyword(PvlKeyword("EquitorialRadius", toString(equatorialRadius, 15)));
+      mappingGroup.addKeyword(PvlKeyword("EquatorialRadius", toString(equatorialRadius, 15)));
       mappingGroup.addKeyword(PvlKeyword("PolarRadius", toString(polarRadius, 15)));
       mappingGroup.addKeyword(PvlKeyword("LatitudeType", "Planetographic"));
       mappingGroup.addKeyword(PvlKeyword("LongitudeDirection", "PositiveEast"));
