@@ -492,3 +492,130 @@ TEST_F(DefaultCube, FunctionalTestCam2mapReverseMock) {
   EXPECT_CALL(rs, EndProcess).Times(AtLeast(1));
   cam2map(testCube, userMap, userGrp, rs, ui, &log);
 }
+
+// Test that the USEPROJ/PROJSTRING functionality produces the correct Mapping keyword values
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProj) {
+  QVector<QString> args = {
+      "from=" + testCube->fileName(),
+      "to=" + tempDir.path() + "/level2.cub",
+      "useproj=yes",
+      "projstring=+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3376200 +units=m +no_defs",
+      "matchmap=no", "defaultrange=camera",
+      "minlon=0", "maxlon=10", "minlat=0", "maxlat=10",
+      "pixres=mpp", "resolution=100000"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(tempDir.path() + "/level2.cub");
+
+  PvlGroup cubeMapGroup = ocube.label()->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(cubeMapGroup.keywords(), 16);
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("ProjectionName")[0], "IProj");
+  ASSERT_EQ(cubeMapGroup.findKeyword("ProjStr")[0],
+            "+type=crs +proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3376200 +units=m +no_defs");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("TargetName")[0], "MARS");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("EquatorialRadius")[0], "3396190.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("PolarRadius")[0], "3376200.0");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("LatitudeType")[0], "Planetographic");
+  ASSERT_EQ(cubeMapGroup.findKeyword("LongitudeDirection")[0], "PositiveEast");
+  ASSERT_EQ(cubeMapGroup.findKeyword("LongitudeDomain")[0], "180");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("MinimumLatitude")[0], "0.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("MaximumLatitude")[0], "10.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("MinimumLongitude")[0], "0.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("MaximumLongitude")[0], "10.0");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("PixelResolution")[0], "100000.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("Scale")[0], "0.59274697523306");
+
+  ASSERT_EQ(cubeMapGroup.findKeyword("UpperLeftCornerX")[0], "0.0");
+  ASSERT_EQ(cubeMapGroup.findKeyword("UpperLeftCornerY")[0], "600000.0");
+}
+
+// Test that the USEPROJ/PROJSTRING functionality prepends "+type=crs" to a PROJString that
+// starts with "+proj=" and doesn't already contain it
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjTypeCrsAdded) {
+  QString projStr = "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3376200 +units=m +no_defs";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=" + projStr};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(tempDir.path() + "/level2.cub");
+
+  PvlGroup cubeMapGroup = ocube.label()->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(cubeMapGroup.findKeyword("ProjStr")[0], "+type=crs " + projStr);
+}
+
+// Test that the USEPROJ/PROJSTRING functionality skips prepending "+type=crs" to a PROJString that
+// starts with "+proj=" and already contains it
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjTypeCrsAlreadyPresent) {
+  QString projStr =
+      "+proj=sinu +lon_0=0 +x_0=0 +y_0=0 +a=3396190 +b=3376200 +units=m +no_defs +type=crs";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=" + projStr};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  cam2map(ui, &log);
+
+  Cube ocube(tempDir.path() + "/level2.cub");
+
+  PvlGroup cubeMapGroup = ocube.label()->findGroup("Mapping", Pvl::Traverse);
+  ASSERT_EQ(cubeMapGroup.findKeyword("ProjStr")[0], projStr);
+}
+
+// Test that the USEPROJ/PROJSTRING functionality throws if given an unparseable PROJString
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjInvalidProjString) {
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=+proj=notarealprojection"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(ui, &log);
+    FAIL() << "Expected an exception for an invalid PROJString";
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), IException::User);
+    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to create projection from"))
+        << e.toString().toStdString();
+  }
+}
+
+// Test that the USEPROJ/PROJSTRING functionality throws if given a PROJString that resolves to
+// a valid PROJ object with no associated ellipsoid.
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjNoEllipsoid) {
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=+proj=unitconvert +xy_in=deg +xy_out=rad +type=crs"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(ui, &log);
+    FAIL() << "Expected an exception for a PROJString with no ellipsoid";
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), IException::User);
+    EXPECT_TRUE(e.toString().toLatin1().contains("Unable to create ellipsoid from"))
+        << e.toString().toStdString();
+  }
+}
