@@ -300,3 +300,31 @@ TEST_F(ReadWriteTiff, TestGTiffSRS) {
 
   dataset->Close();
 }
+
+TEST_F(ReadWriteTiff, TestGTiffRemoveBlob) {
+  createTiff(SignedWord);
+
+  Cube tiff;
+  tiff.open(path, "rw");
+  EXPECT_FALSE(tiff.hasBlob("UnitTest", "Blob"));
+
+  Blob b("UnitTest", "Blob");
+  char buf[] = {"ABCD"};
+  b.setData(buf, 4);
+  tiff.write(b);
+  EXPECT_TRUE(tiff.hasBlob("UnitTest", "Blob"));
+  tiff.deleteBlob("UnitTest", "Blob");
+  EXPECT_FALSE(tiff.hasBlob("UnitTest", "Blob"));
+
+  tiff.write(b);
+  EXPECT_TRUE(tiff.hasBlob("UnitTest", "Blob"));
+
+  tiff.reopen("rw");
+  EXPECT_TRUE(tiff.hasBlob("UnitTest", "Blob"));
+
+  tiff.deleteBlob("UnitTest", "Blob");
+  EXPECT_FALSE(tiff.hasBlob("UnitTest", "Blob"));
+
+  tiff.reopen("rw");
+  EXPECT_FALSE(tiff.hasBlob("UnitTest", "Blob"));
+}

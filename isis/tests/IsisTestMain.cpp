@@ -11,6 +11,10 @@ using namespace Isis;
 int main(int argc, char **argv) {
    Isis::Preference::Preferences(true);
 
+    // Setup gdal drivers and error handler
+    GDALAllRegister();
+    CPLSetErrorHandler(CPLQuietErrorHandler);
+
    // Keep SpiceQL from generating a new cache directory per test process
    QTemporaryDir spiceqlCache;
    if (spiceqlCache.isValid() && getenv("SPICEQL_CACHE_DIR") == NULL) {

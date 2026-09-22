@@ -97,55 +97,93 @@ namespace Isis {
   PvlGroup SerialNumber::FindSerialTranslation(Pvl &label) {
     Pvl outLabel;
 
-    // check if label has CSM information
-    if(label.findObject("IsisCube").hasGroup("CsmInfo")) {
+    // Determine the mission and instrument for the instrument-based serial number,
+    // if the cube has an ISIS instrument label. These translations return a default
+    // ("Unknown") for an unrecognized instrument, but can throw if the expected
+    // groups/keywords are missing, so they are guarded.
+    QString mission;
+    QString instrument;
+    if(label.findObject("IsisCube").hasGroup("Instrument")) {
+      try {
+        static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
+        static PvlToPvlTranslationManager missionXlater(missionTransFile);
+        missionXlater.SetLabel(label);
+        mission = missionXlater.Translate("MissionName");
+
+        static QString instTransFile = "$ISISROOT/appdata/translations/Instruments.trn";
+        static PvlToPvlTranslationManager instrumentXlater(instTransFile);
+        instrumentXlater.SetLabel(label);
+        instrument = instrumentXlater.Translate("InstrumentName");
+      }
+      catch (IException &e) {
+        // No CSM fallback: re-throw. Otherwise fall through to the CSM serial number.
+        if (!label.findObject("IsisCube").hasGroup("CsmInfo")) {
+          throw IException(e, IException::Unknown,
+                           "Unable to find a serial number translation for this cube.",
+                           _FILEINFO_);
+        }
+      }
+    }
+
+    // A usable instrument serial number needs a recognized mission and instrument.
+    bool instrumentUsable = !mission.isEmpty() && !instrument.isEmpty()
+                            && instrument != "Unknown";
+
+    // Prefer the per-image instrument serial number; the CSM serial number is not
+    // unique. Use CSM only when there is no usable instrument serial.
+    bool hasCsm = label.findObject("IsisCube").hasGroup("CsmInfo");
+    bool useCsm = hasCsm && !instrumentUsable;
+
+    if(!useCsm) {
+      try {
+        // We want to use this instrument's translation manager. It's much faster for
+        //   SerialNumberList if we keep the translation manager in memory, so re-reading
+        //   from the disk is not necessary every time. To do this, we'll use a map to store
+        //   the translation managers with a string identifier to find them. This identifier
+        //   needs to have the mission name and the instrument name.
+
+        //  Create the static map to keep the translation managers in memory
+        static std::map<QString, PvlToPvlTranslationManager> missionTranslators;
+
+        // Determine the key for this translation manager - must have both mission and instrument
+        QString key = mission + "_" + instrument;
+
+        // Try to find an existing translation manager with the key
+        std::map<QString, PvlToPvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
+
+        // If we don't succeed, create one
+        if(translationIterator == missionTranslators.end()) {
+          // Get the file
+
+          FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + instrument + "SerialNumber.trn");
+
+          // use the translation file to generate keywords
+          missionTranslators.insert(
+            std::pair<QString, PvlToPvlTranslationManager>(key, PvlToPvlTranslationManager(snFile.expanded()))
+          );
+
+          translationIterator = missionTranslators.find(key);
+        }
+        translationIterator->second.SetLabel(label);
+        translationIterator->second.Auto(outLabel);
+      }
+      catch (IException &) {
+        // A recognized instrument with no <mission><instrument>SerialNumber.trn
+        // (for example Rosetta Osiris or Hayabusa Nirs) cannot produce an
+        // instrument-based serial number. Fall back to the CSM serial number when
+        // the cube has a CSM model; otherwise there is nothing left to try.
+        if(!hasCsm) {
+          throw;
+        }
+        useCsm = true;
+        outLabel = Pvl();
+      }
+    }
+
+    if(useCsm) {
       static QString csmTransFile = "$ISISROOT/appdata/translations/CsmSerialNumber.trn";
       PvlToPvlTranslationManager csmTranslator(label, csmTransFile);
       csmTranslator.Auto(outLabel);
-    }
-    else {
-      // Get the mission name
-      static QString missionTransFile = "$ISISROOT/appdata/translations/MissionName2DataDir.trn";
-      static PvlToPvlTranslationManager missionXlater(missionTransFile);
-      missionXlater.SetLabel(label);
-      QString mission = missionXlater.Translate("MissionName");
-
-      // Get the instrument name
-      static QString instTransFile = "$ISISROOT/appdata/translations/Instruments.trn";
-      static PvlToPvlTranslationManager instrumentXlater(instTransFile);
-      instrumentXlater.SetLabel(label);
-      QString instrument = instrumentXlater.Translate("InstrumentName");
-
-      // We want to use this instrument's translation manager. It's much faster for
-      //   SerialNumberList if we keep the translation manager in memory, so re-reading
-      //   from the disk is not necessary every time. To do this, we'll use a map to store
-      //   the translation managers with a string identifier to find them. This identifier
-      //   needs to have the mission name and the instrument name.
-
-      //  Create the static map to keep the translation managers in memory
-      static std::map<QString, PvlToPvlTranslationManager> missionTranslators;
-
-      // Determine the key for this translation manager - must have both mission and instrument
-      QString key = mission + "_" + instrument;
-
-      // Try to find an existing translation manager with the key
-      std::map<QString, PvlToPvlTranslationManager>::iterator translationIterator = missionTranslators.find(key);
-
-      // If we don't succeed, create one
-      if(translationIterator == missionTranslators.end()) {
-        // Get the file
-
-        FileName snFile((QString) "$ISISROOT/appdata/translations/" + mission + instrument + "SerialNumber.trn");
-
-        // use the translation file to generate keywords
-        missionTranslators.insert(
-          std::pair<QString, PvlToPvlTranslationManager>(key, PvlToPvlTranslationManager(snFile.expanded()))
-        );
-
-        translationIterator = missionTranslators.find(key);
-      }
-      translationIterator->second.SetLabel(label);
-      translationIterator->second.Auto(outLabel);
     }
 
     PvlGroup snGroup = outLabel.findGroup("SerialNumberKeywords");

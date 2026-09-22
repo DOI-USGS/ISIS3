@@ -588,6 +588,14 @@ namespace Isis {
 
           BundleObservationQsp observation =
               m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
+          if (!observation) {
+            QString msg = "Serial number [" + cubeSerialNumber + "] on control point ["
+                          + point->GetId() + "] was not found among the input images. "
+                          "Serial numbers can change between ISIS versions, so a control "
+                          "network made with an older version may no longer match the images. "
+                          "Regenerate the network's serial numbers to match the current images.";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
           BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
 
           measure->setParentObservation(observation);
@@ -621,6 +629,14 @@ namespace Isis {
 
         BundleObservationQsp observation =
             m_bundleObservations.observationByCubeSerialNumber(cubeSerialNumber);
+        if (!observation) {
+          QString msg = "Serial number [" + cubeSerialNumber + "] on lidar point ["
+                        + lidarPoint->GetId() + "] was not found among the input images. "
+                        "Serial numbers can change between ISIS versions, so a control "
+                        "network made with an older version may no longer match the images. "
+                        "Regenerate the network's serial numbers to match the current images.";
+          throw IException(IException::User, msg, _FILEINFO_);
+        }
         BundleImageQsp image = observation->imageByCubeSerialNumber(cubeSerialNumber);
 
         measure->setParentObservation(observation);

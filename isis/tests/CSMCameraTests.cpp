@@ -463,6 +463,48 @@ TEST_F(CSMCameraSetFixture, SerialNumber) {
 }
 
 
+// Two distinct cubes given the same CsmInfo must still get distinct, instrument-based
+// serial numbers (ISIS #5482, #4240), else SerialNumberList reports a duplicate.
+TEST(CSMSerialNumber, SerialNumberListNoDuplicateFromCsmInfo) {
+  Pvl labelA(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
+  Pvl labelB(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/m0402852.cub").expanded());
+
+  PvlGroup csmInfo("CsmInfo");
+  csmInfo += PvlKeyword("CSMPlatformID", "csm");
+  csmInfo += PvlKeyword("CSMInstrumentId", "csm");
+  csmInfo += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816");
+  labelA.findObject("IsisCube").addGroup(csmInfo);
+  labelB.findObject("IsisCube").addGroup(csmInfo);
+
+  SerialNumberList snl;
+  snl.add(labelA, "ab102401.cub");
+  snl.add(labelB, "m0402852.cub");
+
+  EXPECT_EQ(snl.size(), 2);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, snl.serialNumber(0), "MGS/561812335:32/MOC-WA/RED");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, snl.serialNumber(1), "MGS/619971158:28/MOC-NA/BROAD_BAND");
+}
+
+
+// A cube with a recognized instrument but no SerialNumber.trn (e.g. Rosetta Osiris)
+// plus a CSM model must fall back to the CSM serial number, not yield "Unknown".
+TEST(CSMSerialNumber, FallBackToCsmWhenInstrumentHasNoTranslation) {
+  Pvl label(FileName("$ISISTESTDATA/isis/src/mgs/unitTestData/ab102401.cub").expanded());
+  PvlGroup &inst = label.findObject("IsisCube").findGroup("Instrument");
+  inst.addKeyword(PvlKeyword("SpacecraftName", "ROSETTA-ORBITER"), PvlContainer::Replace);
+  inst.addKeyword(PvlKeyword("InstrumentId", "OSINAC"), PvlContainer::Replace);
+
+  PvlGroup csmInfo("CsmInfo");
+  csmInfo += PvlKeyword("CSMPlatformID", "TestPlatform");
+  csmInfo += PvlKeyword("CSMInstrumentId", "TestInstrument");
+  csmInfo += PvlKeyword("ReferenceTime", "2000-01-01T11:58:55.816");
+  label.findObject("IsisCube").addGroup(csmInfo);
+
+  QString sn = SerialNumber::Compose(label);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, sn, "TestPlatform/TestInstrument/2000-01-01T11:58:55.816");
+}
+
+
 TEST_F(CSMCameraFixture, CameraState) {
   std::string testString = "MockSensorModel\nTestModelState";
   EXPECT_CALL(mockModel, getModelState())
