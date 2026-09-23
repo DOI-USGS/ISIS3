@@ -3196,9 +3196,10 @@ void IsisAml::StartParser(const char *xmlfile) {
   }
 
   catch(const XERCES::XMLException &toCatch) {
-
+    char *transcodedCharArray = XERCES::XMLString::transcode(toCatch.getMessage());
     QString message = "Error during XML parser initialization" +
-                     (QString)XERCES::XMLString::transcode(toCatch.getMessage());
+                     (QString)transcodedCharArray;
+    XERCES::XMLString::release(&transcodedCharArray);
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     return;
   }
@@ -3210,25 +3211,28 @@ void IsisAml::StartParser(const char *xmlfile) {
 
 //  SAX2XMLReader::ValSchemes valScheme = SAX2XMLReader::Val_Auto;
   XERCES::SAX2XMLReader::ValSchemes valScheme = XERCES::SAX2XMLReader::Val_Never;
-  if(valScheme == XERCES::SAX2XMLReader::Val_Auto) {
-    parser->setFeature(XERCES::XMLString::transcode("http://xml.org/sax/features/validation"), true);
-    parser->setFeature(XERCES::XMLString::transcode("http://apache.org/xml/features/validation/dynamic"), true);
+  XMLCh* xmlValidationFeature = XERCES::XMLString::transcode("http://xml.org/sax/features/validation");
+  if(valScheme == XERCES::SAX2XMLReader::Val_Auto || 
+     valScheme == XERCES::SAX2XMLReader::Val_Always) {
+    XMLCh* xmlDynamicFeature = XERCES::XMLString::transcode("http://apache.org/xml/features/validation/dynamic");
+    parser->setFeature(xmlDynamicFeature, true);
+    XERCES::XMLString::release(&xmlDynamicFeature);
   }
   else if(valScheme == XERCES::SAX2XMLReader::Val_Never) {
-    parser->setFeature(XERCES::XMLString::transcode("http://xml.org/sax/features/validation"), false);
+    parser->setFeature(xmlValidationFeature, false);
   }
-
-  else if(valScheme == XERCES::SAX2XMLReader::Val_Always) {
-    parser->setFeature(XERCES::XMLString::transcode("http://xml.org/sax/features/validation"), true);
-    parser->setFeature(XERCES::XMLString::transcode("http://apache.org/xml/features/validation/dynamic"), false);
-  }
+  XERCES::XMLString::release(&xmlValidationFeature);
 
 //  bool doSchema = true;
   bool doSchema = false;
-  parser->setFeature(XERCES::XMLString::transcode("http://apache.org/xml/features/validation/schema"), doSchema);
+  XMLCh* xmlFeature = XERCES::XMLString::transcode("http://apache.org/xml/features/validation/schema");
+  parser->setFeature(xmlFeature, doSchema);
+  XERCES::XMLString::release(&xmlFeature);
 
   bool schemaFullChecking = false;
-  parser->setFeature(XERCES::XMLString::transcode("http://apache.org/xml/features/validation/schema-full-checking"), schemaFullChecking);
+  xmlFeature = XERCES::XMLString::transcode("http://apache.org/xml/features/validation/schema-full-checking");
+  parser->setFeature(xmlFeature, schemaFullChecking);
+  XERCES::XMLString::release(&xmlFeature);
 
   //  Create the handler object for an application
   //  Then parse the file
@@ -3241,8 +3245,10 @@ void IsisAml::StartParser(const char *xmlfile) {
     parser->parse(xmlfile);
   }
   catch (const XERCES::XMLException &toCatch) {
+    char *transcodedCharArray = XERCES::XMLString::transcode(toCatch.getMessage());
     QString message = "Error in application XML file: " + 
-                     (QString)XERCES::XMLString::transcode(toCatch.getMessage());
+                     (QString)transcodedCharArray;
+    XERCES::XMLString::release(&transcodedCharArray);
     throw Isis::IException(Isis::IException::Programmer, message, _FILEINFO_);
     XERCES::XMLPlatformUtils::Terminate();
     return;

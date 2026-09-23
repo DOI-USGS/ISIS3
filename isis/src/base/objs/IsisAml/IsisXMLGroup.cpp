@@ -66,15 +66,19 @@ void IsisXMLGroup::startElement(const XMLCh *const uri,
                                 const XMLCh *const localname,
                                 const XMLCh *const qname,
                                 const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"parameter")  {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"parameter")  {
     if(parameterHandler != NULL) {
       delete parameterHandler;
       parameterHandler = NULL;
     }
     unsigned int index = group->parameters.size();
     group->parameters.resize(index + 1);
-    QString name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString name(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
 // Taken out after PVL refactor      name.UpCase();
     group->parameters[index].name = name;
     parameterHandler = new IsisXMLParameter(encodingName, expandNamespaces,
@@ -85,7 +89,6 @@ void IsisXMLGroup::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 }

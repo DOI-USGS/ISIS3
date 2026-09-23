@@ -47,8 +47,10 @@ void IsisXMLIgnore::characters(const XMLCh *const chars,
 void IsisXMLIgnore::endElement(const XMLCh *const uri,
                                const XMLCh *const localname,
                                const XMLCh *const qname) {
-
-  if((string)XERCES::XMLString::transcode(localname) == ignore) {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == ignore) {
     parser->setContentHandler(prevDocHandler);
     parser->setErrorHandler(prevErrorHandler);
   }
