@@ -19,6 +19,15 @@ namespace Isis {
     p_camera->SetSkyMap(this);
   }
 
+  CameraSkyMap::~CameraSkyMap() {
+    if (p_camera) {
+      if (p_camera->SkyMap() == this) {
+        // deregister the sky map from the camera so it's not freed twice 
+        p_camera->SetSkyMap(NULL, false);      
+      }
+    }
+  }
+
   /** Compute ra/dec from focal plane coordinate
    *
    * This method will compute the right ascension and declination given an

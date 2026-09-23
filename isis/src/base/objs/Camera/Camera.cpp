@@ -2861,7 +2861,7 @@ namespace Isis {
   /**
    * Returns a pointer to the CameraGroundMap object
    *
-   * @return @b CameraCGroundMap*
+   * @return @b CameraGroundMap*
    */
   CameraGroundMap *Camera::GroundMap() {
     return p_groundMap;
