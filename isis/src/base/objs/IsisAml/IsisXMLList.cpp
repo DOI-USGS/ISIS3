@@ -65,8 +65,10 @@ void IsisXMLList::startElement(const XMLCh *const uri,
                                const XMLCh *const localname,
                                const XMLCh *const qname,
                                const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"brief")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -74,7 +76,7 @@ void IsisXMLList::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &list->brief);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"description") {
+  else if(transcodedStr == (string)"description") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -82,7 +84,7 @@ void IsisXMLList::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &list->description);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"exclusions") {
+  else if(transcodedStr == (string)"exclusions") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -91,7 +93,7 @@ void IsisXMLList::startElement(const XMLCh *const uri,
       new IsisXMLMultipleValues(encodingName, expandNamespaces,
                                 parser, &list->exclude);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"inclusions") {
+  else if(transcodedStr == (string)"inclusions") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -106,8 +108,7 @@ void IsisXMLList::startElement(const XMLCh *const uri,
       ignoreHandler = NULL;
     }
     ignoreHandler =
-      new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                        (string)XERCES::XMLString::transcode(localname));
+      new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 
 

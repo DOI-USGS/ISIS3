@@ -63,8 +63,10 @@ void IsisXMLHistory::startElement(const XMLCh *const uri,
                                   const XMLCh *const localname,
                                   const XMLCh *const qname,
                                   const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"change") {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"change") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -75,15 +77,19 @@ void IsisXMLHistory::startElement(const XMLCh *const uri,
     changes->resize(index + 1);
 
     // Get the name and date attributes
-    string st;
     for(unsigned int i = 0; i < 2; i++) {
-      st = XERCES::XMLString::transcode(attributes.getQName(i));
-      if(st == "name") {
-        (*changes)[index].name = XERCES::XMLString::transcode(attributes.getValue(i));
+      char *transCodedName = XERCES::XMLString::transcode(attributes.getQName(i));
+      std::string transCodedNameStr(transCodedName);
+      char *transCodedValue = XERCES::XMLString::transcode(attributes.getValue(i));
+      if(transCodedNameStr == "name") {
+        (*changes)[index].name = transCodedValue;
       }
-      else if(st == "date") {
-        (*changes)[index].date = XERCES::XMLString::transcode(attributes.getValue(i));
+      else if(transCodedNameStr == "date") {
+
+        (*changes)[index].date = transCodedValue;
       }
+      XERCES::XMLString::release(&transCodedName);
+      XERCES::XMLString::release(&transCodedValue);
     }
 
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
@@ -94,8 +100,7 @@ void IsisXMLHistory::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 
 }

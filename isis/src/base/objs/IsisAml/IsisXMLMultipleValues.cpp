@@ -59,8 +59,10 @@ void IsisXMLMultipleValues::startElement(const XMLCh *const uri,
     const XMLCh *const localname,
     const XMLCh *const qname,
     const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"item") {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"item") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -75,7 +77,6 @@ void IsisXMLMultipleValues::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 }

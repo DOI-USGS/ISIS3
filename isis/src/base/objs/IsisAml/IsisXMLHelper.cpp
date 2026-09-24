@@ -65,8 +65,10 @@ void IsisXMLHelper::startElement(const XMLCh *const uri,
                                  const XMLCh *const localname,
                                  const XMLCh *const qname,
                                  const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"brief")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -74,7 +76,7 @@ void IsisXMLHelper::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &helper->brief);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"description")  {
+  else if(transcodedStr == (string)"description")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -82,7 +84,7 @@ void IsisXMLHelper::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &helper->description);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"function")  {
+  else if(transcodedStr == (string)"function")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -90,7 +92,7 @@ void IsisXMLHelper::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &helper->function);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"icon")  {
+  else if(transcodedStr == (string)"icon")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -103,7 +105,6 @@ void IsisXMLHelper::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 }

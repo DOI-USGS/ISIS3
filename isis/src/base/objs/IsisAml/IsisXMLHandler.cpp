@@ -77,25 +77,31 @@ IsisXMLHandler::~IsisXMLHandler() {}
 //  IsisXMLHandler: Overrides the SAX ErrorHandler
 void IsisXMLHandler::error(const XERCES::SAXParseException &e) {
   ostringstream os;
+  char* transcodedStr = XERCES::XMLString::transcode(e.getMessage());
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
-     << XERCES::XMLString::transcode(e.getMessage());
+     << transcodedStr;
+  XERCES::XMLString::release(&transcodedStr);
   throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
 void IsisXMLHandler::fatalError(const XERCES::SAXParseException &e) {
   ostringstream os;
+  char* transcodedStr = XERCES::XMLString::transcode(e.getMessage());
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
-     << XERCES::XMLString::transcode(e.getMessage());
+     << transcodedStr;
+  XERCES::XMLString::release(&transcodedStr);
   throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
 void IsisXMLHandler::warning(const XERCES::SAXParseException &e) {
   ostringstream os;
+  char* transcodedStr = XERCES::XMLString::transcode(e.getMessage());
   os << "Error in application XML file line: " << e.getLineNumber()
      << " char: " << e.getColumnNumber() << ". "
-     << XERCES::XMLString::transcode(e.getMessage());
+     << transcodedStr;
+  XERCES::XMLString::release(&transcodedStr);
   throw Isis::IException(Isis::IException::Programmer, os.str(), _FILEINFO_);
 }
 
@@ -105,8 +111,9 @@ void IsisXMLHandler::characters(const XMLCh *const chars,
                                 const XMLSize_t length) {
 
   if(value != NULL) {
-    QString str;
-    str = XERCES::XMLString::transcode(chars);
+    char* transcodedStr = XERCES::XMLString::transcode(chars);
+    QString str(transcodedStr);
+    XERCES::XMLString::release(&transcodedStr);
     str = str.trimmed();
     *value += str;
   }
@@ -122,8 +129,9 @@ void IsisXMLHandler::endElement(const XMLCh *const uri,
                                 const XMLCh *const qname) {
 
   if(outputEndTag > 0) {
-    QString str;
-    str = XERCES::XMLString::transcode(localname);
+    char* transcodedStr = XERCES::XMLString::transcode(localname);
+    QString str(transcodedStr);
+    XERCES::XMLString::release(&transcodedStr);
     *value += "</" + str + ">";
     outputEndTag--;
   }
@@ -154,8 +162,9 @@ void IsisXMLHandler::startElement(const XMLCh *const uri,
                                   const XERCES::Attributes &attributes) {
 
   if(value != NULL) {
-    QString str;
-    str = XERCES::XMLString::transcode(localname);
+    char* transcodedStr = XERCES::XMLString::transcode(localname);
+    QString str(transcodedStr);
+    XERCES::XMLString::release(&transcodedStr);
     // Note: need to build the attributes into the string too
     *value += "<" + str + ">";
     outputEndTag++;
