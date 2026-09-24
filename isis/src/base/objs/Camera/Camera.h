@@ -328,10 +328,10 @@ namespace Isis {
       QString spacecraftNameShort() const;
 
       void SetDistortionMap(CameraDistortionMap *map, bool deleteExisting = true);
-      void SetFocalPlaneMap(CameraFocalPlaneMap *map);
-      void SetDetectorMap(CameraDetectorMap *map);
-      void SetGroundMap(CameraGroundMap *map);
-      void SetSkyMap(CameraSkyMap *map);
+      void SetFocalPlaneMap(CameraFocalPlaneMap *map, bool deleteExisting = true);
+      void SetDetectorMap(CameraDetectorMap *map, bool deleteExisting = true);
+      void SetGroundMap(CameraGroundMap *map, bool deleteExisting = true);
+      void SetSkyMap(CameraSkyMap *map, bool deleteExisting = true);
 
       double NorthAzimuth();
       double SunAzimuth();

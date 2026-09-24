@@ -79,7 +79,7 @@ namespace Isis {
       CameraGroundMap(Camera *parent);
 
       //! Destructor
-      virtual ~CameraGroundMap() {};
+      virtual ~CameraGroundMap();
 
       virtual bool SetFocalPlane(const double ux, const double uy,
                                  const double uz);

@@ -2376,8 +2376,8 @@ namespace Isis {
    *
    * @param *map Pointer to a CameraFocalPlaneMap object
    */
-  void Camera::SetFocalPlaneMap(CameraFocalPlaneMap *map) {
-    if (p_focalPlaneMap) {
+  void Camera::SetFocalPlaneMap(CameraFocalPlaneMap *map, bool deleteExisting) {
+    if (deleteExisting && p_focalPlaneMap) {
       delete p_focalPlaneMap;
     }
 
@@ -2391,8 +2391,8 @@ namespace Isis {
    *
    * @param *map Pointer to a CameraDetectorMap object
    */
-  void Camera::SetDetectorMap(CameraDetectorMap *map) {
-    if (p_detectorMap) {
+  void Camera::SetDetectorMap(CameraDetectorMap *map, bool deleteExisting) {
+    if (deleteExisting && p_detectorMap) {
       delete p_detectorMap;
     }
 
@@ -2406,8 +2406,8 @@ namespace Isis {
    *
    * @param *map Pointer to a CameraGroundMap object
    */
-  void Camera::SetGroundMap(CameraGroundMap *map) {
-    if (p_groundMap) {
+  void Camera::SetGroundMap(CameraGroundMap *map, bool deleteExisting) {
+    if (deleteExisting && p_groundMap) {
       delete p_groundMap;
     }
 
@@ -2420,8 +2420,8 @@ namespace Isis {
    *
    * @param *map Pointer to a CameraSkyMap object
    */
-  void Camera::SetSkyMap(CameraSkyMap *map) {
-    if (p_skyMap) {
+  void Camera::SetSkyMap(CameraSkyMap *map, bool deleteExisting) {
+    if (deleteExisting && p_skyMap) {
       delete p_skyMap;
     }
 
@@ -2873,7 +2873,7 @@ namespace Isis {
   /**
    * Returns a pointer to the CameraGroundMap object
    *
-   * @return @b CameraCGroundMap*
+   * @return @b CameraGroundMap*
    */
   CameraGroundMap *Camera::GroundMap() {
     return p_groundMap;

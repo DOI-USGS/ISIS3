@@ -34,7 +34,7 @@ namespace Isis {
       CameraSkyMap(Camera *parent);
 
       //! Destructor
-      virtual ~CameraSkyMap() {};
+      virtual ~CameraSkyMap();
 
       virtual bool SetFocalPlane(const double ux, const double uy,
                                  const double uz);

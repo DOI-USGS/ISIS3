@@ -88,15 +88,7 @@ namespace Isis {
     focalMap->SetDetectorOrigin(bsSample, bsLine);
 
     // Setup distortion map
-    try {
-      new TgoCassisDistortionMap(this, naifIkCode());
-    }
-    catch (IException &e) {
-      // Set NULL so that cameras destructor wont seg fault trying to delete
-      SetDistortionMap(NULL, false);
-      QString msg = "Unable to Create TgoCassisDistortionMap";
-      throw IException(e, IException::Unknown, msg, _FILEINFO_);
-    }
+    new TgoCassisDistortionMap(this, naifIkCode());
     // Setup the ground and sky map
     new CameraGroundMap(this);
     new CameraSkyMap(this);

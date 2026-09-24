@@ -79,7 +79,13 @@ namespace Isis {
    * Destructor
    * 
    */
-  CameraFocalPlaneMap::~CameraFocalPlaneMap(){
+  CameraFocalPlaneMap::~CameraFocalPlaneMap() {
+    if (p_camera) {
+      if (p_camera->FocalPlaneMap() == this) {
+        // deregister the focal plane map from the camera so it's not freed twice 
+        p_camera->SetFocalPlaneMap(NULL, false);      
+      }
+    }
   }
 
 
