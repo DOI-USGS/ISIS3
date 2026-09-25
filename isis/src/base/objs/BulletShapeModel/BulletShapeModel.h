@@ -30,7 +30,8 @@ namespace Isis {
    *
    * @internal
    *   @history 2017-03-22 - Kris Becker - Original Version
- 
+   *   @history 2026-06-26 - Kris J Becker - Added intercept() and plate_index()
+   *                          methods 
    */
   class BulletShapeModel : public ShapeModel {
     public:
@@ -69,6 +70,8 @@ namespace Isis {
       Distance localRadius(const Latitude &lat, const Longitude &lon);
 
       const BulletWorldManager &model() const;
+      const BulletClosestRayCallback &intercept() const;
+      int plate_index() const;
 
 
       // Determine if the internal intercept is occluded from the observer/lookdir

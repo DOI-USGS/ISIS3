@@ -14,6 +14,7 @@ find files of those names at the top level of this repository. **/
 
 #include "Intercept.h"
 #include "NaifDskPlateModel.h"
+#include "TriangularPlate.h"
 
 namespace Isis {
   class Intercept;
@@ -37,6 +38,10 @@ namespace Isis {
    *   @history 2017-06-07 Kristin Berry - Added a using declaration so that the new 
    *                            intersectSurface methods in ShapeModel are accessible by
    *                            EllipsoidShape.
+   *   @history 2026-06-25 Kris J Becker - Added optional Target parameter to
+   *                            NaifDskPlateModel constructor. If its defined,
+   *                            will provide full functionality
+   *   @history 2026-06-25 Kris J Becker - Added the plate_index() method.
    *   @todo Remove Model from name to match other derived classes
    */
   class NaifDskShape : public ShapeModel {
@@ -44,7 +49,7 @@ namespace Isis {
       // Constructors
       NaifDskShape();
       NaifDskShape(Target *target, Pvl &pvl);
-      NaifDskShape(const NaifDskPlateModel &model);
+      NaifDskShape(const NaifDskPlateModel &model, Target *target = nullptr );
 
       // Destructor
       ~NaifDskShape();
@@ -71,6 +76,8 @@ namespace Isis {
 
       const NaifDskPlateModel &model() const;
       const Intercept *intercept() const;
+
+      int plate_index() const;
 
 
     private:
