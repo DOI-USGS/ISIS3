@@ -1080,3 +1080,205 @@ TEST_F(DefaultCube, FunctionalTestCam2mapUseProjNoEllipsoid) {
         << e.toString().toStdString();
   }
 }
+
+// Test that the USEPROJ/PROJSTRING functionality rejects an IAU authority-code formatted
+// PROJString
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjIauCodeFails) {
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=IAU_2015:49920"};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(ui, &log);
+    FAIL() << "Expected an exception rejecting a non-PROJ-string-format PROJString";
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), IException::User);
+    EXPECT_TRUE(e.toString().toLatin1().contains("Only a +key=value formatted string is supported"))
+        << e.toString().toStdString();
+  }
+}
+
+// Test that the USEPROJ/PROJSTRING functionality rejects a WKT PROJString
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjWktFails) {
+  // WKT string was copied from https://spatialreference.org/ref/iau_2015/49920/
+  QString projStr = R"WKT(
+    PROJCRS["Mars (2015) - Sphere / Ocentric / Sinusoidal, clon = 0",
+      BASEGEOGCRS["Mars (2015) - Sphere / Ocentric",
+          DATUM["Mars (2015) - Sphere",
+              ELLIPSOID["Mars (2015) - Sphere",3396190,0,
+                  LENGTHUNIT["metre",1]],
+              ANCHOR["Viking 1 lander: 47.95137 W"]],
+          PRIMEM["Reference Meridian",0,
+              ANGLEUNIT["degree",0.0174532925199433]],
+          ID["IAU",49900,2015]],
+      CONVERSION["Sinusoidal, clon = 0",
+          METHOD["Sinusoidal",
+              ID["PROJ","SINUSOIDAL"]],
+          PARAMETER["Longitude of natural origin",0,
+              ANGLEUNIT["degree",0.0174532925199433],
+              ID["EPSG",8802]],
+          PARAMETER["False easting",0,
+              LENGTHUNIT["metre",1],
+              ID["EPSG",8806]],
+          PARAMETER["False northing",0,
+              LENGTHUNIT["metre",1],
+              ID["EPSG",8807]]],
+      CS[Cartesian,2],
+          AXIS["(E)",east,
+              ORDER[1],
+              LENGTHUNIT["metre",1]],
+          AXIS["(N)",north,
+              ORDER[2],
+              LENGTHUNIT["metre",1]],
+      ID["IAU",49920,2015]]
+    )WKT";
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=" + projStr};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(ui, &log);
+    FAIL() << "Expected an exception rejecting a non-PROJ-string-format PROJString";
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), IException::User);
+    EXPECT_TRUE(e.toString().toLatin1().contains("Only a +key=value formatted string is supported"))
+        << e.toString().toStdString();
+  }
+}
+
+// Test that the USEPROJ/PROJSTRING functionality rejects a PROJJSON PROJString
+TEST_F(DefaultCube, FunctionalTestCam2mapUseProjJsonFails) {
+  // PROJJSON string was copied from https://spatialreference.org/ref/iau_2015/49920/
+  QString projStr = R"JSON(
+    {
+      "$schema": "https://proj.org/schemas/v0.7/projjson.schema.json",
+      "type": "ProjectedCRS",
+      "name": "Mars (2015) - Sphere / Ocentric / Sinusoidal, clon = 0",
+      "base_crs": {
+        "type": "GeographicCRS",
+        "name": "Mars (2015) - Sphere / Ocentric",
+        "datum": {
+          "type": "GeodeticReferenceFrame",
+          "name": "Mars (2015) - Sphere",
+          "anchor": "Viking 1 lander: 47.95137 W",
+          "ellipsoid": {
+            "name": "Mars (2015) - Sphere",
+            "radius": 3396190
+          },
+          "prime_meridian": {
+            "name": "Reference Meridian",
+            "longitude": 0
+          }
+        },
+        "coordinate_system": {
+          "subtype": "ellipsoidal",
+          "axis": [
+            {
+              "name": "Geodetic latitude",
+              "abbreviation": "Lat",
+              "direction": "north",
+              "unit": "degree"
+            },
+            {
+              "name": "Geodetic longitude",
+              "abbreviation": "Lon",
+              "direction": "east",
+              "unit": "degree"
+            }
+          ]
+        },
+        "id": {
+          "authority": "IAU",
+          "code": 49900,
+          "version": 2015
+        },
+        "remarks": "Use semi-major radius as sphere for interoperability. Source of IAU Coordinate systems: https://doi.org/10.1007/s10569-017-9805-5"
+      },
+      "conversion": {
+        "name": "Sinusoidal, clon = 0",
+        "method": {
+          "name": "Sinusoidal",
+          "id": {
+            "authority": "PROJ",
+            "code": "SINUSOIDAL"
+          }
+        },
+        "parameters": [
+          {
+            "name": "Longitude of natural origin",
+            "value": 0,
+            "unit": "degree",
+            "id": {
+              "authority": "EPSG",
+              "code": 8802
+            }
+          },
+          {
+            "name": "False easting",
+            "value": 0,
+            "unit": "metre",
+            "id": {
+              "authority": "EPSG",
+              "code": 8806
+            }
+          },
+          {
+            "name": "False northing",
+            "value": 0,
+            "unit": "metre",
+            "id": {
+              "authority": "EPSG",
+              "code": 8807
+            }
+          }
+        ]
+      },
+      "coordinate_system": {
+        "subtype": "Cartesian",
+        "axis": [
+          {
+            "name": "Easting",
+            "abbreviation": "E",
+            "direction": "east",
+            "unit": "metre"
+          },
+          {
+            "name": "Northing",
+            "abbreviation": "N",
+            "direction": "north",
+            "unit": "metre"
+          }
+        ]
+      },
+      "id": {
+        "authority": "IAU",
+        "code": 49920,
+        "version": 2015
+      }
+    }
+    )JSON";
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + tempDir.path() + "/level2.cub",
+                           "useproj=yes",
+                           "projstring=" + projStr};
+  UserInterface ui(APP_XML, args);
+
+  Pvl log;
+  try {
+    cam2map(ui, &log);
+    FAIL() << "Expected an exception rejecting a non-PROJ-string-format PROJString";
+  }
+  catch(IException &e) {
+    ASSERT_EQ(e.errorType(), IException::User);
+    EXPECT_TRUE(e.toString().toLatin1().contains("Only a +key=value formatted string is supported"))
+        << e.toString().toStdString();
+  }
+}
