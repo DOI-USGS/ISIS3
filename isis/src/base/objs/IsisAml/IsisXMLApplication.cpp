@@ -80,12 +80,16 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
                                       const XMLCh *const localname,
                                       const XMLCh *const qname,
                                       const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"application")  {
-    QString name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"application")  {
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString name(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
     appData->name = name.toLower();
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {
+  else if(transcodedStr == (string)"brief")  {
     if(briefHandler != NULL) {
       delete briefHandler;
       briefHandler = NULL;
@@ -93,7 +97,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
     briefHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                       parser, &appData->brief);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"description")  {
+  else if(transcodedStr == (string)"description")  {
     if(descriptionHandler != NULL) {
       delete descriptionHandler;
       descriptionHandler = NULL;
@@ -101,7 +105,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
     descriptionHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                             parser, &appData->description);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"groups")  {
+  else if(transcodedStr == (string)"groups")  {
     if(groupsHandler != NULL) {
       delete groupsHandler;
       groupsHandler = NULL;
@@ -109,7 +113,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
     groupsHandler = new IsisXMLGroups(encodingName, expandNamespaces, parser,
                                       &appData->groups);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"category")  {
+  else if(transcodedStr == (string)"category")  {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -117,7 +121,7 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &appData->categorys);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"history")  {
+  else if(transcodedStr == (string)"history")  {
     if(historyHandler != NULL) {
       delete historyHandler;
       historyHandler = NULL;
@@ -130,7 +134,6 @@ void IsisXMLApplication::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 }

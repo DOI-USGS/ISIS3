@@ -64,15 +64,20 @@ void IsisXMLGroups::startElement(const XMLCh *const uri,
                                  const XMLCh *const localname,
                                  const XMLCh *const qname,
                                  const XERCES::Attributes &attributes) {
-
-  if((string)XERCES::XMLString::transcode(localname) == (string)"group") {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"group") {
     if(groupHandler != NULL) {
       delete groupHandler;
       groupHandler = NULL;
     }
     unsigned int index = groups->size();
     groups->resize(index + 1);
-    (*groups)[index].name = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString name(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
+    (*groups)[index].name = name;
     groupHandler = new IsisXMLGroup(encodingName, expandNamespaces, parser,
                                     &(*groups)[index]);
   }
@@ -81,8 +86,7 @@ void IsisXMLGroups::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 
 }
