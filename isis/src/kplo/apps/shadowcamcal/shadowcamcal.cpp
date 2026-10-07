@@ -223,8 +223,8 @@ namespace Isis {
         // Setup the ProcessByLine object
         ProcessByLine wp;
         wp.PropagateHistory(false);
-        CubeAttributeInput inputAtt = CubeAttributeInput();
-        CubeAttributeOutput outputAtt = CubeAttributeOutput();
+        CubeAttributeInput inputAtt = ui.GetInputAttribute("FROM");
+        CubeAttributeOutput outputAtt = ui.GetOutputAttribute("TO");
         wp.SetInputCube(cubeFileIn, inputAtt, 0);
 
         // Check if output file is provided

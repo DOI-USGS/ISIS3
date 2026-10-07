@@ -123,13 +123,23 @@ EndGroup
 # Format = Attached | Detached
 # History = On | Off
 # MaximumSize = max # of gigabytes
+# AutoExtension = On | Off
+#    On - Automatically determine the file format based
+#         on the output file extension. If no extension is
+#         provided a "Tile" Cube is selected. This
+#         setting does not override formats specified
+#         by output attributes.
+#    Off - Propagate the input file format to the output
+#          files format unless specified in the output
+#          attributes.
 ########################################################
 
 Group = CubeCustomization
-  Overwrite  = Allow
-  Format     = Attached
-  History    = On
-  MaximumSize = 12
+  Overwrite     = Allow
+  Format        = Attached
+  History       = On
+  MaximumSize   = 12
+  AutoExtension = Off
 EndGroup
 
 ########################################################

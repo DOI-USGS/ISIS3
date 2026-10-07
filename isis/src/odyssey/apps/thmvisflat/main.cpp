@@ -66,12 +66,8 @@ void IsisMain() {
 
   CubeAttributeOutput outAtt = ui.GetOutputAttribute("TO");
   ocube.setDimensions(icube.sampleCount(), icube.lineCount(), icube.bandCount());
-  ocube.setByteOrder(outAtt.byteOrder());
-  ocube.setFormat(outAtt.fileFormat());
-  ocube.setLabelsAttached(outAtt.labelAttachment());
-  ocube.setPixelType(outAtt.pixelType());
 
-  ocube.create(FileName(ui.GetCubeName("TO")).expanded());
+  ocube.create(FileName(ui.GetCubeName("TO")).expanded(), outAtt);
 
   LineManager icubeMgr(icube);
   vector<int> filter;

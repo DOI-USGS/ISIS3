@@ -77,7 +77,6 @@ void IsisMain() {
 
   QString tempCubeName = detachedLabel.baseName() + ".temp.cub";
   CubeAttributeOutput outputAtts = ui.GetOutputAttribute("TO");
-  outputAtts.setPixelType( Isis::Real);
   Cube* tempCube = processPDS.SetOutputCube(tempCubeName, outputAtts);
 
   // Convert the fits file into an ISIS cube

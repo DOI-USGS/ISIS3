@@ -527,7 +527,7 @@ namespace Isis {
 
       // Allocate output cube
       QString out = outList[img].toString();
-      CubeAttributeOutput outAtt;
+      CubeAttributeOutput outAtt(out);
       p.SetOutputCube(out, outAtt, icube->sampleCount(),
           icube->lineCount(), icube->bandCount());
 

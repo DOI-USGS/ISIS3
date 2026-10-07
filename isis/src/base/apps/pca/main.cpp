@@ -25,9 +25,7 @@ void IsisMain() {
   Cube *icube = p.SetInputCube("FROM");
   p.SetBrickSize(128, 128, icube->bandCount());
 
-  // The output cube with no attributes and real pixel type
-  Isis::CubeAttributeOutput cao;
-  cao.setPixelType(Isis::Real);
+  Isis::CubeAttributeOutput cao = ui.GetOutputAttribute("TO");
 
   // Start the sample processing
   if(ui.GetString("MODE") == "TRANSFORM") {
