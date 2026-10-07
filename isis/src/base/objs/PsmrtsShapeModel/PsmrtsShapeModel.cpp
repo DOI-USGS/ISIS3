@@ -249,6 +249,9 @@ namespace Isis {
 
     m_tracer = tracer_s.get_shape_tracer();
     m_psmrts_debug = toBool( m_parameters.get( "PsmrtsDebug", "false" ) );
+    if ( m_parameters.exists( "Tolerance" ) ) {
+      m_tolerance = toDouble( m_parameters.get( "Tolerance" ) );
+    }
     clearSurfacePoint();
   }
 
@@ -277,6 +280,9 @@ namespace Isis {
 
     setName("PSMRTS");
     m_psmrts_debug = toBool( m_parameters.get( "PsmrtsDebug", "false" ) );
+    if ( m_parameters.exists( "Tolerance" ) ) {
+      m_tolerance = toDouble( m_parameters.get( "Tolerance" ) );
+    }    
     clearSurfacePoint();
   }
 
