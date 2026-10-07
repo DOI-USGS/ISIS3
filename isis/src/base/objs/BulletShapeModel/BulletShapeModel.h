@@ -71,7 +71,7 @@ namespace Isis {
 
       const BulletWorldManager &model() const;
       const BulletClosestRayCallback &intercept() const;
-      int plate_index() const;
+      virtual int plate_index() const;
 
 
       // Determine if the internal intercept is occluded from the observer/lookdir

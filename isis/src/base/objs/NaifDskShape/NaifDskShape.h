@@ -77,8 +77,7 @@ namespace Isis {
       const NaifDskPlateModel &model() const;
       const Intercept *intercept() const;
 
-      int plate_index() const;
-
+      virtual int plate_index() const;
 
     private:
       // Disallow copying because ShapeModel is not copyable

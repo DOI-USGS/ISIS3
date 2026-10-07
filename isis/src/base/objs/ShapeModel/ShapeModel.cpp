@@ -499,6 +499,26 @@ namespace Isis {
   }
 
   /**
+   * @brief Return the plate id of the current intercept point
+   * 
+   * This method returns the index of the facet/plate in a tesselated plate
+   * model of the intercept point. The plate_index is not available or exists 
+   * in all shape models - in those cases a -1 is returned.
+   * 
+   * Any shape model that has a plate index should implement this method and
+   * return the index.
+   * 
+   * The plate index is defined as the (plate id - 1) where the plate id is the
+   * values contained in file formats such as OBJ and NAIF DSK that uniquely
+   * identify the facet/plate identifier.
+   * 
+   * @return int The index of the plate
+   */
+  int ShapeModel::plate_index() const {
+    return ( -1 );
+  }
+
+  /**
    * Returns the status of the target. If it is NULL, this method
    * returns false.
    *
