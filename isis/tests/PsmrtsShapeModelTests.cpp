@@ -105,21 +105,30 @@ TEST(PsmrtsShapeModelTests, PsmrtsConstructorTests ) {
   // Set up a minimal label for PSMRTS
   PvlFlatMap flat_t;
   flat_t.add( PvlKeyword( "ShapeModel", bennu_list) );
-
   Pvl pvl_t0 = make_preferences( flat_t, "Kernels" );
+  EXPECT_TRUE( PsmrtsShapeModel::requires_psmrts( pvl_t0 ) );
 
   PsmrtsShapeModel psmrts_t0( &target_t, pvl_t0 );
   EXPECT_FALSE( psmrts_t0.isDEM() );
+  
+  EXPECT_TRUE( psmrts_t0.tracer().isValid() );
+  EXPECT_EQ( psmrts_t0.tracer().size(), 2 );
+
+  EXPECT_STREQ( psmrts_t0.tracer().tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( psmrts_t0.tracer().tracers()[1]->type().c_str(),  "tracer" );
+
+  EXPECT_STREQ( psmrts_t0.tracer().tracers()[0]->model().c_str(), "bullet" );
+  EXPECT_STREQ( psmrts_t0.tracer().tracers()[1]->model().c_str(), "ellipsoid" );
 
   EXPECT_FALSE( psmrts_t0.isDebug() );
   psmrts_t0.set_debug( true );
   EXPECT_TRUE( psmrts_t0.isDebug() );
 
-  EXPECT_NEAR(psmrts_t0.get_tolerance(), PsmrtsShapeModel::DefaultDistanceTolerance, tolerance_km );
+  EXPECT_NEAR( psmrts_t0.get_tolerance(), PsmrtsShapeModel::DefaultDistanceTolerance, tolerance_km );
   psmrts_t0.set_tolerance( 10.0 );
-  EXPECT_NEAR(psmrts_t0.get_tolerance(), 10.0, tolerance_km );
+  EXPECT_NEAR( psmrts_t0.get_tolerance(), 10.0, tolerance_km );
   psmrts_t0.set_tolerance( );
-  EXPECT_NEAR(psmrts_t0.get_tolerance(), PsmrtsShapeModel::DefaultDistanceTolerance, tolerance_km );
+  EXPECT_NEAR( psmrts_t0.get_tolerance(), PsmrtsShapeModel::DefaultDistanceTolerance, tolerance_km );
 
   EXPECT_TRUE( psmrts_t0.tracer().isValid() );
   EXPECT_EQ( psmrts_t0.tracer().size(), 2 );
@@ -127,6 +136,30 @@ TEST(PsmrtsShapeModelTests, PsmrtsConstructorTests ) {
   Pvl pvl_t1 = make_preferences( flat_t, "Kernels" );
   PsmrtsModelPtr psmrts_t1( PsmrtsShapeModel::create( &target_t, pvl_t1 ) );
   ASSERT_NE( psmrts_t1, nullptr );
+
+  EXPECT_TRUE( psmrts_t1->tracer().isValid() );
+  EXPECT_EQ( psmrts_t1->tracer().size(), 2 );
+
+  EXPECT_STREQ( psmrts_t1->tracer().tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( psmrts_t1->tracer().tracers()[1]->type().c_str(),  "tracer" );
+
+  EXPECT_STREQ( psmrts_t1->tracer().tracers()[0]->model().c_str(), "bullet" );
+  EXPECT_STREQ( psmrts_t1->tracer().tracers()[1]->model().c_str(), "ellipsoid" );
+
+  auto params_t = psmrts_t1->parameters();
+  params_t.add( "Tolerance", "0.5" );
+  PsmrtsShapeModel psmrts_tr( psmrts_t1->tracer(), params_t );
+  EXPECT_FALSE( psmrts_tr.isDEM() );
+  EXPECT_NEAR( psmrts_tr.get_tolerance(), 0.5, tolerance_km );
+  
+  EXPECT_TRUE( psmrts_tr.tracer().isValid() );
+  EXPECT_EQ( psmrts_tr.tracer().size(), 2 );
+
+  EXPECT_STREQ( psmrts_tr.tracer().tracers()[0]->type().c_str(),  "tracer" );
+  EXPECT_STREQ( psmrts_tr.tracer().tracers()[1]->type().c_str(),  "tracer" );
+
+  EXPECT_STREQ( psmrts_tr.tracer().tracers()[0]->model().c_str(), "bullet" );
+  EXPECT_STREQ( psmrts_tr.tracer().tracers()[1]->model().c_str(), "ellipsoid" );
 
   EXPECT_EQ( psmrts::PsmrtsFactory().shape_count(),  1 );
   EXPECT_EQ( psmrts::PsmrtsFactory().tracer_count(), 2 );
