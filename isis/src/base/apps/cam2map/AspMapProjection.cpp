@@ -11,6 +11,7 @@
 #include "Portal.h"
 #include "Preference.h"
 #include "Progress.h"
+#include "ProjectionFactory.h"
 #include "Pvl.h"
 #include "SpecialPixel.h"
 #include "SurfacePoint.h"
@@ -372,146 +373,6 @@ void GeoRef::geodetic_to_cartesian(double lon, double lat, double height,
   x = (N + height) * clat * clon;
   y = (N + height) * clat * slon;
   z = (N * (1.0 - e2) + height) * slat;
-}
-
-// Cartographic utility. Convert an ISIS PVL Mapping group to a WKT string
-// using OGR setters. Mirrors GDAL's ISIS3 driver (frmts/pds/isis3dataset.cpp)
-// for consistency. Radii default to the DEM's if not present in the map file.
-std::string pvlToWkt(const PvlGroup &mapGrp,
-                     double defaultSemiMajor,
-                     double defaultSemiMinor) {
-
-  std::string projName = mapGrp["ProjectionName"][0].toLower().toStdString();
-
-  double a = defaultSemiMajor;
-  double b = defaultSemiMinor;
-  if (mapGrp.hasKeyword("EquatorialRadius"))
-    a = toDouble(mapGrp["EquatorialRadius"][0]);
-  if (mapGrp.hasKeyword("PolarRadius"))
-    b = toDouble(mapGrp["PolarRadius"][0]);
-
-  double lon0 = 0.0;
-  if (mapGrp.hasKeyword("CenterLongitude"))
-    lon0 = toDouble(mapGrp["CenterLongitude"][0]);
-
-  double lat0 = 0.0;
-  if (mapGrp.hasKeyword("CenterLatitude"))
-    lat0 = toDouble(mapGrp["CenterLatitude"][0]);
-
-  double scaleFactor = 1.0;
-  if (mapGrp.hasKeyword("ScaleFactor"))
-    scaleFactor = toDouble(mapGrp["ScaleFactor"][0]);
-
-  // Set projection (matching GDAL ISIS3 driver)
-  OGRSpatialReference oSRS;
-  oSRS.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
-
-  if (projName == "pointperspective" || projName == "obliquecylindrical")
-    throw IException(IException::User,
-      "ASP_MAP: projection not yet supported in PVL map file: " +
-      QString::fromStdString(projName) +
-      ". Provide the projection via a georeferenced image "
-      "(e.g., a .cub or .tif) as the map= argument instead.",
-      _FILEINFO_);
-  else if (projName == "equirectangular" || projName == "simplecylindrical")
-    oSRS.SetEquirectangular2(0.0, lon0, lat0, 0, 0);
-  else if (projName == "orthographic")
-    oSRS.SetOrthographic(lat0, lon0, 0, 0);
-  else if (projName == "sinusoidal")
-    oSRS.SetSinusoidal(lon0, 0, 0);
-  else if (projName == "mercator")
-    oSRS.SetMercator(lat0, lon0, scaleFactor, 0, 0);
-  else if (projName == "polarstereographic")
-    oSRS.SetPS(lat0, lon0, scaleFactor, 0, 0);
-  else if (projName == "stereographic")
-    oSRS.SetStereographic(lat0, lon0, scaleFactor, 0, 0);
-  else if (projName == "transversemercator")
-    oSRS.SetTM(lat0, lon0, scaleFactor, 0, 0);
-  else if (projName == "lambertconformal") {
-    double par1 = 0.0, par2 = 0.0;
-    if (mapGrp.hasKeyword("FirstStandardParallel"))
-      par1 = toDouble(mapGrp["FirstStandardParallel"][0]);
-    if (mapGrp.hasKeyword("SecondStandardParallel"))
-      par2 = toDouble(mapGrp["SecondStandardParallel"][0]);
-    oSRS.SetLCC(par1, par2, lat0, lon0, 0, 0);
-  } else if (projName == "lambertazimuthalequalarea")
-    oSRS.SetLAEA(lat0, lon0, 0, 0);
-  else if (projName == "mollweide")
-    oSRS.SetMollweide(lon0, 0, 0);
-  else if (projName == "robinson")
-    oSRS.SetRobinson(lon0, 0, 0);
-  else
-    throw IException(IException::User,
-      "ASP_MAP: unsupported projection in PVL map file: " +
-      QString::fromStdString(projName) +
-      ". Provide the projection via a georeferenced image "
-      "(e.g., a .cub or .tif) as the map= argument instead.",
-      _FILEINFO_);
-
-  // Set ProjCS name, e.g. "Equirectangular Moon"
-  std::string targetName = "Body";
-  if (mapGrp.hasKeyword("TargetName"))
-    targetName = mapGrp["TargetName"][0].toStdString();
-  oSRS.SetProjCS((mapGrp["ProjectionName"][0].toStdString() +
-                  " " + targetName).c_str());
-
-  // Set ellipsoid (matching GDAL ISIS3 driver's per-projection logic)
-  bool bIsGeographic = true;
-  if (mapGrp.hasKeyword("LatitudeType") &&
-      mapGrp["LatitudeType"][0].toLower() == "planetocentric")
-    bIsGeographic = false;
-
-  double iflattening = 0.0;
-  if ((a - b) >= 0.0000001)
-    iflattening = a / (a - b);
-
-  std::string geogName = "GCS_" + targetName;
-  std::string datumName = "D_" + targetName;
-  std::string sphereName = targetName;
-
-  if (projName == "polarstereographic" ||
-      (projName == "stereographic" && fabs(lat0) == 90.0)) {
-    if (bIsGeographic)
-      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
-                     a, iflattening, "Reference_Meridian", 0.0);
-    else
-      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(),
-                     (sphereName + "_polarRadius").c_str(),
-                     b, 0.0, "Reference_Meridian", 0.0);
-  } else if (projName == "simplecylindrical" ||
-             projName == "orthographic" ||
-             projName == "sinusoidal") {
-    // ISIS uses spherical equations for these
-    oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
-                   a, 0.0, "Reference_Meridian", 0.0);
-  } else if (projName == "equirectangular") {
-    // Local radius at CenterLatitude
-    double radLat = lat0 * M_PI / 180.0;
-    double meanRadius = sqrt(pow(b * cos(radLat), 2) +
-                             pow(a * sin(radLat), 2));
-    double localRadius = (meanRadius == 0.0) ? 0.0 : a * b / meanRadius;
-    oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(),
-                   (sphereName + "_localRadius").c_str(),
-                   localRadius, 0.0, "Reference_Meridian", 0.0);
-  } else {
-    // Mercator, TM, LCC, LAEA, Mollweide, Robinson
-    if (bIsGeographic)
-      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
-                     a, iflattening, "Reference_Meridian", 0.0);
-    else
-      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
-                     a, 0.0, "Reference_Meridian", 0.0);
-  }
-
-  // Export to WKT
-  char *wkt = nullptr;
-  oSRS.exportToWkt(&wkt);
-  if (!wkt)
-    throw IException(IException::Programmer,
-      "Failed to export projection to WKT", _FILEINFO_);
-  std::string result(wkt);
-  CPLFree(wkt);
-  return result;
 }
 
 // Tiled raster reader using ISIS Portal for chunk-cached random access.
@@ -1376,7 +1237,7 @@ void lonlatBboxToProj(double minLat, double maxLat,
 //   mpp = 2*PI*localRadius / (360*ppd)
 // For a sphere (a == c), localRadius = a regardless of latitude.
 // For an ellipsoid, localRadius = a*c / sqrt((c*cos)^2 + (a*sin)^2).
-// In practice, semiMajor == semiMinor here because pvlToWkt() and the
+// In practice, semiMajor == semiMinor here because PvlToWkt() and the
 // GDAL ISIS3 driver bake the local radius at CenterLatitude into the
 // ellipsoid as a sphere. The ellipsoid case below is kept for correctness
 // if this function is ever called with true ellipsoid axes.
@@ -1722,8 +1583,8 @@ GeoRef geoRefFromMapFile(const std::string &mapFile,
   Pvl mapPvl;
   mapPvl.read(QString::fromStdString(mapFile));
   PvlGroup &mapGrp = mapPvl.findGroup("Mapping", Pvl::Traverse);
-
-  std::string wkt = pvlToWkt(mapGrp, defaultSemiMajor, defaultSemiMinor);
+  std::string wkt = ProjectionFactory::PvlToWkt(mapGrp, defaultSemiMajor,
+                                                defaultSemiMinor);
   bool fromString = true;
   return GeoRef(wkt, fromString);
 }

@@ -10,6 +10,9 @@ find files of those names at the top level of this repository. **/
 #include <cfloat>
 #include <cmath>
 #include <iomanip>
+#include <sstream>
+
+#include <ogr_spatialref.h>
 
 #include "Camera.h"
 #include "Cube.h"
@@ -17,8 +20,10 @@ find files of those names at the top level of this repository. **/
 #include "Distance.h"
 #include "FileName.h"
 #include "IException.h"
+#include "IString.h"
 #include "Plugin.h"
 #include "Projection.h"
+#include "PvlGroup.h"
 #include "RingPlaneProjection.h"
 #include "TProjection.h"
 
@@ -1159,4 +1164,168 @@ namespace Isis {
     }
     return (Isis::Projection *) proj;
   }
+  std::string ProjectionFactory::PvlToWkt(const Isis::PvlGroup &mapGrp,
+                                          double defaultSemiMajor,
+                                          double defaultSemiMinor) {
+
+    std::string projName = mapGrp["ProjectionName"][0].toLower().toStdString();
+
+    double a = defaultSemiMajor;
+    double b = defaultSemiMinor;
+    if (mapGrp.hasKeyword("EquatorialRadius"))
+      a = toDouble(mapGrp["EquatorialRadius"][0]);
+    if (mapGrp.hasKeyword("PolarRadius"))
+      b = toDouble(mapGrp["PolarRadius"][0]);
+
+    double lon0 = 0.0;
+    if (mapGrp.hasKeyword("CenterLongitude"))
+      lon0 = toDouble(mapGrp["CenterLongitude"][0]);
+
+    double lat0 = 0.0;
+    if (mapGrp.hasKeyword("CenterLatitude"))
+      lat0 = toDouble(mapGrp["CenterLatitude"][0]);
+
+    double scaleFactor = 1.0;
+    if (mapGrp.hasKeyword("ScaleFactor"))
+      scaleFactor = toDouble(mapGrp["ScaleFactor"][0]);
+
+    OGRSpatialReference oSRS;
+    oSRS.SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+
+    if (projName == "equirectangular" || projName == "simplecylindrical")
+      oSRS.SetEquirectangular2(0.0, lon0, lat0, 0, 0);
+    else if (projName == "orthographic")
+      oSRS.SetOrthographic(lat0, lon0, 0, 0);
+    else if (projName == "sinusoidal")
+      oSRS.SetSinusoidal(lon0, 0, 0);
+    else if (projName == "mercator")
+      oSRS.SetMercator(lat0, lon0, scaleFactor, 0, 0);
+    else if (projName == "polarstereographic")
+      oSRS.SetPS(lat0, lon0, scaleFactor, 0, 0);
+    else if (projName == "stereographic")
+      oSRS.SetStereographic(lat0, lon0, scaleFactor, 0, 0);
+    else if (projName == "transversemercator")
+      oSRS.SetTM(lat0, lon0, scaleFactor, 0, 0);
+    else if (projName == "lambertconformal") {
+      double par1 = 0.0, par2 = 0.0;
+      if (mapGrp.hasKeyword("FirstStandardParallel"))
+        par1 = toDouble(mapGrp["FirstStandardParallel"][0]);
+      if (mapGrp.hasKeyword("SecondStandardParallel"))
+        par2 = toDouble(mapGrp["SecondStandardParallel"][0]);
+      oSRS.SetLCC(par1, par2, lat0, lon0, 0, 0);
+    } else if (projName == "lambertazimuthalequalarea")
+      oSRS.SetLAEA(lat0, lon0, 0, 0);
+    else if (projName == "mollweide")
+      oSRS.SetMollweide(lon0, 0, 0);
+    else if (projName == "robinson")
+      oSRS.SetRobinson(lon0, 0, 0);
+    else if (projName == "pointperspective") {
+      // Distance is in km in ISIS PVL; convert to meters.
+      // height_above_ground = distance - semi_major (matches GDAL driver).
+      if (!mapGrp.hasKeyword("Distance"))
+        throw IException(IException::User,
+          "PointPerspective Mapping group requires the Distance keyword",
+          _FILEINFO_);
+      double distance = toDouble(mapGrp["Distance"][0]) * 1000.0;
+      double heightAboveGround = distance - a;
+      oSRS.SetVerticalPerspective(lat0, lon0, 0, heightAboveGround, 0, 0);
+    }
+    else if (projName == "obliquecylindrical") {
+      // ISIS3's rotated-pole convention differs from PROJ ob_tran.
+      // Compensate per GDAL ISIS3 driver:
+      //   poleLatitude  ->  180 - poleLatitude
+      //   poleRotation  ->  -poleRotation
+      // See ObliqueCylindrical.cpp in ISIS and src/projections/ob_tran.cpp
+      // in PROJ for the difference.
+      if (!mapGrp.hasKeyword("PoleLatitude") ||
+          !mapGrp.hasKeyword("PoleLongitude") ||
+          !mapGrp.hasKeyword("PoleRotation"))
+        throw IException(IException::User,
+          "ObliqueCylindrical Mapping group requires "
+          "PoleLatitude, PoleLongitude, and PoleRotation keywords",
+          _FILEINFO_);
+      double poleLatitude = toDouble(mapGrp["PoleLatitude"][0]);
+      double poleLongitude = toDouble(mapGrp["PoleLongitude"][0]);
+      double poleRotation = toDouble(mapGrp["PoleRotation"][0]);
+      std::ostringstream oss;
+      oss.precision(17);
+      oss << "+proj=ob_tran +o_proj=eqc"
+          << " +o_lon_p=" << -poleRotation
+          << " +o_lat_p=" << (180.0 - poleLatitude)
+          << " +lon_0=" << poleLongitude;
+      if (oSRS.SetFromUserInput(oss.str().c_str()) != OGRERR_NONE)
+        throw IException(IException::Programmer,
+          "Failed to build ObliqueCylindrical PROJ4 string: " +
+          QString::fromStdString(oss.str()),
+          _FILEINFO_);
+    }
+    else
+      throw IException(IException::User,
+        "Unsupported projection: " + QString::fromStdString(projName),
+        _FILEINFO_);
+
+    std::string targetName = "Body";
+    if (mapGrp.hasKeyword("TargetName"))
+      targetName = mapGrp["TargetName"][0].toStdString();
+    oSRS.SetProjCS((mapGrp["ProjectionName"][0].toStdString() +
+                    " " + targetName).c_str());
+
+    bool bIsGeographic = true;
+    if (mapGrp.hasKeyword("LatitudeType") &&
+        mapGrp["LatitudeType"][0].toLower() == "planetocentric")
+      bIsGeographic = false;
+
+    double iflattening = 0.0;
+    if ((a - b) >= 0.0000001)
+      iflattening = a / (a - b);
+
+    std::string geogName = "GCS_" + targetName;
+    std::string datumName = "D_" + targetName;
+    std::string sphereName = targetName;
+
+    if (projName == "polarstereographic" ||
+        (projName == "stereographic" && fabs(lat0) == 90.0)) {
+      if (bIsGeographic)
+        oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
+                       a, iflattening, "Reference_Meridian", 0.0);
+      else
+        oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(),
+                       (sphereName + "_polarRadius").c_str(),
+                       b, 0.0, "Reference_Meridian", 0.0);
+    } else if (projName == "simplecylindrical" ||
+               projName == "orthographic" ||
+               projName == "sinusoidal" ||
+               projName == "pointperspective") {
+      // ISIS uses spherical equations for these
+      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
+                     a, 0.0, "Reference_Meridian", 0.0);
+    } else if (projName == "equirectangular") {
+      // Local radius at CenterLatitude
+      double radLat = lat0 * M_PI / 180.0;
+      double meanRadius = sqrt(pow(b * cos(radLat), 2) +
+                               pow(a * sin(radLat), 2));
+      double localRadius = (meanRadius == 0.0) ? 0.0 : a * b / meanRadius;
+      oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(),
+                     (sphereName + "_localRadius").c_str(),
+                     localRadius, 0.0, "Reference_Meridian", 0.0);
+    } else {
+      // Mercator, TM, LCC, LAEA, Mollweide, Robinson
+      if (bIsGeographic)
+        oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
+                       a, iflattening, "Reference_Meridian", 0.0);
+      else
+        oSRS.SetGeogCS(geogName.c_str(), datumName.c_str(), sphereName.c_str(),
+                       a, 0.0, "Reference_Meridian", 0.0);
+    }
+
+    char *wkt = nullptr;
+    oSRS.exportToWkt(&wkt);
+    if (!wkt)
+      throw IException(IException::Programmer,
+        "Failed to export projection to WKT", _FILEINFO_);
+    std::string result(wkt);
+    CPLFree(wkt);
+    return result;
+  }
+
 } //end namespace isis
