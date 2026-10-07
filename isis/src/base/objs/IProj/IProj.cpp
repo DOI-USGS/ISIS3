@@ -66,9 +66,25 @@ namespace Isis {
       throw IException(IException::Programmer, msg, _FILEINFO_);
     }
 
-    m_llaProj2outputProj = proj_create_crs_to_crs_from_pj(m_C, m_llaProj, m_outputProj, 0, 0);
-    if (0 == m_llaProj2outputProj) {
+    PJ *transformation = proj_create_crs_to_crs_from_pj(m_C, m_llaProj, m_outputProj, 0, 0);
+    if (0 == transformation) {
       QString msg = "Unable to create transform from [" + QString(projString.c_str()) + "]";
+      throw IException(IException::User, msg, _FILEINFO_);
+    }
+
+    // Depending on the format of m_userOutputProjStr, proj_create() can return a projection
+    // with either a traditional (lon, lat)/(x, y) axis order on the transform, or a (lat, lon)
+    // axis order. For example WKT and PROJJSON use (lat, lon) per the ISO 19111 standard.
+    //
+    // proj_normalize_for_visualization() ensures the transformation is always in (lon, lat) order,
+    // which then ensures that proj_trans() in IProj::SetGround() and IProj::SetCoordinate() works
+    // correctly.
+    m_llaProj2outputProj = proj_normalize_for_visualization(m_C, transformation);
+
+    proj_destroy(transformation);
+
+    if (0 == m_llaProj2outputProj) {
+      QString msg = "Unable to normalize transform from [" + QString(projString.c_str()) + "]";
       throw IException(IException::User, msg, _FILEINFO_);
     }
   }
