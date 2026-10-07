@@ -24,9 +24,16 @@ using namespace std;
 
 namespace Isis {
 
+  /** Create a PvlKeyword with a vector of QStrings */
+  inline PvlKeyword keyword_vector( const QString &name, 
+                                    const QStringList &vlist,
+                                    const QString &unit = "" ) {
+    PvlKeyword key( name );
+    for ( const QString &v : vlist ) {
+      key.addValue( v, unit );
+    }
 
-  inline std::string bool_s( const bool torf ) {
-    return ( ( torf == true ) ? "true" : "false" );
+    return ( key );
   }
 
   /** Generic constructor sets type to a TIN */
@@ -86,7 +93,6 @@ namespace Isis {
     if ( psmrts_p.size() == 0 ) psmrts_p = get_shapemodel_preferences();
 
     m_psmrts_debug = toBool( psmrts_p.get( "PsmrtsDebug", "false" ) );
-    // m_psmrts_debug = toBool( psmrts_p.get( "PsmrtsDebug", "true" ) );
 
     if ( m_psmrts_debug ) std::cout << "ISIS/PSMRTS Constructor running..." << std::endl;
 
@@ -118,7 +124,11 @@ namespace Isis {
           (void) load_shape_list( m_parameters.get("ShapeModel" ), psmrts_p );
         }
         else if ( ( "conf" ==  fext ) || ( "pvl" == fext ) ) {
-          (void) load_pvl_config( m_parameters.get("ShapeModel" ), psmrts_p );
+          bool success = load_pvl_config( m_parameters.get( "ShapeModel" ), psmrts_p );
+          if ( !success ) {
+            QString mess = "Invalid content in config file " + m_parameters.get( "ShapeModel" );
+            throw IException( IException::User, mess, _FILEINFO_ );            
+          }
         }
         else {
           psmrts_p.add( m_parameters.keyword( "ShapeModel" ) );
@@ -168,9 +178,8 @@ namespace Isis {
 
     // If it is defined set up the reference ellipsoid
     if ( radii.size() > 0 ) {
-      tracer_s.set_reference_ellipsoid( qt_to_string( target->systemName() ), 
-                                        radii );
-                                         
+      std::string name_e = ( nullptr == target->spice() ) ? "ellipsoid" : target->systemName().toStdString();
+      tracer_s.set_reference_ellipsoid( name_e, radii );
     }
 
     // Check for tolerance amd apply if given found
@@ -222,17 +231,23 @@ namespace Isis {
    * @param model DSK plate model from an existing NaifDskPlateModel (see the
    *              model() method
    */
-  PsmrtsShapeModel::PsmrtsShapeModel(const psmrts::PsmrtsTracerSystem &tracer_s,
-                                     const PvlFlatMap &parameters ) :
-                                     ShapeModel(),
-                                     m_parameters( parameters ),
-                                     m_shape_ray_t(),
-                                     m_latlon_ray_t(),
-                                     m_tracer( tracer_s.get_shape_tracer() ),
-                                     m_tolerance( DefaultDistanceTolerance ),
-                                     m_psmrts_debug( false ) {
+  PsmrtsShapeModel::PsmrtsShapeModel( const std::string &name,
+                                      const std::vector<std::string> &shapes,
+                                      const PvlFlatMap &parameters ) :
+                                      ShapeModel(),
+                                      m_parameters( parameters ),
+                                      m_shape_ray_t(),
+                                      m_latlon_ray_t(),
+                                      m_tracer( ),
+                                      m_tolerance( DefaultDistanceTolerance ),
+                                      m_psmrts_debug( false ) {
 
     setName("PSMRTS");
+    auto tracer_s = psmrts::PsmrtsTracerSystem( name, shapes, 
+                                                create_isis_path_translator( QString::fromStdString( name ) ) );
+    NaifStatus::CheckErrors();
+
+    m_tracer = tracer_s.get_shape_tracer();
     m_psmrts_debug = toBool( m_parameters.get( "PsmrtsDebug", "false" ) );
     clearSurfacePoint();
   }
@@ -344,7 +359,7 @@ namespace Isis {
     // If successful, set observer and calculate lookdir
     if ( true == status ) {
       // Save off the surfpt intercept point in case backCheck is needed
-      auto ray_t( std::move( m_shape_ray_t.trace() ) );
+      auto ray_t = m_shape_ray_t.trace();
       auto &datum_r = m_shape_ray_t.trace().datum();
 
       Eigen::Vector3d observer_t( observerPos.data() );
@@ -439,7 +454,7 @@ namespace Isis {
    * If the normal is not set the the ellipsoid normal is set.
    * 
    */
-  void PsmrtsShapeModel::calculateDefaultlNormal() {
+  void PsmrtsShapeModel::calculateDefaultNormal() {
     // Check if none are set
     if ( !hasNormal() && !m_shape_ray_t.hasHit() ) {
       QString mess = "Intercept point does not exist - cannot provide normal vector";
@@ -488,35 +503,12 @@ namespace Isis {
       throw IException(IException::Programmer, mess, _FILEINFO_);
     }
 
-    setLocalNormalFromIntercept();
-    return;
-  }
- 
-
-  /**
-   * @brief Set the local normal vector to the intercept point normal
-   *
-   * This method will reassign the ShapeModel normal to the current intecept point
-   * shape (which is a triangular plate) normal.  If an intercept point is not
-   * defined, an error will ensue.
-   *
-   * @author 2026-03-14 Kris Becker
-   */
-  void PsmrtsShapeModel::setLocalNormalFromIntercept()  {
-
-    // Sanity check
-    if ( !( hasIntersection() && m_shape_ray_t.hasHit() ) ) { // hasIntersection()  <==>  !m_intercept.isNull()
-      QString mess = "Intercept point does not exist - cannot provide normal vector";
-      throw IException(IException::Programmer, mess, _FILEINFO_);
-    }
-
     // Got it, use the existing intercept point (plate) normal
     Eigen::Vector3d norm_t = m_shape_ray_t.trace().normal();
     setLocalNormal(norm_t[0], norm_t[1], norm_t[2]); // this also takes care of setHasLocalNormal(true);
     return;
   }
-
-  
+ 
   /**
    * @brief Determine if the intercept is visiable from the position/lookdir
    * 
@@ -691,6 +683,25 @@ namespace Isis {
   }
 
 
+  /**
+   * @brief Load a special config/pvl file containing Kernels group
+   * 
+   * This method provides support specifically for file formats used during the
+   * OREX mission at Bennu. These PVL formatted files contain a Kernels group
+   * that contains, at a minimum, a ShapeModel keyword. The keyword may contain
+   * more that one named shape model and is intended to provide a list of
+   * kernels that are prioritized. The group may also contain a set of PSMRTS
+   * configuration keywords that are transerer to the flat_p container.
+   * 
+   * Because this file may be given as in the MODEL parameter of the spiceinit 
+   * application, it must contain a "ShapeModel" keyword or it will return 
+   * a false status indicating it did not exist.
+   * 
+   * @param pvlconf_f PVL file containing a Kernels group and ShapeModel keyword
+   * @param flat_p    PVL flat map container to add content to
+   * @return true     If the ShapeModel keyword is present in a Kernels group
+   * @return false    If the Kernels group or ShapeModel keyword is not present
+   */
   bool PsmrtsShapeModel::load_pvl_config( const QString &pvlconf_f,
                                           PvlFlatMap &flat_p ) const {
     try {
@@ -711,6 +722,18 @@ namespace Isis {
   }
       
 
+  /**
+   * @brief Update the ISIS PVL Kernel group keywords with PSRMTS configuration
+   * 
+   * This method transfers the internal PSMRTS configuration keywords to the
+   * ISIS PVL Kernels group to ensure consistent instantiation of PSMRTS shape
+   * model tracers are preserved after the initial spiceinit setup.
+   * 
+   * @param pvl         ISIS Kernel label to update
+   * @param psmrts_data PSMRTS configuration data
+   * @return true       Upon success, returns true
+   * @return false      If any issues are encountered
+   */
   bool PsmrtsShapeModel::psmrtsUpdateIsisLabel( Pvl &pvl, 
                                                 const PvlFlatMap &psmrts_data ) { 
 
@@ -938,6 +961,24 @@ namespace Isis {
 
     // There is more that one shape model which requires PSMRTS
     return ( true );
+  }
+
+  /**
+   * @brief Reverse the order of the tracers
+   * 
+   * This method will reverse the priority tracers which will reorder the list
+   * of tracers in the PsmrtsPriorityTracer such that the last tracer in the
+   * priority list will become the first tracer and the first tracer the last.
+   * 
+   * This has utility is cases of global shape models with an ellipsoid tracer
+   * appended to the list. By reversing the order, this essentially achieves
+   * switching from a high precision global facet-based model to the ellipsoid
+   * shape model, which more times than not is not a good representation of the
+   * target body, but could be useful.
+   */
+  size_t PsmrtsShapeModel::reverse_priority() {
+    m_latlon_ray_t.set_trace();  // Must reset this!
+    return ( m_tracer.reverse_priority() );
   }
 
 

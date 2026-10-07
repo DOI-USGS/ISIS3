@@ -9,6 +9,7 @@ find files of those names at the top level of this repository. **/
 #include "ShapeModel.h"
 
 #include <vector>
+#include <string>
 
 #include <QString>
 
@@ -42,55 +43,55 @@ namespace Isis {
 
       // Constructors
       PsmrtsShapeModel();
-      PsmrtsShapeModel(Target *target, Pvl &pvl, 
-                       const PvlFlatMap &parameters = PvlFlatMap() );
-      PsmrtsShapeModel(const psmrts::PsmrtsTracerSystem &tracer_s, 
-                       const PvlFlatMap &parameters = PvlFlatMap() );                       
-      PsmrtsShapeModel(const psmrts::PsmrtsPriorityTracer &tracer_t, 
-                       const PvlFlatMap &parameters = PvlFlatMap() );
+      PsmrtsShapeModel( Target *target, Pvl &pvl, 
+                        const PvlFlatMap &parameters = PvlFlatMap() );
+      PsmrtsShapeModel( const std::string &name, 
+                        const std::vector<std::string> &shapes, 
+                        const PvlFlatMap &parameters = PvlFlatMap() );                       
+      PsmrtsShapeModel( const psmrts::PsmrtsPriorityTracer &tracer_t, 
+                        const PvlFlatMap &parameters = PvlFlatMap() );
 
       // Destructor
       ~PsmrtsShapeModel();
 
       // Psmrts shape model creator methods */
-      static PsmrtsShapeModel *create(Target *target, Pvl &pvl, 
-                                      const bool throw_errors = true);
+      static PsmrtsShapeModel *create( Target *target, 
+                                       Pvl &pvl, 
+                                       const bool throw_errors = true );
 
       // Intersect the shape model
-      bool intersectSurface(std::vector<double> observerPos,
-                            std::vector<double> lookDirection);
-      virtual bool intersectSurface(const Latitude &lat, const Longitude &lon,
-                                    const std::vector<double> &observerPos,
-                                    const bool &checkOcclusion = true);
-      virtual bool intersectSurface(const SurfacePoint &surfpt, 
-                                    const std::vector<double> &observerPos,
-                                    const bool &checkOcclusion = true);
+      bool intersectSurface( std::vector<double> observerPos,
+                             std::vector<double> lookDirection);
+      virtual bool intersectSurface( const Latitude &lat, const Longitude &lon,
+                                     const std::vector<double> &observerPos,
+                                     const bool &checkOcclusion = true );
+      virtual bool intersectSurface( const SurfacePoint &surfpt, 
+                                     const std::vector<double> &observerPos,
+                                     const bool &checkOcclusion = true );
 
 
       // Calculate the surface normal of the current intersection point
-      void calculateDefaultlNormal();
-      void calculateLocalNormal(QVector<double *> cornerNeighborPoints); // use default normal
-      void setLocalNormalFromIntercept();
-
+      virtual void calculateDefaultNormal();
+      virtual void calculateLocalNormal( QVector<double *> cornerNeighborPoints ); // use default normal
 
       // Determine if the internal intercept is occluded from the observer/lookdir
-      virtual bool isVisibleFrom(const std::vector<double> observerPos,
-                                 const std::vector<double> lookDirection);
+      virtual bool isVisibleFrom( const std::vector<double> observerPos,
+                                  const std::vector<double> lookDirection );
 
       virtual void clearSurfacePoint();
 
       // CSMCamera uses all of these so be sure they are implemented!!
       // Calculate the emission angle of the current intersection point
-      virtual double emissionAngle(const std::vector<double> & sB);
+      virtual double emissionAngle( const std::vector<double> & sB );
 
       // Calculate the incidence angle of the current intersection point
-      virtual double incidenceAngle(const std::vector<double> &uB);
+      virtual double incidenceAngle( const std::vector<double> &uB );
 
-      Distance localRadius(const Latitude &lat, const Longitude &lon);
+      Distance localRadius( const Latitude &lat, const Longitude &lon );
     
-      bool isDEM() const;
+      virtual bool isDEM() const;
 
-      int plate_index() const;
+      virtual int plate_index() const;
 
       /** Return the composite tracer system reference */
       inline const psmrts::PsmrtsPriorityTracer &tracer() const {
@@ -194,6 +195,7 @@ namespace Isis {
       bool load_shape_list( const QString &shapelist_f, PvlFlatMap &flat_p ) const;
       static bool requires_psmrts( const Pvl &pvl );
 
+      size_t reverse_priority();
 
       /** Return a reference to the configuration keywords */
       inline const PvlFlatMap &parameters() const {
