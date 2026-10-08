@@ -32,6 +32,12 @@ namespace Isis {
    * Destructor for the ISIS default camera distortion map. 
    */
   CameraDistortionMap::~CameraDistortionMap() {
+    if (p_camera) {
+      if (p_camera->DistortionMap() == this) {
+        // deregister the distortion map from the camera so it's not freed twice 
+        p_camera->SetDistortionMap(NULL, false);      
+      }
+    }
   }
 
 

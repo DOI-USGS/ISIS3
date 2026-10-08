@@ -75,7 +75,10 @@ void IsisXMLParameter::characters(const XMLCh *const chars,
 void IsisXMLParameter::endElement(const XMLCh *const uri,
                                   const XMLCh *const localname,
                                   const XMLCh *const qname) {
-  if((string)XERCES::XMLString::transcode(localname) != "list") {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr != "list") {
     parser->setContentHandler(prevDocHandler);
     parser->setErrorHandler(prevErrorHandler);
   }
@@ -85,7 +88,10 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
                                     const XMLCh *const localname,
                                     const XMLCh *const qname,
                                     const XERCES::Attributes &attributes) {
-  if((string)XERCES::XMLString::transcode(localname) == (string)"type") {
+  char* transcodedCharArray = XERCES::XMLString::transcode(localname);
+  std::string transcodedStr(transcodedCharArray);
+  XERCES::XMLString::release(&transcodedCharArray);
+  if(transcodedStr == (string)"type") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -93,7 +99,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &parameter->type);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"brief")  {
+  else if(transcodedStr == (string)"brief")  {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -101,7 +107,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &parameter->brief);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"description") {
+  else if(transcodedStr == (string)"description") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -109,7 +115,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &parameter->description);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"default") {
+  else if(transcodedStr == (string)"default") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -117,7 +123,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->defaultValues);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"internalDefault") {
+  else if(transcodedStr == (string)"internalDefault") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -125,7 +131,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &parameter->internalDefault);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"count") {
+  else if(transcodedStr == (string)"count") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -133,42 +139,48 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &parameter->count);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"list") {
+  else if(transcodedStr == (string)"list") {
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"option") {
+  else if(transcodedStr == (string)"option") {
     if(listHandler != NULL) {
       delete listHandler;
       listHandler = NULL;
     }
     unsigned int index = parameter->listOptions.size();
     parameter->listOptions.resize(index + 1);
-    QString lo = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString lo(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
     lo = lo.toUpper();
     parameter->listOptions[index].value = lo;
     listHandler = new IsisXMLList(encodingName, expandNamespaces, parser,
                                   &parameter->listOptions[index]);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"minimum") {
+  else if(transcodedStr == (string)"minimum") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
     }
-    QString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString mi(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
     parameter->minimum_inclusive = mi.toLower();
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces,
                                         parser, &parameter->minimum);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"maximum") {
+  else if(transcodedStr == (string)"maximum") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
     }
-    QString mi = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    char* transcodedCharArray = XERCES::XMLString::transcode(attributes.getValue((XMLSize_t)0));
+    QString mi(transcodedCharArray);
+    XERCES::XMLString::release(&transcodedCharArray);
     parameter->maximum_inclusive = mi.toLower();
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &parameter->maximum);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"greaterThan") {
+  else if(transcodedStr == (string)"greaterThan") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -176,7 +188,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->greaterThan);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"greaterThanOrEqual") {
+  else if(transcodedStr == (string)"greaterThanOrEqual") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -184,7 +196,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->greaterThanOrEqual);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"lessThan") {
+  else if(transcodedStr == (string)"lessThan") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -192,7 +204,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->lessThan);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"lessThanOrEqual") {
+  else if(transcodedStr == (string)"lessThanOrEqual") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -200,7 +212,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->lessThanOrEqual);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"notEqual") {
+  else if(transcodedStr == (string)"notEqual") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -208,7 +220,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->notEqual);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"odd") {
+  else if(transcodedStr == (string)"odd") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -217,7 +229,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser);
 
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"exclusions") {
+  else if(transcodedStr == (string)"exclusions") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -225,7 +237,7 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->exclude);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"inclusions") {
+  else if(transcodedStr == (string)"inclusions") {
     if(multipleValuesHandler != NULL) {
       delete multipleValuesHandler;
       multipleValuesHandler = NULL;
@@ -233,14 +245,14 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     multipleValuesHandler = new IsisXMLMultipleValues(encodingName, expandNamespaces,
         parser, &parameter->include);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"filter") {
+  else if(transcodedStr == (string)"filter") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
     }
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser, &parameter->filter);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"defaultPath") {
+  else if(transcodedStr == (string)"defaultPath") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
@@ -248,21 +260,21 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser,
                                         &parameter->path);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"fileMode") {
+  else if(transcodedStr == (string)"fileMode") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
     }
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser, &parameter->fileMode);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"pixelType") {
+  else if(transcodedStr == (string)"pixelType") {
     if(generalHandler != NULL) {
       delete generalHandler;
       generalHandler = NULL;
     }
     generalHandler = new IsisXMLHandler(encodingName, expandNamespaces, parser, &parameter->pixelType);
   }
-  else if((string)XERCES::XMLString::transcode(localname) == (string)"helpers") {
+  else if(transcodedStr == (string)"helpers") {
     if(helpersHandler != NULL) {
       delete helpersHandler;
       helpersHandler = NULL;
@@ -275,7 +287,6 @@ void IsisXMLParameter::startElement(const XMLCh *const uri,
       delete ignoreHandler;
       ignoreHandler = NULL;
     }
-    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser,
-                                      (string)XERCES::XMLString::transcode(localname));
+    ignoreHandler = new IsisXMLIgnore(encodingName, expandNamespaces, parser, transcodedStr);
   }
 }

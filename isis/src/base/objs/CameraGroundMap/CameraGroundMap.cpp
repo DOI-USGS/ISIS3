@@ -33,6 +33,15 @@ namespace Isis {
     p_camera->SetGroundMap(this);
   }
 
+  CameraGroundMap::~CameraGroundMap() {
+    if (p_camera) {
+      if (p_camera->GroundMap() == this) {
+        // deregister the ground map from the camera so it's not freed twice 
+        p_camera->SetGroundMap(NULL, false);      
+      }
+    }
+  }
+
 
   /** 
    * Compute ground position from focal plane coordinate

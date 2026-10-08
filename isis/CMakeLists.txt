@@ -666,7 +666,7 @@ if(buildTests)
 
   if(buildCoverage)
     SET(COVERAGE_COMMAND ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 | true)
-    SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" "tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*.h" ".*.hpp" ".*.cc")
+    SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" "tests/.*" ".*/qisis/.*" ".*.cc")
     SET(CODE_COVERAGE_VERBOSE TRUE)
     SET(GCOVR_ADDITIONAL_ARGS --exclude-noncode-lines)
 

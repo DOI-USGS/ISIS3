@@ -27,6 +27,12 @@ namespace Isis {
 
   //! Destructor
   CameraDetectorMap::~CameraDetectorMap() {
+    if (p_camera) {
+      if (p_camera->DetectorMap() == this) {
+        // deregister the detector map from the camera so it's not freed twice 
+        p_camera->SetDetectorMap(NULL, false);      
+      }
+    }
   }
 
 
