@@ -1023,8 +1023,8 @@ TEST_F(PsmrtsSpiceinit, PsmrtsTwoWayCamptComparison ) {
   EXPECT_NEAR( toDouble( cpt["OffNadirAngle"] ), -3.2144548089471, tolerance_small );
   EXPECT_NEAR( toDouble( cpt["SubSpacecraftGroundAzimuth"] ), 178.82511288584, tolerance_small );
 
-  EXPECT_NEAR( toDouble( cpt["SunPosition"][0] ), 70633378.109504, tolerance_large );
-  EXPECT_NEAR( toDouble( cpt["SunPosition"][1] ), 142837223.62645, tolerance_large );
+  EXPECT_NEAR( toDouble( cpt["SunPosition"][0] ), 70633378.109504, 1.0e-3 );
+  EXPECT_NEAR( toDouble( cpt["SunPosition"][1] ), 142837223.62645, 1.0e-3 );
   EXPECT_NEAR( toDouble( cpt["SunPosition"][2] ), 6078864.0202888, tolerance_large );
 
   EXPECT_NEAR( toDouble( cpt["SubSolarAzimuth"] ), 16.681494836056, tolerance_small );
