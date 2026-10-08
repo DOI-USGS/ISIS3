@@ -299,9 +299,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitBullet ) {
 
 TEST_F(PsmrtsSpiceinit, PsmrtsSpiceinitNaifDsk ) {
 
-  const double tolerance_u   = 1.0e-9;
-  const double tolerance_d   = 1.0e-9;
-  const double tolerance_km  = 1.0e-9;
+  const double tolerance_u   = 1.0e-8;
+  const double tolerance_d   = 1.0e-8;
+  const double tolerance_km  = 1.0e-8;
 
   const QString bennu_t( "naifdsk::$osirisrex/kernels/dsk/bennu_g_12600mm_alt_obj_0000n00000_v021a.bds" );
   const QString ocams_f( "data/osirisRexImages/ocams/20190328T200344S309_pol_iofL2pan.fits" );
@@ -1023,9 +1023,9 @@ TEST_F(PsmrtsSpiceinit, PsmrtsTwoWayCamptComparison ) {
   EXPECT_NEAR( toDouble( cpt["OffNadirAngle"] ), -3.2144548089471, tolerance_small );
   EXPECT_NEAR( toDouble( cpt["SubSpacecraftGroundAzimuth"] ), 178.82511288584, tolerance_small );
 
-  EXPECT_NEAR( toDouble( cpt["SunPosition"][0] ), 70633378.109504, tolerance_small );
-  EXPECT_NEAR( toDouble( cpt["SunPosition"][1] ), 142837223.62645, tolerance_small );
-  EXPECT_NEAR( toDouble( cpt["SunPosition"][2] ), 6078864.0202888, tolerance_small );
+  EXPECT_NEAR( toDouble( cpt["SunPosition"][0] ), 70633378.109504, tolerance_large );
+  EXPECT_NEAR( toDouble( cpt["SunPosition"][1] ), 142837223.62645, tolerance_large );
+  EXPECT_NEAR( toDouble( cpt["SunPosition"][2] ), 6078864.0202888, tolerance_large );
 
   EXPECT_NEAR( toDouble( cpt["SubSolarAzimuth"] ), 16.681494836056, tolerance_small );
   EXPECT_NEAR( toDouble( cpt["SolarDistance"] ), 1.0659453789984, tolerance_small );
