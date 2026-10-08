@@ -668,6 +668,7 @@ if(buildTests)
     SET(COVERAGE_COMMAND ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 | true)
     SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" "tests/.*" ".*/moc_.*" "build/.*" "gtest/.*" ".*/qisis/.*" ".*.h" ".*.hpp" ".*.cc")
     SET(CODE_COVERAGE_VERBOSE TRUE)
+    SET(GCOVR_ADDITIONAL_ARGS --exclude-noncode-lines)
 
     setup_target_for_coverage_gcovr_html(
       NAME test_coverage_html                    # New target name
