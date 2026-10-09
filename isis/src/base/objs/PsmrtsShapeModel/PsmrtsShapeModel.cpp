@@ -168,20 +168,6 @@ namespace Isis {
     tracer_s = psmrts::PsmrtsTracerSystem( name_t, v_shapefiles, tracer_s.translations( ) );
     NaifStatus::CheckErrors();
 
-    // Add the ellipsoid as defined in target
-    std::vector<double> radii;
-    for ( const auto &radius : this->targetRadii() ) {
-      if ( radius.isValid() ) {
-        radii.push_back( radius.kilometers() );
-      }
-    }
-
-    // If it is defined set up the reference ellipsoid
-    if ( radii.size() > 0 ) {
-      std::string name_e = ( nullptr == target->spice() ) ? "ellipsoid" : target->systemName().toStdString();
-      tracer_s.set_reference_ellipsoid( name_e, radii );
-    }
-
     // Check for tolerance amd apply if given found
     QString tolerance_s = kmap_t.get( "Tolerance", "" );
     if ( tolerance_s.size() == 0 ) {
