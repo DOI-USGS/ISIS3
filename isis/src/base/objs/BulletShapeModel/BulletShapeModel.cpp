@@ -533,6 +533,29 @@ namespace Isis {
     return (*m_model);
   }
 
+  const BulletClosestRayCallback &BulletShapeModel::intercept() const {
+    return ( m_intercept );
+  }
+
+  /**
+   * @brief Returns the plate index (0-based for consistency) of the intercept
+   * 
+   * This method will return the plate index of the surface intercept facet
+   * determined from the Bullet ray callback result set. 
+   * 
+   * A 0-based index is returned to maintain consistency with other shape models
+   * that return a 0-based index. To convert this to a real plate ID you can add
+   * 1 to the value returned. 
+   * 
+   * Returned values greater that 0 and less or equal to the number of plates
+   * minus 1 are valid numbers.
+   * 
+   * @return int Returns the plate index of the intercept. Returns a -1 if there
+   *               is no intercept or its invalid.
+   */  
+  int BulletShapeModel::plate_index() const {
+    return ( this->intercept().triangleIndex() );
+  }
 
   /**
    * Returns The maximum distance in the Bullet world. This can be used to

@@ -306,6 +306,10 @@ find_package(Armadillo         REQUIRED)
 find_package(Threads)
 find_package(inja              REQUIRED)
 
+# Install/configure PSMRTS system
+include(psmrts_system)
+
+
 # Setup for googletest/googlemock before adding SensorUtilities so we build its tests
 if(buildTests)
   set(INSTALL_GTEST OFF)
@@ -379,7 +383,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 # add target based linkages to ALLLIBS variable
-list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double CSPICE::cspice)
+list(APPEND ALLLIBS pantor::inja sensorutilities protobuf::libprotobuf embree GDAL::GDAL Bullet::Bullet_double CSPICE::cspice psmrts::psmrts)
 
 list(APPEND ALLLIBS ${OpenCV_LIBS})
 list(APPEND ALLINCDIRS ${OpenCV_INCLUDE_DIRS})
@@ -664,6 +668,7 @@ if(buildTests)
     SET(COVERAGE_COMMAND ctest -j ${PROCESSOR_COUNT} --output-on-failure --timeout 10000 | true)
     SET(COVERAGE_EXCLUDE ".*/unitTest.cpp" "tests/.*" ".*/qisis/.*" ".*.cc")
     SET(CODE_COVERAGE_VERBOSE TRUE)
+    SET(GCOVR_ADDITIONAL_ARGS --exclude-noncode-lines)
 
     setup_target_for_coverage_gcovr_html(
       NAME test_coverage_html                    # New target name
