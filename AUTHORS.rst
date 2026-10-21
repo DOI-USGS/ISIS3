@@ -140,7 +140,8 @@ Integrated Software for Imagers and Spectrometers Contributors
 - Sanders, Austin (United States Geological Survey, Astro Geology
   Science Center)
 - Scott, Bill
-- Seignovert, Benoit
+- Seignovert, Benoît (Observatoire des Sciences de l'Univers Nantes
+  Atlantique)
 - Shepard, Makayla
 - Shinaman, John (United States Geological Survey, Astro Geology
   Science Center)
