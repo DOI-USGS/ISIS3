@@ -138,3 +138,27 @@ TEST_F(GalileoSsiCube, FunctionalTestGllssicalRadiance) {
   EXPECT_DOUBLE_EQ(oCubeStats->StandardDeviation(), 6119860.4426242532);
 }
 
+
+
+TEST_F(GalileoSsiCube, FunctionalTestGllssicalEarthConstants) {
+  PvlGroup &archive = testCube->label()->findObject("IsisCube").findGroup("Archive");
+  archive.findKeyword("CalTargetCode").setValue("E1");
+  testCube->reopen();
+
+  QString outCubeFileName = tempDir.path() + "/outTemp.cub";
+  QVector<QString> args = {"from="+ testCube->fileName(),  "to="+outCubeFileName};
+
+  UserInterface options(APP_XML, args);
+  try {
+    gllssical(options);
+  }
+  catch (IException &e) {
+    FAIL() << "Unable to open image: " << e.what() << std::endl;
+  }
+
+  Cube oCube(outCubeFileName, "r");
+  PvlGroup radGroup = oCube.label()->findObject("IsisCube").findGroup("RadiometricCalibration");
+
+  // Fixture filter is RED (FilterNumber 2): E1 FloatToRef[2] = 1.382E-02
+  EXPECT_DOUBLE_EQ((double)radGroup.findKeyword("S1"), 0.01382);
+}

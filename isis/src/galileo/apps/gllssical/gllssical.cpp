@@ -417,10 +417,18 @@ namespace Isis {
   void calculateScaleFactor0(Cube *icube, Cube *gaincube) {
     Pvl conversionFactors(GetScaleFactorFile().expanded());
     PvlKeyword fltToRef, fltToRad;
-  
+    PvlKeyword defaultFltToRef, defaultFltToRad;
+
     for(int grp = 0; grp < conversionFactors.groups(); grp++) {
       PvlGroup currGrp = conversionFactors.group(grp);
-  
+
+      // A group with no target keywords is the default; it must not override specific matches
+      if(!currGrp.hasKeyword("TargetName") && !currGrp.hasKeyword("MinimumTargetName")) {
+        defaultFltToRef = currGrp["FloatToRef"];
+        defaultFltToRad = currGrp["FloatToRad"];
+        continue;
+      }
+
       // Match target name
       if(currGrp.hasKeyword("TargetName")) {
         if(!icube->group("Archive")["CalTargetCode"][0].startsWith(currGrp["TargetName"][0])) {
@@ -445,8 +453,13 @@ namespace Isis {
       fltToRad = currGrp["FloatToRad"];
     }
   
+    if(fltToRef.size() == 0) {
+      fltToRef = defaultFltToRef;
+      fltToRad = defaultFltToRad;
+    }
+
     int filterNumber = toInt(icube->group("BandBin")["FilterNumber"][0]);
-  
+
     if(fltToRef.size() == 0) {
       throw IException(IException::Unknown,
                        "Unable to find matching reflectance and radiance values for target [" +
