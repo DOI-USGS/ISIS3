@@ -44,7 +44,16 @@ namespace Isis {
     if (ui.GetBoolean("USEPROJ")) {
       PvlGroup mappingGroup("Mapping");
       mappingGroup.addKeyword(PvlKeyword("ProjectionName", "IProj"));
-      QString userProjStr = ui.GetAsString("PROJString");
+      QString userProjStr = ui.GetAsString("PROJString").trimmed();
+
+      // Only allow PROJ strings to be given to proj_create().
+      if (!userProjStr.startsWith("+")) {
+        QString msg = "Only a +key=value formatted string is supported for PROJString, and it "
+                      "must begin with a '+' character (e.g. \"+proj=sinu +lon_0=0 ...\"). Other "
+                      "formats such as WKT, or PROJJSON are not supported: [" + userProjStr + "].";
+        throw IException(IException::User, msg, _FILEINFO_);
+      }
+
       // PROJ4 strings produce a coordinate operation, not a CRS.
       // proj_get_ellipsoid needs a CRS, so add +type=crs if needed.
       if (userProjStr.startsWith("+proj=") && !userProjStr.contains("+type=crs"))

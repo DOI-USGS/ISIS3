@@ -402,8 +402,12 @@
         <type>string</type>
         <brief>A PROJ4 string that defines the projection</brief>
         <description>
-          This parameters is used instead of the map file to define the projection to
-          transform into. For help with PROJ strings visit https://proj.org/en/9.3/index.html
+          This parameter is used instead of the map file to define the projection to
+          transform into. It must be a PROJ4 string in "+key=value" format (e.g. "+proj=sinu
+          +lon_0=0 ..."), and must begin with a '+' character. Other CRS formats accepted by
+          PROJ in general, such as authority codes (e.g. "EPSG:4326"), WKT, and PROJJSON, are
+          not supported here and will result in an error. For help with PROJ4 strings visit
+          https://proj.org/en/9.3/index.html
         </description>
       </parameter>
     </group>
@@ -1411,7 +1415,7 @@
             <description>
               Entire <i>cam2map</i> GUI with parameters filled in for FROM file, TO
               file, default PIXRES, Output Map Ground Range set to the CAMERA
-              of the input cube, USEPROJ=YES, and the PROJSTRING set to the desired PROJ projection. 
+              of the input cube, USEPROJ=YES, and the PROJSTRING set to the desired PROJ projection.
               The rest of the parameters are all set to the defaults.
             </description>
             <thumbnail src="assets/thumbs/CAM2MAP_USEPROJ_GUI_thumb.jpeg" width="144" height="220" caption="USEPROJ=YES GUI "/>
@@ -1422,7 +1426,7 @@
         <image src="assets/images/CAM2MAP_USEPROJ_OUT.jpeg" width="496" height="496">
           <brief> Output image for cam2map USEPROJ=YES</brief>
           <description>
-            This is what an equirectangular projection using PROJ looks like. 
+            This is what an equirectangular projection using PROJ looks like.
             Given the correct projection string, you will get identical projections
             from PROJ when compared to there ISIS counterparts.
           </description>
