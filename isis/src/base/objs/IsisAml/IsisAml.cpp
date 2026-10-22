@@ -2124,8 +2124,14 @@ Isis::CubeAttributeOutput &IsisAml::GetOutputAttribute(const QString &paramName)
     value = param->values[0];
   }
   if(param->fileMode == "output") {
+    Isis::FileName fileName(value);
     param->outCubeAtt.setAttributes("+" + param->pixelType);
-    param->outCubeAtt.addAttributes(Isis::FileName(value));
+    param->outCubeAtt.addAttributes(fileName);
+
+    if (param->outCubeAtt.propagateFileFormat()) {
+      QString ext = fileName.extension().toLower();
+      param->outCubeAtt.setFileFormat(ext);
+    }
   }
   else {
     QString message = "Unable to get output cube attributes.  Parameter ["

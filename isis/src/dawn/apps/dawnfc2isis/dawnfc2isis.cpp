@@ -59,8 +59,8 @@ namespace Isis {
     p.SetOrganization(Isis::ProcessImport::BSQ);
     QString tmpName = "$TEMPORARY/" + inFile.baseName() + ".tmp.cub";
     FileName tmpFile(tmpName);
-    CubeAttributeOutput outatt = CubeAttributeOutput("+Real");
-    p.SetOutputCube(tmpFile.expanded(), outatt);
+    CubeAttributeOutput tmpOutatt = CubeAttributeOutput("+Real");
+    p.SetOutputCube(tmpFile.expanded(), tmpOutatt);
     p.SaveFileHeader();
 
     Pvl labelPvl(inFile.expanded());
@@ -71,7 +71,8 @@ namespace Isis {
     ProcessBySample p2;
     CubeAttributeInput inatt;
     p2.SetInputCube(tmpFile.expanded(), inatt);
-    Cube *outcube = p2.SetOutputCube("TO");
+    CubeAttributeOutput outatt = ui.GetOutputAttribute("TO");
+    Cube *outcube = p2.SetOutputCube(ui.GetCubeName("TO"), outatt);
 
     // Get the directory where the DAWN translation tables are.
     QString transDir = "$ISISROOT/appdata/translations/";
