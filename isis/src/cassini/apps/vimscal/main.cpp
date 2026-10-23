@@ -316,6 +316,9 @@ void calibrate(vector<Buffer *> &inBuffers, vector<Buffer *> &outBuffers) {
  *
  * @param *icube A pointer to the input cube
  * @param *p A pointer to the ProcessByLine object
+ *
+ * @throw Isis::IException::Unknown - "No camera found"
+ * @throw Isis::IException::Unknown - "No surface intersection found"
  */
 void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
   UserInterface &ui = Application::GetUserInterface();
@@ -378,16 +381,13 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     solarRemoveCoefficient = cam->SolarDistance() * cam->SolarDistance();
   }
 
-  // Default to original vimscal's solar distance if we can't find a target
+  // Raise an error when no surface intersection found
   if(solarRemoveCoefficient < 0) {
-    solarRemoveCoefficient = 81.595089;
-    /*
     QString msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
-    msg += icube->FileName() + "]";
-    throw iException::Message(iException::Camera, msg, _FILEINFO_);
-    */
+    msg += icube->fileName() + "]";
+    throw IException::Message(IException::Unknown, msg, _FILEINFO_);
   }
 
   //bool vis = (icube->label()->
@@ -1073,7 +1073,7 @@ QString createCroppedFile(Cube *icube, QString cubeFileName, bool flatFile) {
                     "_" + FileName(icube->fileName()).name());
 
   appArgs += "to=" + tempFile.expanded();
-  if (ui.GetParamPreference() != "") { 
+  if (ui.GetParamPreference() != "") {
     appArgs += " -PREFERENCE=" + ui.GetParamPreference();
   }
 
