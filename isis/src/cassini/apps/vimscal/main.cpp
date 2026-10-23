@@ -386,8 +386,8 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     QString msg = "Unable to project image at four corners, center of edges or ";
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
-    msg += icube->FileName() + "]";
-    throw iException::Message(iException::Unknown, msg, _FILEINFO_);
+    msg += icube->fileName() + "]";
+    throw IException::Message(IException::Unknown, msg, _FILEINFO_);
   }
 
   //bool vis = (icube->label()->
