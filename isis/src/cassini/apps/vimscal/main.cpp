@@ -387,7 +387,7 @@ void calculateSolarRemove(Cube *icube, ProcessByLine *p) {
     msg += "at center. The solar distance can not be calculated, try using";
     msg += " [UNITS=SPECENERGY] on [";
     msg += icube->fileName() + "]";
-    throw IException::Message(IException::Unknown, msg, _FILEINFO_);
+    throw IException(IException::User, msg, _FILEINFO_);
   }
 
   //bool vis = (icube->label()->
