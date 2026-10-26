@@ -152,6 +152,10 @@ namespace Isis {
     return ( m_btbody.get() );
   }
 
+  /** Sets the shape model name */
+  void BulletTargetShape::setName( const QString &name ) {
+    m_name = name;
+  }
 
   /** Set the Bullet shape object to this object instance   */
   void BulletTargetShape::setTargetBody(btCollisionObject *body) {

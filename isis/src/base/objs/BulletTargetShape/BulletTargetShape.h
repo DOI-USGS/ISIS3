@@ -54,12 +54,13 @@ namespace Isis {
       btScalar maximumDistance() const;
 
     protected:
+      void setName( const QString &name );
       void setTargetBody(btCollisionObject *body);
       void setMaximumDistance();
       static void btDelete( btCollisionObject *btbody ); // shared_ptr destructor cleanup
 
     private:
-      QString                            m_name;   /**! The name of the body */
+      QString                            m_name;   /**! The name of the shape/body */
       std::shared_ptr<btCollisionObject> m_btbody; /**! The Bullet collision object
                                                        for the body */
       btScalar                           m_maximumDistance; /**! The distance from the minimum
