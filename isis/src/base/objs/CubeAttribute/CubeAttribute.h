@@ -493,6 +493,9 @@ namespace Isis {
       //! Set the format to the fmt parameter
       void setFileFormat(Cube::Format fmt);
 
+      //! Set the format based on the provided file extension
+      void setFileFormat(const QString &ext);
+
       //! Return the byte order as an Isis::ByteOrder
       ByteOrder byteOrder() const;
 

@@ -160,6 +160,11 @@ namespace Isis {
     return useWeb;
   }
 
+  bool Preference::autodetectFileFormat() {
+    bool autodetectFormat = checkIfPrefEquals("CubeCustomization", "AutoExtension", "On", false);
+    return autodetectFormat;
+  }
+
   void Preference::Shutdown() {
     if(p_preference) {
       delete p_preference;

@@ -47,6 +47,7 @@
          <filter>
            *.cub
          </filter>
+         <pixelType>real</pixelType>
        </parameter>
     </group>
 
