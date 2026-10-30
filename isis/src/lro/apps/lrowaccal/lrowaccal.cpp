@@ -814,9 +814,22 @@ namespace Isis {
           offset = specpixCube->Index(1, frameHeight * std::min(frame, (specpixCube->LineDimension() - 1) / frameHeight) + 1, b + 1);
         }
 
+        // We're bypassing Buffer::at for speed, so we need to make sure our
+        // index will not overrun the buffer
+        if (offset + frameSize > specpixCube->size()) {
+          QString msg = QStringLiteral(
+            "%1 (Specpix cube)").arg(
+              Message::ArraySubscriptNotInRange(offset + frameSize));
+          throw IException(IException::Programmer, msg, _FILEINFO_);
+        }
+
+        const int outFrameOffset = b * frameSize;
         for (int i = 0; i < frameSize; i++) {
-          if (IsSpecial((*specpixCube)[offset + i])) {
-            out[i + b * frameSize] = (*specpixCube)[offset + i];
+          const double specpixPixel = (*specpixCube)[offset + i];
+          double &outputPixel = out[i + outFrameOffset];
+
+          if (IsSpecial(specpixPixel)) {
+            outputPixel = specpixPixel;
           }
         }
       }
