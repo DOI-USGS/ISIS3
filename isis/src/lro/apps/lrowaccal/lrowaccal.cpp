@@ -208,7 +208,7 @@ namespace Isis {
 
       // invert the flat-field data here so we don't have to divide for every pixel of the wac
       for (int i = 0; i < flatCube->size(); i++) {
-        flatCube->at(i) = 1.0 / flatCube->at(i);
+        (*flatCube)[i] = 1.0 / (*flatCube)[i];
       }
     }
 
