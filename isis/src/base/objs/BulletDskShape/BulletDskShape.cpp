@@ -175,6 +175,9 @@ namespace Isis {
  */
   void BulletDskShape::loadFromDsk(const QString &dskfile) {
 
+    /* Set the name of the DSK file */
+    setName( dskfile );
+
     /** NAIF DSK parameter setup   */
     SpiceInt      handle;   //!< The DAS file handle of the DSK file.
     SpiceBoolean  found;
