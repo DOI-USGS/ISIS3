@@ -185,14 +185,16 @@ namespace Isis {
      * @param timeDifferenceYears The time difference between the image time and the initial time in fractional Julian
      *                            years, excluding leapseconds
      * @param filterNums The filter numbers corresponding to each band in order
-     * @param coefficients The time-dependent correction coefficients for each band
+     * @param factors The time-dependent correction factors for each band
      *
      * @internal
      *   @history 2026-08-25 Cordell Michaud - Original version
+     *   @history 2026-11-02 Cordell Michaud - Changed the coefficients parameter to an array of precomputed correction
+     *                                         factors for each filter number to multiply with the input values
      */
     void CorrectTDR(Buffer &inout, int correctBand, double timeDifferenceYears,
                     const std::vector<int> &filterNums,
-                    const std::array<std::array<double, 2>, 7> &coefficients);
+                    const std::array<double, 7> &factors);
   }
 }
 

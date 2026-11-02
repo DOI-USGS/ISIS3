@@ -327,6 +327,7 @@ namespace Isis {
       filterNums.push_back(toInt(filterNumStrings[bandIndex]));
     }
     std::array<std::array<double, 2>, 7> timeCorrectionCoefficients;
+    std::array<double, 7> timeCorrectionFactors;
     PvlKeyword timeDependentFilePvlKeyword("TimeDependentFile");
     PvlKeyword timeDependentACoefficientsPvlKeyword("TimeDependentACoefficients");
     PvlKeyword timeDependentBCoefficientsPvlKeyword("TimeDependentBCoefficients");
@@ -351,6 +352,7 @@ namespace Isis {
       timeDifferenceYears = timeDifferenceSeconds / secondsPerYear;
 
       timeCorrectionCoefficients = LroWacCal::GetTDRCoefficients(timeDependentFileName.expanded());
+      timeCorrectionFactors = LroWacCal::CalculateTDRFactors(timeCorrectionCoefficients, timeDifferenceYears);
       for (auto filterNumIndex = 0UL; filterNumIndex < filterNums.size(); filterNumIndex++) {
         const int &filterNum = filterNums[filterNumIndex];
         const double &a = timeCorrectionCoefficients[filterNum - 1][0];
@@ -393,7 +395,7 @@ namespace Isis {
     auto Calibrate = [calParams, &bands, startTemperature, endTemperature, darkCube1,
                       darkCube2, flatCube, specpixCube, &temperatureConstants, numFrames,
                       temp1, temp2, &iofResponsivity, &radianceResponsivity,
-                      timeDifferenceYears, &timeCorrectionCoefficients,
+                      timeDifferenceYears, &timeCorrectionFactors,
                       &filterNums](Buffer &inCube, Buffer &outCube) -> void {
       int correctBand = -1;
       // If we are passed in a single band (img.cub+4) we need to pay special attention that we don't start with band1
@@ -441,7 +443,7 @@ namespace Isis {
       }
 
       if (calParams.timeDependent) {
-        LroWacCal::CorrectTDR(outCube, correctBand, timeDifferenceYears, filterNums, timeCorrectionCoefficients);
+        LroWacCal::CorrectTDR(outCube, correctBand, timeDifferenceYears, filterNums, timeCorrectionFactors);
       }
     };
 
@@ -932,16 +934,13 @@ namespace Isis {
 
     void CorrectTDR(Buffer &inout, int correctBand, double timeDifferenceYears,
                     const std::vector<int> &filterNums,
-                    const std::array<std::array<double, 2>, 7> &coefficients) {
+                    const std::array<double, 7> &factors) {
       for (int i = 0; i < inout.size(); i++) {
         if (!IsSpecial(inout[i]) && !IsNullPixel(inout[i])) {
           const int bandNum = (correctBand != -1) ? correctBand : inout.Band(i);
           const int filterNum = (correctBand != -1) ? filterNums[0] : filterNums[bandNum - 1];
-          const std::array<double, 2> &currentCoefficients = coefficients[filterNum - 1];
-          const double a = currentCoefficients[0];
-          const double b = currentCoefficients[1];
-          const double correctionFactor = 1 - a * timeDifferenceYears + b * timeDifferenceYears * timeDifferenceYears;
-          inout[i] /= correctionFactor;
+          const double &correctionFactor = factors[filterNum - 1];
+          inout[i] *= correctionFactor;
         }
       }
     }
