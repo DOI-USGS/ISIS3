@@ -432,6 +432,12 @@ namespace Isis {
             }
             if (ellipsoidNormal) {
               ShapeModel *shapeModel = cam->target()->shape();
+              // The ellipsoid normal is normally computed as a side effect of
+              // EmissionAngle() or IncidenceAngle(). If neither was requested,
+              // compute it here so normal() does not throw.
+              if (!shapeModel->hasNormal()) {
+                shapeModel->calculateDefaultNormal();
+              }
               std::vector<double> ellipsoidNormal = shapeModel->normal();
 
               LinearAlgebra::Vector ellipsoidNormalXYZ = LinearAlgebra::vector(ellipsoidNormal[0], ellipsoidNormal[1], ellipsoidNormal[2]);
