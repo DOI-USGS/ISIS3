@@ -1105,7 +1105,7 @@ namespace Isis {
 
     std::array<double, 7> CalculateTDRFactors(const std::array<std::array<double, 2>, 7> &coefficients,
                                               double timeDifferenceYears) {
-      std::array<double, 7> factors;
+      std::array<double, 7> factors = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
       for (auto i = 0UL; i < coefficients.size(); i++) {
         const double &a = coefficients.at(i).at(0);
         const double &b = coefficients.at(i).at(1);
