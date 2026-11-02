@@ -113,8 +113,10 @@ for FILE in $FILES; do
       if [ $res != 0 ]; then
         COMPRESULT="ERROR"
       else
-        COMPRESULT=COMPRESULT=`$(ISISROOT)/bin/getkey from=compare.txt                \
-	          grp=Results keyword=Compare | tr '[:upper:]' '[:lower:]'`; 
+        COMPRESULT="$ISISROOT/bin/getkey"   \
+		           "from=compare.txt"       \
+	               "grp=Results"            \
+				   "keyword=Compare" | tr '[:upper:]' '[:lower:]'`; 
       fi
       if [ "$COMPRESULT" != "identical" ]; then
         echo "Failed ... File [$FILE]"
