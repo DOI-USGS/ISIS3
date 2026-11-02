@@ -326,7 +326,6 @@ namespace Isis {
       }
       filterNums.push_back(toInt(filterNumStrings[bandIndex]));
     }
-    std::array<std::array<double, 2>, 7> timeCorrectionCoefficients;
     std::array<double, 7> timeCorrectionFactors;
     PvlKeyword timeDependentFilePvlKeyword("TimeDependentFile");
     PvlKeyword timeDependentACoefficientsPvlKeyword("TimeDependentACoefficients");
@@ -351,7 +350,7 @@ namespace Isis {
       constexpr double secondsPerYear = 365.25 * 24 * 60 * 60;
       timeDifferenceYears = timeDifferenceSeconds / secondsPerYear;
 
-      timeCorrectionCoefficients = LroWacCal::GetTDRCoefficients(timeDependentFileName.expanded());
+      const auto timeCorrectionCoefficients = LroWacCal::GetTDRCoefficients(timeDependentFileName.expanded());
       timeCorrectionFactors = LroWacCal::CalculateTDRFactors(timeCorrectionCoefficients, timeDifferenceYears);
       for (auto filterNumIndex = 0UL; filterNumIndex < filterNums.size(); filterNumIndex++) {
         const int &filterNum = filterNums[filterNumIndex];
