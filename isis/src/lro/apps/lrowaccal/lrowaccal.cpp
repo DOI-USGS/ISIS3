@@ -320,11 +320,11 @@ namespace Isis {
     const PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
     for (auto bandIndex = 0UL; bandIndex < bands.size(); bandIndex++) {
       int bandNum = bands[bandIndex];
-      if (bandNum > filterNumStrings.size()) {
+      if (bandIndex >= filterNumStrings.size()) {
         QString msg = QStringLiteral("No corresponding filter number found for band %1.").arg(static_cast<int>(bandNum));
         throw IException(IException::User, msg, _FILEINFO_);
       }
-      filterNums.push_back(toInt(filterNumStrings[bandNum - 1]));
+      filterNums.push_back(toInt(filterNumStrings[bandIndex]));
     }
     std::array<std::array<double, 2>, 7> timeCorrectionCoefficients;
     PvlKeyword timeDependentFilePvlKeyword("TimeDependentFile");
