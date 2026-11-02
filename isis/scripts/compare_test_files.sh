@@ -116,7 +116,7 @@ for FILE in $FILES; do
         COMPRESULT="$ISISROOT/bin/getkey"   \
 		           "from=$FAILURE_REPORT"   \
 	               "grp=Results"            \
-				   "keyword=Compare" | tr '[:upper:]' '[:lower:]'`; 
+				   "keyword=Compare" | tr '[:upper:]' '[:lower:]'; 
       fi
       if [ "$COMPRESULT" != "identical" ]; then
         echo "Failed ... File [$FILE]"
