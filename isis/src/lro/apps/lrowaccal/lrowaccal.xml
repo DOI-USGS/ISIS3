@@ -275,6 +275,11 @@
       Added check that the band count does not exceed 7.
       Fixed off-by-one error in temperature correction.
     </change>
+    <change name="Cordell Michaud" date="2026-11-04">
+      Fixed improper filter number checking and indexing for cubes with less than 7 bands.
+      Added calculation of time-dependent correction factors ahead of time rather than redundantly on the fly during the calibration loop.
+      Added missing bounds checking and message to CorrectSpecialPixels to be consistent with other corrections.
+    </change>
   </history>
 
   <groups>
