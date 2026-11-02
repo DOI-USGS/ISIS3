@@ -6,7 +6,11 @@
 #include <QTextStream>
 #include <QStringList>
 
+#include <cmath>
+
+#include "Angle.h"
 #include "BandManager.h"
+#include "Camera.h"
 #include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
@@ -633,6 +637,77 @@ TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
   EXPECT_GT(latHist->ValidPixels(), 0);
   std::unique_ptr<Histogram> lonHist(cube.histogram(5));
   EXPECT_GT(lonHist->ValidPixels(), 0);
+
+  cube.close();
+}
+
+
+ }
+
+
+/**
+   * FunctionalTestPhocubeLocalBandOrder
+   *
+   * Regression test for https://github.com/DOI-USGS/ISIS3/issues/6176.
+   * The band names in the BandBin group must describe the values that are
+   * actually written to each band. With LOCALEMISSION and LOCALNORMAL the
+   * local emission angle is written first, followed by the local normal.
+   */
+TEST_F(DefaultCube, FunctionalTestPhocubeLocalBandOrder) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "phase=false", "emission=false",
+                           "incidence=false", "latitude=false", "longitude=false",
+                           "localemission=true", "localnormal=true"};
+  UserInterface options(APP_XML, args);
+  resizeCube(5, 5, 1);
+  phocube(testCube, options);
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 4);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Local Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Local Normal X");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Local Normal Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Local Normal Z");
+
+  // Compare every pixel of every band against the camera values the band
+  // name promises.
+  Camera *cam = testCube->camera();
+  LineManager outLine(cube);
+  for (int lineNum = 1; lineNum <= cube.lineCount(); lineNum++) {
+    QVector<QVector<double>> bands(cube.bandCount());
+    for (int band = 1; band <= cube.bandCount(); band++) {
+      outLine.SetLine(lineNum, band);
+      cube.read(outLine);
+      for (int i = 0; i < outLine.size(); i++) {
+        bands[band - 1].push_back(outLine[i]);
+      }
+    }
+
+    for (int samp = 1; samp <= cube.sampleCount(); samp++) {
+      ASSERT_TRUE(cam->SetImage(samp, lineNum));
+
+      Angle phase, incidence, emission;
+      bool success = false;
+      cam->LocalPhotometricAngles(phase, incidence, emission, success);
+      ASSERT_TRUE(success);
+
+      double normal[3];
+      cam->GetLocalNormal(normal);
+      double mag = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
+      ASSERT_GT(mag, 0.0);
+
+      EXPECT_NEAR(bands[0][samp - 1], emission.degrees(), 1e-6);
+      EXPECT_NEAR(bands[1][samp - 1], normal[0] / mag, 1e-6);
+      EXPECT_NEAR(bands[2][samp - 1], normal[1] / mag, 1e-6);
+      EXPECT_NEAR(bands[3][samp - 1], normal[2] / mag, 1e-6);
+    }
+  }
 
   cube.close();
 }

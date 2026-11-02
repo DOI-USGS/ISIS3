@@ -249,6 +249,16 @@ namespace Isis {
       name += "Ellipsoid Normal Z";
       raBandNum++;
     }
+    // The order of the names below must match the order in which the bands are
+    // written in the processing function further down.
+    if (localEmission) {
+      name += "Local Emission Angle";
+      raBandNum++;
+    }
+    if (localIncidence) {
+      name += "Local Incidence Angle";
+      raBandNum++;
+    }
     if (localNormal) {
       name += "Local Normal X";
       raBandNum++;
@@ -261,14 +271,6 @@ namespace Isis {
     }
     if (slope) {
       name += "Slope";
-      raBandNum++;
-    }
-    if (localEmission) {
-      name += "Local Emission Angle";
-      raBandNum++;
-    }
-    if (localIncidence) {
-      name += "Local Incidence Angle";
       raBandNum++;
     }
     if (latitude) {
