@@ -318,7 +318,7 @@ namespace Isis {
     std::vector<int> filterNums;
     filterNums.reserve(bands.size());
     const PvlKeyword &filterNumStrings = icube->label()->findGroup("BandBin", Pvl::Traverse).findKeyword("FilterNumber");
-    for (auto bandIndex = 0UL; bandIndex < bands.size(); bandIndex++) {
+    for (int bandIndex = 0; bandIndex < static_cast<int>(bands.size()); bandIndex++) {
       int bandNum = bands[bandIndex];
       if (bandIndex >= filterNumStrings.size()) {
         QString msg = QStringLiteral("No corresponding filter number found for band %1.").arg(static_cast<int>(bandNum));
@@ -923,7 +923,7 @@ namespace Isis {
     std::array<double, 7> CalculateTDRFactors(const std::array<std::array<double, 2>, 7> &coefficients,
                                               double timeDifferenceYears) {
       std::array<double, 7> factors;
-      for (int i = 0; i < coefficients.size(); i++) {
+      for (auto i = 0UL; i < coefficients.size(); i++) {
         const double &a = coefficients.at(i).at(0);
         const double &b = coefficients.at(i).at(1);
         factors.at(i) = 1 / (1 - a * timeDifferenceYears + b * timeDifferenceYears * timeDifferenceYears);
