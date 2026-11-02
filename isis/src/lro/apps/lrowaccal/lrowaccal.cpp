@@ -919,6 +919,17 @@ namespace Isis {
       return coefficients;
     }
 
+    std::array<double, 7> CalculateTDRFactors(const std::array<std::array<double, 2>, 7> &coefficients,
+                                              double timeDifferenceYears) {
+      std::array<double, 7> factors;
+      for (int i = 0; i < coefficients.size(); i++) {
+        const double &a = coefficients.at(i).at(0);
+        const double &b = coefficients.at(i).at(1);
+        factors.at(i) = 1 / (1 - a * timeDifferenceYears + b * timeDifferenceYears * timeDifferenceYears);
+      }
+      return factors;
+    }
+
     void CorrectTDR(Buffer &inout, int correctBand, double timeDifferenceYears,
                     const std::vector<int> &filterNums,
                     const std::array<std::array<double, 2>, 7> &coefficients) {

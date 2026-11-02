@@ -165,6 +165,19 @@ namespace Isis {
     std::array<std::array<double, 2>, 7> GetTDRCoefficients(const QString &coefficientsFile);
 
     /**
+     * @brief Calculates time-dependent correction factors based on correction coefficient pairs and time.
+     *
+     * @param coefficients The time-dependent correction coefficient pair for each filter number.
+     * @param timeDifferenceYears The time difference between the image time and the initial time in fractional Julian years, excluding leapseconds
+     *
+     * @return An array containing the time-dependent correction factors corresponding to each pair of input coefficients.
+     *
+     * @internal
+     *   @history 2026-11-02 Cordell Michaud - Original version
+     */
+    std::array<double, 7> CalculateTDRFactors(const std::array<std::array<double, 2>, 7> &coefficients,
+                                              double timeDifferenceYears);
+    /**
      * @brief Performs a time-dependent correction on the `inout` buffer.
      *
      * @param inout The buffer to read from and write to
