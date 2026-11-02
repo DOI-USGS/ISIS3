@@ -114,7 +114,7 @@ for FILE in $FILES; do
         COMPRESULT="ERROR"
       else
         COMPRESULT="$ISISROOT/bin/getkey"   \
-		           "from=compare.txt"       \
+		           "from=$FAILURE_REPORT"   \
 	               "grp=Results"            \
 				   "keyword=Compare" | tr '[:upper:]' '[:lower:]'`; 
       fi
