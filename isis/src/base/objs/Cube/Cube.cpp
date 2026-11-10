@@ -654,6 +654,11 @@ namespace Isis {
 
       QString datafile = m_dataFileName->expanded();
       QString format = "GTiff";
+
+      QString maskFile = datafile + ".msk";
+      if (QFile::exists(maskFile)) {
+        QFile::remove(maskFile);
+      }
       createGdal(datafile, format, papszOptions);
 
       m_geodataSet = GDALDataset::FromHandle(GDALOpen(datafile.toStdString().c_str(), GA_Update));
