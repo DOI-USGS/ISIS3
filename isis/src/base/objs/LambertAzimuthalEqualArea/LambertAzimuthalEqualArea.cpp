@@ -745,12 +745,14 @@ namespace Isis {
       double sinC = sin(c);
       double cosC = cos(c);
 
-      // verify the following is in the domain of the arcsin function
-      if (fabs(cosC*m_sinPhi1+y*sinC*m_cosPhi1/rho) > 1) {
-        m_good = false;
-        return m_good;
-      }
-      phi = asin(cosC*m_sinPhi1+y*sinC*m_cosPhi1/rho);//Snyder eq (20-14) pg 186
+      // Snyder eq (20-14) pg 186, phi = asin(cosC*sinPhi1 + y*sinC*cosPhi1/rho),
+      // computed from rho * sin(phi), rho * cos(phi) * cos(lambda) and
+      // rho * cos(phi) * sin(lambda) with atan2(): asin() of a value close to 1
+      // lost half the digits close to the poles
+      double n = rho*cosC*m_sinPhi1 + y*sinC*m_cosPhi1;
+      double d = rho*cosC*m_cosPhi1 - y*sinC*m_sinPhi1;
+      double e = x*sinC;
+      phi = atan2(n, sqrt(e*e + d*d));
       if (m_northPolarAspect ) { // spherical north polar aspect
         lambda = m_lambda0 + atan2(x,-y); // Snyder eqn (20-16) pg 187, 
                                           // need to use atan2 to correct for

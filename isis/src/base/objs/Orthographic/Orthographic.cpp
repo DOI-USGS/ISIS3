@@ -297,10 +297,13 @@ namespace Isis {
       z = asin(con);
       sinz = sin(z);
       cosz = cos(z);
-      con = cosz * m_sinph0 + GetY() * sinz * m_cosph0 / rho;
-      if (con > 1.0) con = 1.0;
-      if (con < -1.0) con = -1.0;
-      m_latitude = asin(con);
+      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon):
+      // the latitude from atan2() keeps full precision close to the poles,
+      // where asin() of a value close to 1 lost half the digits
+      double n = rho * cosz * m_sinph0 + GetY() * sinz * m_cosph0;
+      double d = rho * cosz * m_cosph0 - GetY() * sinz * m_sinph0;
+      double e = GetX() * sinz;
+      m_latitude = atan2(n, sqrt(e * e + d * d));
       con = fabs(m_centerLatitude) - HALFPI;
       if (fabs(con) <= epsilon) {
         if (m_centerLatitude >= 0.0) {
