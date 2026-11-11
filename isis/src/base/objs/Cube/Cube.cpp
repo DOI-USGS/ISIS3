@@ -655,10 +655,19 @@ namespace Isis {
       QString datafile = m_dataFileName->expanded();
       QString format = "GTiff";
 
-      QString maskFile = datafile + ".msk";
-      if (QFile::exists(maskFile)) {
-        QFile::remove(maskFile);
+      if (QFile::exists(datafile)) {
+        GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
+        if (driver) {
+          CPLErr err = driver->Delete(datafile.toStdString().c_str());
+          if (err != CE_None) {
+            QString msg = "Failed to delete existing TIFF [" + datafile + "] and its auxiliary files. ";
+            msg += "GDAL Error: " + QString(CPLGetLastErrorMsg());
+            cleanUp(false);
+            throw IException(IException::Io, msg, _FILEINFO_);
+          }
+        }
       }
+
       createGdal(datafile, format, papszOptions);
 
       m_geodataSet = GDALDataset::FromHandle(GDALOpen(datafile.toStdString().c_str(), GA_Update));
