@@ -20,6 +20,39 @@ find files of those names at the top level of this repository. **/
 
 using namespace std;
 
+namespace {
+  // s - sin(s), accurate also for small |s|, where the subtraction would lose
+  // most of the digits
+  double sMinusSinS(double s) {
+    if (fabs(s) < 0.25) {
+      double s2 = s * s;
+      return s * s2 * (1. / 6 - s2 * (1. / 120 - s2 * (1. / 5040 - s2 * (1. / 362880
+             - s2 * (1. / 39916800 - s2 / 6227020800.)))));
+    }
+    return s - sin(s);
+  }
+
+  // Close to the poles. With theta = (pi - s) / 2 and chi the colatitude,
+  // 2 * theta + sin(2 * theta) = pi * sin(phi) becomes
+  // s - sin(s) = 2 * pi * sin(chi / 2)^2, which Newton's method solves with
+  // quadratic convergence, where the iteration on theta converges only
+  // linearly (its derivative vanishes at the poles). Returns s.
+  double mollweidePolarS(double chi) {
+    double sh = sin(0.5 * chi);
+    double w = 2. * Isis::PI * sh * sh;
+    double s = cbrt(6. * w); // <= the root, as s - sin(s) <= s^3 / 6
+    for (int i = 0; i < 20; i++) {
+      double sh2 = sin(0.5 * s);
+      double d = 2. * sh2 * sh2; // 1 - cos(s)
+      if (d == 0.) break;
+      double ds = (sMinusSinS(s) - w) / d;
+      s -= ds;
+      if (fabs(ds) <= 1e-12 * s) break;
+    }
+    return s;
+  }
+}
+
 
 namespace Isis {
 
@@ -141,7 +174,10 @@ namespace Isis {
     //can be used to decrease the number of iterations.
     while (dtheta > DBL_EPSILON) {
 
-      theta[1] = theta[0] - (2*theta[0]+sin(2*theta[0]) -(Isis::PI)*sin(phi))/(2+2*cos(theta[0]));
+      // Newton step for f(theta) = 2*theta + sin(2*theta) - PI*sin(phi), whose
+      // derivative is 2 + 2*cos(2*theta) (the step used 2 + 2*cos(theta), which
+      // made the iteration converge only linearly)
+      theta[1] = theta[0] - (2*theta[0]+sin(2*theta[0]) -(Isis::PI)*sin(phi))/(2+2*cos(2*theta[0]));
       dtheta = fabs(theta[1]-theta[0]);
       theta[0] = theta[1];
       niter++;
@@ -186,6 +222,17 @@ namespace Isis {
     // Compute the coordinate
     double deltaLon = lonRadians - m_centerLongitude;
 
+    if (fabs(latRadians) > HALFPI - 0.5) {
+      // cos(theta) = sin(s / 2) and sin(theta) = cos(s / 2), with s as in
+      // mollweidePolarS()
+      double s = mollweidePolarS(HALFPI - fabs(latRadians));
+      double x = (2*sqrt(2)/PI) * m_equatorialRadius * deltaLon * sin(0.5 * s);
+      double y = sqrt(2) * m_equatorialRadius * cos(0.5 * s);
+      SetComputedXY(x, latRadians < 0 ? -y : y);
+      m_good = true;
+      return m_good;
+    }
+
     if (newton_rapheson(latRadians,theta) ) {
 
       double x = (2*sqrt(2)/PI )*m_equatorialRadius*(deltaLon)*cos(theta);   
@@ -220,7 +267,20 @@ namespace Isis {
     // Save the coordinate
     
     SetXY(x, y);
-  
+
+    double ymax = m_equatorialRadius * sqrt(2);
+    if (fabs(GetY()) > 0.5 * ymax && fabs(GetY()) <= ymax) {
+      // Close to the poles: cos(s / 2) = |y| / ymax, with s as in
+      // mollweidePolarS(), and the colatitude chi from
+      // 2 * sin(chi / 2)^2 = (s - sin(s)) / pi, instead of asin() of a value
+      // close to 1
+      double halfS = 2. * asin(sqrt(0.5 * (ymax - fabs(GetY())) / ymax));
+      double chi = 2. * asin(sqrt(sMinusSinS(2. * halfS) / (2. * PI)));
+      double den = (2*sqrt(2)/PI) * m_equatorialRadius * sin(halfS);
+      m_latitude = GetY() < 0 ? chi - HALFPI : HALFPI - chi;
+      m_longitude = m_centerLongitude + (den == 0. ? 0. : GetX() / den);
+    }
+    else {
     double theta = asin(y/(m_equatorialRadius*sqrt(2)));
 
     // Compute latitude and make sure it is not above 90
@@ -249,6 +309,7 @@ namespace Isis {
 
     else {
     m_longitude = m_centerLongitude+(Isis::PI)*GetX()/(2*m_equatorialRadius*sqrt(2)*cos(theta));
+    }
     }
 
 
