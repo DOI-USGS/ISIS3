@@ -205,14 +205,10 @@ namespace Isis {
       }
       x = 0.5 * m_equatorialRadius * m_scalefactor * log((1.0 + b) / (1.0 - b));
 
-      // If arcosine argument is too close to 1, con=0.0 because arcosine(1)=0
-      double con = cosphi * cos(deltaLonRads) / sqrt(1.0 - b * b);
-      if (fabs(con) > 1.0) {
-        con = 0.0;
-      }
-      else {
-        con = acos(con);
-      }
+      // Same angle as acos(cosphi * cos(deltaLon) / sqrt(1 - b * b)), since
+      // 1 - b * b = sinphi^2 + (cosphi * cos(deltaLon))^2, but without the loss
+      // of precision of acos() near 1, i.e. close to the equator
+      double con = atan2(fabs(sin(latRadians)), cosphi * cos(deltaLonRads));
       if (m_latitude < 0.0) con = -con;
       y = m_equatorialRadius * m_scalefactor * (con - m_centerLatitude);
     }
@@ -278,10 +274,9 @@ namespace Isis {
       g = 0.5 * (f - 1.0 / f);
       temp = m_centerLatitude + GetY() / (m_equatorialRadius * m_scalefactor);
       h = cos(temp);
-      con = sqrt((1.0 - h * h) / (1.0 + g * g));
-      if (con > 1.0) con = 1.0;
-      if (con < -1.0) con = -1.0;
-      m_latitude = asin(con);
+      // Same angle as asin(sqrt((1 - h * h) / (1 + g * g))), but without the
+      // loss of precision of 1 - h * h close to the equator
+      m_latitude = atan2(fabs(sin(temp)), sqrt(g * g + h * h));
       if (temp < 0.0) m_latitude = -m_latitude;
       m_longitude = m_centerLongitude;
       if (g != 0.0 || h != 0.0) {
