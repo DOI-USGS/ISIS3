@@ -661,6 +661,8 @@ namespace Isis {
           CPLErr err = driver->Delete(datafile.toStdString().c_str());
           if (err != CE_None) {
             QFile::remove(datafile);
+            QFile::remove(datafile + ".msk");
+            QFile::remove(datafile + ".aux.xml");
           }
         }
       }
