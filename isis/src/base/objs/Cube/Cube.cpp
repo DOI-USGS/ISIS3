@@ -660,10 +660,7 @@ namespace Isis {
         if (driver) {
           CPLErr err = driver->Delete(datafile.toStdString().c_str());
           if (err != CE_None) {
-            QString msg = "Failed to delete existing TIFF [" + datafile + "] and its auxiliary files. ";
-            msg += "GDAL Error: " + QString(CPLGetLastErrorMsg());
-            cleanUp(false);
-            throw IException(IException::Io, msg, _FILEINFO_);
+            QFile::remove(datafile);
           }
         }
       }
