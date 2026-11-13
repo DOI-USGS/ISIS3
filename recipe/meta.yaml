@@ -88,9 +88,9 @@ requirements:
    - libxml2
    - make
    - mesalib
-   - mkl                         # [not (osx and arm64)]
+   - mkl                         # [x86_64]
    - mysql
-   - mysql-connector-c           # [not (osx and arm64)]
+   - mysql-connector-c           # [x86_64]
    - nanoflann >=1.4.2,<1.5
    - nlohmann_json=3.11.2
    - ninja >=1.10,<1.11
@@ -158,7 +158,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
-  - {{ pin_compatible('mkl', min_pin='x', max_pin='x.x') }}  # [not (osx and arm64)]
+  - {{ pin_compatible('mkl', min_pin='x', max_pin='x.x') }}  # [x86_64]
   - mysql
   - nanoflann >=1.4.2,<1.5
   - nlohmann_json

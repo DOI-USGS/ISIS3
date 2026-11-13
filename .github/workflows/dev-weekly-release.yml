@@ -35,6 +35,29 @@ jobs:
           sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
           conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
 
+  build-ubuntu-arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Mambaforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          auto-update-conda: false
+          use-mamba: true
+      - name: Build Release
+        run: |
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+          echo $ISIS_VERSION
+          conda install python=3.12 conda-build anaconda-client --solver=classic -y
+          git fetch origin
+          git checkout dev
+          cd recipe
+          sed -i "s/{% set version = \"[^\"]*\" %}/{% set version = \"$ISIS_VERSION\" %}/" meta.yaml
+          sed -i "s/version: {{ version }}.0_RC[^ ]*/version: {{ version }}/" meta.yaml
+          sed -i "s/git_tag: {{ version }}/git_tag: 'dev'/" meta.yaml
+          conda build . -c usgs-astrogeology -c conda-forge --override-channels --user usgs-astrogeology --label dev
+
   build-macos-15-intel:
     runs-on: macos-15-intel
     steps:
@@ -92,7 +115,7 @@ jobs:
           auto-update-conda: true
           activate-environment: isis-test
           use-mamba: true
-          
+
       - name: Conda install and test spiceinit
         run: |
           export ISIS_VERSION=$(date +%Y.%m.%d)
@@ -105,7 +128,32 @@ jobs:
           export ISISROOT=$CONDA_PREFIX
           conda list isis
           spiceinit -h
-  
+
+  test-ubuntu-arm64:
+    runs-on: ubuntu-24.04-arm
+    needs: build-ubuntu-arm64
+    steps:
+      - name: Set up Miniforge
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Miniforge3
+          auto-update-conda: true
+          activate-environment: isis-test
+          use-mamba: true
+
+      - name: Conda install and test spiceinit
+        run: |
+          export ISIS_VERSION=$(date +%Y.%m.%d)
+
+          source "${CONDA}/etc/profile.d/conda.sh"
+          conda activate isis-test
+
+          conda install -c conda-forge -c usgs-astrogeology usgs-astrogeology/label/dev::isis=${ISIS_VERSION} -y
+
+          export ISISROOT=$CONDA_PREFIX
+          conda list isis
+          spiceinit -h
+
   test-macos-15-intel:
     runs-on: macos-15-intel
     needs: build-macos-15-intel
@@ -153,10 +201,11 @@ jobs:
   docs:
     name: Build and Upload ISIS Dev Docs
     runs-on: ubuntu-latest
-    needs: [test-ubuntu, test-macos-15-intel, test-macos15-arm64]
+    needs: [test-ubuntu, test-ubuntu-arm64, test-macos-15-intel, test-macos15-arm64]
     if: |
       always() && (
         needs.test-ubuntu.result == 'success' ||
+        needs.test-ubuntu-arm64.result == 'success' ||
         needs.test-macos-15-intel.result == 'success' ||
         needs.test-macos15-arm64.result == 'success'
       )
