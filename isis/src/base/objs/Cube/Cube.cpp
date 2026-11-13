@@ -594,6 +594,19 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
+    if (format() == Format::GTiff && m_dataFileName && QFile::exists(m_dataFileName->expanded())) {
+      QString datafile = m_dataFileName->expanded();
+      GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
+      if (driver) {
+        CPLErr err = driver->Delete(datafile.toStdString().c_str());
+        if (err != CE_None) {
+          QFile::remove(datafile);
+          QFile::remove(datafile + ".msk");
+          QFile::remove(datafile + ".aux.xml");
+        }
+      }
+    }
+
     if (!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
       QString msg = "Failed to create [" + m_labelFile->fileName() + "]. ";
       msg += "Verify the output path exists and you have permission to write to the path.";
