@@ -2254,6 +2254,24 @@ namespace Isis {
           m_label->deleteObject(i);
           QString key = BlobType + "_" + BlobName;
 
+          if (gdalDataset()) {
+            CPLStringList metadata = CPLStringList(gdalDataset()->GetMetadata("json:ISIS3"), false);
+            if (metadata[0] != nullptr) {
+              const char *metadataJsonString = metadata[0];
+              nlohmann::ordered_json jsonblob = nlohmann::ordered_json::parse(metadataJsonString);
+
+              size_t numErased = jsonblob.erase(key.toStdString());
+              if (numErased > 0) {
+                string jsonblobstr = jsonblob.dump();
+
+                char **outputMetadata = new char*[1];
+                outputMetadata[0] = jsonblobstr.data();
+                gdalDataset()->SetMetadata(outputMetadata, "json:ISIS3");
+                delete []outputMetadata;
+              }
+            }
+          }
+
           if (m_blobMap.contains(key)) {
             m_blobMap.remove(key);
             m_blobQueue.removeOne(key);
@@ -2957,8 +2975,23 @@ namespace Isis {
     }
     
     if (m_format == Format::GTiff && labelsAttached() == LabelAttachment::AttachedLabel) {
+      nlohmann::ordered_json jsonOut;
 
+      // Check for existing data, if there is data update it
+      CPLStringList metadata = CPLStringList(gdalDataset()->GetMetadata("json:ISIS3"), false);
+
+      if (metadata[0] != nullptr) {
+        const char *metadataJsonString = metadata[0];
+        jsonOut = nlohmann::ordered_json::parse(metadataJsonString);
+      }
+
+      // update metadata
       nlohmann::ordered_json jsonblob = this->label()->toJson()["Root"];
+      for (auto& [key, val] : jsonblob.items()) {
+        if (!val.contains("Bytes") || key == "Label") {
+          jsonOut[key] = val;
+        }
+      }
 
       for (QString blobKey : m_blobQueue) {
         Blob &blob = m_blobMap[blobKey];
@@ -2966,11 +2999,11 @@ namespace Isis {
         std::string blobJsonStr = "{}";
         blob.WriteGdal(blobJsonStr);
         nlohmann::ordered_json blobJson = nlohmann::ordered_json::parse(blobJsonStr);
-        jsonblob.update(blobJson);
+        jsonOut.update(blobJson);
       }
 
       m_blobQueue.clear();
-      std::string jsonOutStr = jsonblob.dump();
+      std::string jsonOutStr = jsonOut.dump();
 
       char ** outputMetadata = new char*[1];
       outputMetadata[0] = jsonOutStr.data();
