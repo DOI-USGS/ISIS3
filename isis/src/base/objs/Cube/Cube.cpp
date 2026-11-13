@@ -2254,6 +2254,24 @@ namespace Isis {
           m_label->deleteObject(i);
           QString key = BlobType + "_" + BlobName;
 
+          if (gdalDataset()) {
+            CPLStringList metadata = CPLStringList(gdalDataset()->GetMetadata("json:ISIS3"), false);
+            if (metadata[0] != nullptr) {
+              const char *metadataJsonString = metadata[0];
+              nlohmann::ordered_json jsonblob = nlohmann::ordered_json::parse(metadataJsonString);
+
+              size_t numErased = jsonblob.erase(key.toStdString());
+              if (numErased > 0) {
+                string jsonblobstr = jsonblob.dump();
+
+                char **outputMetadata = new char*[1];
+                outputMetadata[0] = jsonblobstr.data();
+                gdalDataset()->SetMetadata(outputMetadata, "json:ISIS3");
+                delete []outputMetadata;
+              }
+            }
+          }
+
           if (m_blobMap.contains(key)) {
             m_blobMap.remove(key);
             m_blobQueue.removeOne(key);
