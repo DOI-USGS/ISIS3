@@ -594,7 +594,7 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-      if (QFile::exists(m_dataFileName->expanded())) {
+      if (format() == Format::GTiff && QFile::exists(m_dataFileName->expanded())) {
         GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
         if (driver) {
           CPLErr err = driver->Delete(m_dataFileName->expanded().toStdString().c_str());
