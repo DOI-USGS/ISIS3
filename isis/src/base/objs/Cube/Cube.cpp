@@ -594,18 +594,18 @@ namespace Isis {
       throw IException(IException::User, msg, _FILEINFO_);
     }
 
-    if (format() == Format::GTiff && m_dataFileName && QFile::exists(m_dataFileName->expanded())) {
-      QString datafile = m_dataFileName->expanded();
-      GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
-      if (driver) {
-        CPLErr err = driver->Delete(datafile.toStdString().c_str());
-        if (err != CE_None) {
-          QFile::remove(datafile);
-          QFile::remove(datafile + ".msk");
-          QFile::remove(datafile + ".aux.xml");
+      if (QFile::exists(m_dataFileName->expanded())) {
+        GDALDriver* driver = GetGDALDriverManager()->GetDriverByName("GTiff");
+        if (driver) {
+          CPLErr err = driver->Delete(m_dataFileName->expanded().toStdString().c_str());
+          if (err != CE_None) {
+            QString msg = "Failed to delete existing TIFF [" + m_dataFileName->expanded() + "] and its auxiliary files. ";
+            msg += "GDAL Error: " + QString(CPLGetLastErrorMsg());
+            cleanUp(false);
+            throw IException(IException::Io, msg, _FILEINFO_);
+          }
         }
-      }
-    }
+      }  
 
     if (!m_labelFile->open(QIODevice::Truncate | QIODevice::ReadWrite)) {
       QString msg = "Failed to create [" + m_labelFile->fileName() + "]. ";
