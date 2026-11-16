@@ -8,13 +8,14 @@
 
 #include <cmath>
 
-#include "Angle.h"
 #include "BandManager.h"
 #include "Camera.h"
 #include "CameraFixtures.h"
 #include "Histogram.h"
 #include "LineManager.h"
 #include "PvlGroup.h"
+#include "ShapeModel.h"
+#include "Target.h"
 #include "TestUtilities.h"
 
 #include "gmock/gmock.h"
@@ -64,13 +65,15 @@ TEST_F(DefaultCube, FunctionalTestPhocubeDefault) {
 TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
   QVector<QString> args = {"to=" + cubeFileName, "dn=true", "phase=true", "emission=true",
-                           "incidence=true", "localemission=true", "localincidence=true",
+                           "incidence=true", "ellipsoidnormal=true", "localemission=true",
+                           "localincidence=true", "localnormal=true", "slope=true",
                            "latitude=true", "longitude=true", "pixelresolution=true",
                            "lineresolution=true", "sampleresolution=true", "detectorresolution=true",
                            "obliquedetectorresolution=true", "northazimuth=true", "sunazimuth=true",
                            "spacecraftazimuth=true", "offnadirangle=true", "subspacecraftgroundazimuth=true",
                            "subsolargroundazimuth=true", "morphology=true", "albedo=true", "radec=true",
-                           "bodyfixed=true", "localtime=true"};
+                           "bodyfixed=true", "sunilluminationmask=true",
+                           "surfaceobliquedetectorresolution=true", "localtime=true"};
 
   UserInterface options(APP_XML, args);
   resizeCube(5, 5, 1);
@@ -81,43 +84,55 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
 
   ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
   ASSERT_EQ(cube.lineCount(), testCube->lineCount());
-  ASSERT_EQ(cube.bandCount(), 27);
+  ASSERT_EQ(cube.bandCount(), 36);
 
+  // The band names must be listed in the order in which the bands are written.
   PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "CLEAR");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Phase Angle");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Emission Angle");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Local Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[5], "Local Incidence Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[6], "Latitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[7], "Longitude");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[8], "Pixel Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[9], "Line Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[10], "Sample Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[11], "Detector Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[12], "Oblique Detector Resolution");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[13], "North Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[14], "Sun Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[15], "Spacecraft Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[16], "OffNadir Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[17], "Sub Spacecraft Ground Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[18], "Sub Solar Ground Azimuth");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[19], "Morphology Rank");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[20], "Albedo Rank");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[21], "Right Ascension");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[22], "Declination");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[23], "Body Fixed X");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[24], "Body Fixed Y");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[25], "Body Fixed Z");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[26], "Local Solar Time");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[4], "Ellipsoid Normal X");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[5], "Ellipsoid Normal Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[6], "Ellipsoid Normal Z");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[7], "Local Emission Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[8], "Local Incidence Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[9], "Local Normal X");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[10], "Local Normal Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[11], "Local Normal Z");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[12], "Slope");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[13], "Latitude");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[14], "Longitude");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[15], "Pixel Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[16], "Line Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[17], "Sample Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[18], "Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[19], "Oblique Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[20], "North Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[21], "Sun Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[22], "Spacecraft Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[23], "OffNadir Angle");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[24], "Sub Spacecraft Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[25], "Sub Solar Ground Azimuth");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[26], "Morphology Rank");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[27], "Albedo Rank");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[28], "Right Ascension");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[29], "Declination");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[30], "Body Fixed X");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[31], "Body Fixed Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[32], "Body Fixed Z");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[33], "Sun Illumination Mask");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[34], "Surface Oblique Detector Resolution");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[35], "Local Solar Time");
 
-  std::unique_ptr<Histogram> hist (cube.histogram(0));
-  EXPECT_NEAR(hist->Average(), -56.952873505781646, .000001);
-  EXPECT_NEAR(hist->Sum(), -38443.189616402611, .000001);
-  EXPECT_EQ(hist->ValidPixels(), 675);
-  EXPECT_NEAR(hist->StandardDeviation(), 667.22341702659094, .000001);
-
+  // Statistics of the bands that have a fixed reference value, listed by their
+  // band number in the output cube.
+  QVector<int> statBands {  1,  2,  3,  4,  8,
+                            9, 14, 15, 16, 17,
+                           18, 19, 20, 21, 22,
+                           23, 24, 25, 26, 27,
+                           28, 29, 30, 31, 32,
+                           33, 36 };
   QVector<double> bandAvg { 13.0,       79.770518,  10.803234,   70.294379,    11.761090,
                             68.010369,  10.087063, 255.646436,   18.841226,    18.841226,
                             18.841226,  18.841226,  19.245272,  333.866008,    91.590917,
@@ -143,12 +158,69 @@ TEST_F(DefaultCube, FunctionalTestPhocubeAllBands) {
                            0.000128,  0.003065,   0.002088, 0.027295, 0.007584,
                            0.0278004, 3.211263e-5 };
 
-  for (int i=1; i<=cube.bandCount(); i++) {
-    std::unique_ptr<Histogram> hist(cube.histogram(i));
-    EXPECT_NEAR(hist->Average(), bandAvg[i-1], 0.000001);
-    EXPECT_NEAR(hist->Sum(), bandSum[i-1], 0.00001);
-    EXPECT_EQ(hist->ValidPixels(), bandValid[i-1]);
-    EXPECT_NEAR(hist->StandardDeviation(), bandStd[i-1], 0.000001);
+  for (int i = 0; i < statBands.size(); i++) {
+    std::unique_ptr<Histogram> hist(cube.histogram(statBands[i]));
+    EXPECT_NEAR(hist->Average(), bandAvg[i], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[i], 0.00001);
+    EXPECT_EQ(hist->ValidPixels(), bandValid[i]);
+    EXPECT_NEAR(hist->StandardDeviation(), bandStd[i], 0.000001);
+  }
+
+  // Compare every pixel of the remaining bands against the values the camera
+  // computes for the same sample and line.
+  Camera *cam = testCube->camera();
+  ShapeModel *shapeModel = cam->target()->shape();
+  LineManager outLine(cube);
+  for (int lineNum = 1; lineNum <= cube.lineCount(); lineNum++) {
+    QVector<QVector<double>> bands(cube.bandCount());
+    for (int band = 1; band <= cube.bandCount(); band++) {
+      outLine.SetLine(lineNum, band);
+      cube.read(outLine);
+      for (int i = 0; i < outLine.size(); i++) {
+        bands[band - 1].push_back(outLine[i]);
+      }
+    }
+
+    for (int samp = 1; samp <= cube.sampleCount(); samp++) {
+      ASSERT_TRUE(cam->SetImage(samp, lineNum));
+
+      // Ellipsoid normal, bands 5 to 7
+      shapeModel->calculateDefaultNormal();
+      std::vector<double> ellipsoidNormal = shapeModel->normal();
+      double ellipsoidMag = sqrt(ellipsoidNormal[0] * ellipsoidNormal[0] +
+                                 ellipsoidNormal[1] * ellipsoidNormal[1] +
+                                 ellipsoidNormal[2] * ellipsoidNormal[2]);
+      ASSERT_GT(ellipsoidMag, 0.0);
+      EXPECT_NEAR(bands[4][samp - 1], ellipsoidNormal[0] / ellipsoidMag, 1e-6);
+      EXPECT_NEAR(bands[5][samp - 1], ellipsoidNormal[1] / ellipsoidMag, 1e-6);
+      EXPECT_NEAR(bands[6][samp - 1], ellipsoidNormal[2] / ellipsoidMag, 1e-6);
+
+      // Sun illumination mask, band 34. Without a ray tracing shape model the
+      // mask is 1 wherever the sun is above the ellipsoid horizon.
+      double expectedMask = (cam->IncidenceAngle() <= 90.0) ? 1.0 : 0.0;
+      EXPECT_EQ(bands[33][samp - 1], expectedMask);
+
+      // Surface oblique detector resolution, band 35
+      EXPECT_NEAR(bands[34][samp - 1], cam->ObliqueDetectorResolution(false), 1e-4);
+
+      // Local normal, bands 10 to 12
+      double localNormal[3];
+      cam->GetLocalNormal(localNormal);
+      double localMag = sqrt(localNormal[0] * localNormal[0] +
+                             localNormal[1] * localNormal[1] +
+                             localNormal[2] * localNormal[2]);
+      ASSERT_GT(localMag, 0.0);
+      EXPECT_NEAR(bands[9][samp - 1], localNormal[0] / localMag, 1e-6);
+      EXPECT_NEAR(bands[10][samp - 1], localNormal[1] / localMag, 1e-6);
+      EXPECT_NEAR(bands[11][samp - 1], localNormal[2] / localMag, 1e-6);
+
+      // Slope, band 13
+      double slope = 0.0;
+      bool success = false;
+      cam->Slope(slope, success);
+      ASSERT_TRUE(success);
+      EXPECT_NEAR(bands[12][samp - 1], slope, 1e-5);
+    }
   }
 
   cube.close();
@@ -637,77 +709,6 @@ TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
   EXPECT_GT(latHist->ValidPixels(), 0);
   std::unique_ptr<Histogram> lonHist(cube.histogram(5));
   EXPECT_GT(lonHist->ValidPixels(), 0);
-
-  cube.close();
-}
-
-
- }
-
-
-/**
-   * FunctionalTestPhocubeLocalBandOrder
-   *
-   * Regression test for https://github.com/DOI-USGS/ISIS3/issues/6176.
-   * The band names in the BandBin group must describe the values that are
-   * actually written to each band. With LOCALEMISSION and LOCALNORMAL the
-   * local emission angle is written first, followed by the local normal.
-   */
-TEST_F(DefaultCube, FunctionalTestPhocubeLocalBandOrder) {
-  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
-  QVector<QString> args = {"to=" + cubeFileName, "phase=false", "emission=false",
-                           "incidence=false", "latitude=false", "longitude=false",
-                           "localemission=true", "localnormal=true"};
-  UserInterface options(APP_XML, args);
-  resizeCube(5, 5, 1);
-  phocube(testCube, options);
-
-  Cube cube(cubeFileName);
-  Pvl *isisLabel = cube.label();
-
-  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
-  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
-  ASSERT_EQ(cube.bandCount(), 4);
-
-  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Local Emission Angle");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Local Normal X");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Local Normal Y");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[3], "Local Normal Z");
-
-  // Compare every pixel of every band against the camera values the band
-  // name promises.
-  Camera *cam = testCube->camera();
-  LineManager outLine(cube);
-  for (int lineNum = 1; lineNum <= cube.lineCount(); lineNum++) {
-    QVector<QVector<double>> bands(cube.bandCount());
-    for (int band = 1; band <= cube.bandCount(); band++) {
-      outLine.SetLine(lineNum, band);
-      cube.read(outLine);
-      for (int i = 0; i < outLine.size(); i++) {
-        bands[band - 1].push_back(outLine[i]);
-      }
-    }
-
-    for (int samp = 1; samp <= cube.sampleCount(); samp++) {
-      ASSERT_TRUE(cam->SetImage(samp, lineNum));
-
-      Angle phase, incidence, emission;
-      bool success = false;
-      cam->LocalPhotometricAngles(phase, incidence, emission, success);
-      ASSERT_TRUE(success);
-
-      double normal[3];
-      cam->GetLocalNormal(normal);
-      double mag = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
-      ASSERT_GT(mag, 0.0);
-
-      EXPECT_NEAR(bands[0][samp - 1], emission.degrees(), 1e-6);
-      EXPECT_NEAR(bands[1][samp - 1], normal[0] / mag, 1e-6);
-      EXPECT_NEAR(bands[2][samp - 1], normal[1] / mag, 1e-6);
-      EXPECT_NEAR(bands[3][samp - 1], normal[2] / mag, 1e-6);
-    }
-  }
 
   cube.close();
 }

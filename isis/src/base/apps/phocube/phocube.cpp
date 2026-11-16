@@ -227,6 +227,8 @@ namespace Isis {
         raBandNum++;
       }
     }
+    // The order of the names below must match the order in which the bands are
+    // written in the processing function further down.
     if (phase) {
       name += "Phase Angle";
       raBandNum++;
@@ -249,8 +251,6 @@ namespace Isis {
       name += "Ellipsoid Normal Z";
       raBandNum++;
     }
-    // The order of the names below must match the order in which the bands are
-    // written in the processing function further down.
     if (localEmission) {
       name += "Local Emission Angle";
       raBandNum++;
@@ -348,14 +348,14 @@ namespace Isis {
     if (bodyFixedZ) {
       name += "Body Fixed Z";
     }
-    if (localSolarTime) {
-      name += "Local Solar Time";
-    }
     if (sunilluminationmask) {
       name += "Sun Illumination Mask";
     }
     if (surfaceobliquedetectorresolution) {
       name += "Surface Oblique Detector Resolution";
+    }
+    if (localSolarTime) {
+      name += "Local Solar Time";
     }
     bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
