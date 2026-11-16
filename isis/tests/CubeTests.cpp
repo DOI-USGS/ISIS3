@@ -1,3 +1,4 @@
+#include <QTemporaryDir>
 #include <QTemporaryFile>
 #include <QString>
 #include <iostream>
@@ -1457,4 +1458,78 @@ TEST_F(ECube, TestCubeECubeFromECubeRead) {
     for (int index = 0; index < readBrick.size(); index++) {
       EXPECT_EQ(readBrick[index], truth[index]);
     }
+}
+
+TEST(CubeTest, TestTiffMaskFileOverwrite) {
+    QTemporaryDir tempDir;
+    ASSERT_TRUE(tempDir.isValid());
+
+    QString tiffPath = tempDir.path() + "/test_overwrite.tif";
+
+    Cube cube1;
+    cube1.setDimensions(10, 10, 1);
+    cube1.setPixelType(Isis::Real);
+    cube1.setFormat(Isis::Cube::GTiff);
+    cube1.create(tiffPath);
+
+    Brick brick1(10, 10, 1, cube1.pixelType());
+    brick1.SetBasePosition(1, 1, 1);
+    for (int i = 0; i < brick1.size(); i++) {
+        brick1[i] = 1.0;
+    }
+    cube1.write(brick1);
+    cube1.close();
+
+    ASSERT_TRUE(QFile::exists(tiffPath));
+
+    Cube cube2;
+    cube2.setDimensions(10, 10, 2);
+    cube2.setPixelType(Isis::Real);
+    cube2.setFormat(Isis::Cube::GTiff);
+
+    ASSERT_NO_THROW(cube2.create(tiffPath));
+
+    Brick brick2(10, 10, 1, cube2.pixelType());
+    for (int band = 1; band <= 2; band++) {
+        brick2.SetBasePosition(1, 1, band);
+        for (int i = 0; i < brick2.size(); i++) {
+            brick2[i] = band * 10.0;
+        }
+        cube2.write(brick2);
+    }
+    cube2.close();
+
+    Cube verifyCube;
+    verifyCube.open(tiffPath);
+
+    EXPECT_EQ(verifyCube.bandCount(), 2);
+    EXPECT_EQ(verifyCube.sampleCount(), 10);
+    EXPECT_EQ(verifyCube.lineCount(), 10);
+
+    Brick readBrick(10, 10, 1, verifyCube.pixelType());
+
+    readBrick.SetBasePosition(1, 1, 1);
+    verifyCube.read(readBrick);
+    EXPECT_DOUBLE_EQ(readBrick[0], 10.0);
+
+    readBrick.SetBasePosition(1, 1, 2);
+    verifyCube.read(readBrick);
+    EXPECT_DOUBLE_EQ(readBrick[0], 20.0);
+
+    verifyCube.close();
+
+    Cube cube3;
+    cube3.setDimensions(20, 20, 3);
+    cube3.setPixelType(Isis::Real);
+    cube3.setFormat(Isis::Cube::GTiff);
+
+    ASSERT_NO_THROW(cube3.create(tiffPath));
+    cube3.close();
+
+    Cube finalCube;
+    finalCube.open(tiffPath);
+    EXPECT_EQ(finalCube.bandCount(), 3);
+    EXPECT_EQ(finalCube.sampleCount(), 20);
+    EXPECT_EQ(finalCube.lineCount(), 20);
+    finalCube.close();
 }
