@@ -227,6 +227,8 @@ namespace Isis {
         raBandNum++;
       }
     }
+    // The order of the names below must match the order in which the bands are
+    // written in the processing function further down.
     if (phase) {
       name += "Phase Angle";
       raBandNum++;
@@ -249,6 +251,14 @@ namespace Isis {
       name += "Ellipsoid Normal Z";
       raBandNum++;
     }
+    if (localEmission) {
+      name += "Local Emission Angle";
+      raBandNum++;
+    }
+    if (localIncidence) {
+      name += "Local Incidence Angle";
+      raBandNum++;
+    }
     if (localNormal) {
       name += "Local Normal X";
       raBandNum++;
@@ -261,14 +271,6 @@ namespace Isis {
     }
     if (slope) {
       name += "Slope";
-      raBandNum++;
-    }
-    if (localEmission) {
-      name += "Local Emission Angle";
-      raBandNum++;
-    }
-    if (localIncidence) {
-      name += "Local Incidence Angle";
       raBandNum++;
     }
     if (latitude) {
@@ -346,14 +348,14 @@ namespace Isis {
     if (bodyFixedZ) {
       name += "Body Fixed Z";
     }
-    if (localSolarTime) {
-      name += "Local Solar Time";
-    }
     if (sunilluminationmask) {
       name += "Sun Illumination Mask";
     }
     if (surfaceobliquedetectorresolution) {
       name += "Surface Oblique Detector Resolution";
+    }
+    if (localSolarTime) {
+      name += "Local Solar Time";
     }
     bool specialPixels = ui.GetBoolean("SPECIALPIXELS");
 
