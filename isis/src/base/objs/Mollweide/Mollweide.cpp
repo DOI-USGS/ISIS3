@@ -181,9 +181,12 @@ namespace Isis {
     theta[0] = asin(2*phi/PI);
     theta[1]=0.0;
     
-    //If this condition is too strict, a larger epsilon value than DBL_EPSILON
-    //can be used to decrease the number of iterations.
-    while (dtheta > DBL_EPSILON) {
+    // The iteration converges quadratically, so once a step is below 1e-14 the
+    // next one would be below 1e-28: theta is exact to rounding. A tolerance of
+    // DBL_EPSILON is below the rounding noise of the step above about 60
+    // degrees, where the iteration could then alternate between two values
+    // 3 ulp apart and never stop.
+    while (dtheta > 1e-14) {
 
       // Newton step for f(theta) = 2*theta + sin(2*theta) - PI*sin(phi), Snyder
       // eq. (31-3) pg 251, whose derivative is 2 + 2*cos(2*theta). This is
@@ -195,7 +198,7 @@ namespace Isis {
       theta[0] = theta[1];
       niter++;
       
-      if (niter > 15000000) {
+      if (niter > 100) {
         //cout << setprecision(10) << phi*(180/PI) << "," << niter << endl;
         return false;
       }
