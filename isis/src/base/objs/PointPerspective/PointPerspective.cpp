@@ -277,10 +277,11 @@ namespace Isis {
         }
       }
       else {
-        con = cosz - m_sinph0 * sin(m_latitude);
-        if ((fabs(con) >= epsilon) || (fabs(GetX()) >= epsilon)) {
-          m_longitude += atan2(GetX() * sinz * m_cosph0, con * rho);
-        }
+        // Snyder (1987) eq. (20-15), lon = lon0 + atan(e / d). The form used
+        // before, atan(x * sinz * cos(lat0) / (rho * (cosz - sin(lat0) * sin(lat)))),
+        // is the same angle, but cosz - sin(lat0) * sin(lat) cancels when the
+        // centre is close to a pole, which lost up to 2 mm on the Moon.
+        m_longitude += atan2(e, d);
       }
     }
 
