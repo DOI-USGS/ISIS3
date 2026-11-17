@@ -240,7 +240,9 @@ namespace Isis {
       m_latitude = m_centerLatitude;
     }
     else {
-      // only at the centre itself: within epsilon * R of it, sinz = 0 put the
+      // Snyder (1987) pg 175: if rho = 0, eqs. (20-14) to (20-17) are
+      // indeterminate, but lat = lat0 and lon = lon0.
+      // Only at the centre itself: within epsilon * R of it, sinz = 0 put the
       // point at the centre (up to 1e-10 * R off)
       if (rp == 0.0) {
         sinz = 0.0;
@@ -251,7 +253,10 @@ namespace Isis {
       z = asin(sinz);
       sinz = sin(z);
       cosz = cos(z);
-      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon):
+      // Snyder (1987) eq. (20-14) pg 175, lat = asin(n / rho), with n, d and e
+      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon)
+      // (d and e are the denominator and numerator of eq. (20-15)), so
+      // n^2 + d^2 + e^2 = rho^2:
       // the latitude from atan2() keeps full precision close to the poles,
       // where asin() of a value close to 1 lost half the digits
       double n = rho * cosz * m_sinph0 + GetY() * sinz * m_cosph0;
@@ -266,7 +271,8 @@ namespace Isis {
         }
         else {
           // x = R * k * cos(lat) * sin(lon), y = R * k * cos(lat) * cos(lon) for the
-          // south polar aspect (see SetGround): atan2(-x, y) mirrored the longitude
+          // south polar aspect (see SetGround), Snyder eq. (20-17) pg 150,
+          // lon = lon0 + atan(x / y): atan2(-x, y) mirrored the longitude
           m_longitude += atan2(GetX(), GetY());
         }
       }

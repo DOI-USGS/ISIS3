@@ -297,7 +297,10 @@ namespace Isis {
       z = asin(con);
       sinz = sin(z);
       cosz = cos(z);
-      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon):
+      // Snyder (1987) eq. (20-14) pg 150, lat = asin(n / rho), with n, d and e
+      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon)
+      // (d and e are the denominator and numerator of eq. (20-15)), so
+      // n^2 + d^2 + e^2 = rho^2:
       // the latitude from atan2() keeps full precision close to the poles,
       // where asin() of a value close to 1 lost half the digits
       double n = rho * cosz * m_sinph0 + GetY() * sinz * m_cosph0;

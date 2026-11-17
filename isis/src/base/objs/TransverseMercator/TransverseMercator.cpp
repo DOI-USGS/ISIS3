@@ -205,6 +205,9 @@ namespace Isis {
       }
       x = 0.5 * m_equatorialRadius * m_scalefactor * log((1.0 + b) / (1.0 - b));
 
+      // Snyder (1987) eq. (8-3) pg 58, y = R * k0 * (atan(tan(phi) / cos(deltaLon))
+      // - phi0), with B from eq. (8-5); atan2() of tan(phi) / cos(deltaLon) times
+      // cos(phi) gives the quadrant for |deltaLon| > 90.
       // Same angle as acos(cosphi * cos(deltaLon) / sqrt(1 - b * b)), since
       // 1 - b * b = sinphi^2 + (cosphi * cos(deltaLon))^2, but without the loss
       // of precision of acos() near 1, i.e. close to the equator
@@ -274,6 +277,9 @@ namespace Isis {
       g = 0.5 * (f - 1.0 / f);
       temp = m_centerLatitude + GetY() / (m_equatorialRadius * m_scalefactor);
       h = cos(temp);
+      // Snyder (1987) eq. (8-6) pg 60, phi = asin(sin(D) / cosh(x / (R * k0))),
+      // with g = sinh(x / (R * k0)) and h = cos(D), cosh^2 = 1 + g^2 and
+      // cosh^2 - sin(D)^2 = g^2 + h^2.
       // Same angle as asin(sqrt((1 - h * h) / (1 + g * g))), but without the
       // loss of precision of 1 - h * h close to the equator
       m_latitude = atan2(fabs(sin(temp)), sqrt(g * g + h * h));

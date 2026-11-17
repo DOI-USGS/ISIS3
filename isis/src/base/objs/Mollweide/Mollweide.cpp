@@ -22,7 +22,12 @@ using namespace std;
 
 namespace {
   // s - sin(s), accurate also for small |s|, where the subtraction would lose
-  // most of the digits
+  // most of the digits. For |s| < 0.25 it is the Taylor series
+  // s - sin(s) = s^3/3! - s^5/5! + s^7/7! - s^9/9! + s^11/11! - s^13/13!,
+  // in Horner form: the constants are factorials (6 = 3!, 120 = 5!, 5040 = 7!,
+  // 362880 = 9!, 39916800 = 11!, 6227020800 = 13!). At |s| = 0.25 the relative
+  // truncation error is 2.7e-19, below double epsilon (stopping at 11! would
+  // leave 9.2e-16).
   double sMinusSinS(double s) {
     if (fabs(s) < 0.25) {
       double s2 = s * s;
@@ -32,11 +37,17 @@ namespace {
     return s - sin(s);
   }
 
-  // Close to the poles. With theta = (pi - s) / 2 and chi the colatitude,
-  // 2 * theta + sin(2 * theta) = pi * sin(phi) becomes
-  // s - sin(s) = 2 * pi * sin(chi / 2)^2, which Newton's method solves with
-  // quadratic convergence, where the iteration on theta converges only
-  // linearly (its derivative vanishes at the poles). Returns s.
+  // Close to the poles, where Snyder (1987) pg 251 notes that the iteration
+  // (31-4) converges slowly. Snyder's eq. (31-3) is
+  // 2 * theta + sin(2 * theta) = pi * sin(phi). With s = pi - 2 * theta
+  // (s = pi - theta' in Snyder's eq. (31-4)) and chi = pi/2 - |phi| the
+  // colatitude, it becomes pi - s + sin(s) = pi * cos(chi), i.e.
+  // s - sin(s) = pi * (1 - cos(chi)) = 2 * pi * sin(chi / 2)^2.
+  // Its derivative in s, 1 - cos(s) = 2 * sin(s / 2)^2, does not vanish at the
+  // poles, so Newton's method converges quadratically there, where the
+  // iteration on theta (whose derivative vanishes at the poles) does not.
+  // The start value cbrt(6 * w) is <= the root, as s - sin(s) <= s^3 / 3!.
+  // Returns s.
   double mollweidePolarS(double chi) {
     double sh = sin(0.5 * chi);
     double w = 2. * Isis::PI * sh * sh;
@@ -174,9 +185,11 @@ namespace Isis {
     //can be used to decrease the number of iterations.
     while (dtheta > DBL_EPSILON) {
 
-      // Newton step for f(theta) = 2*theta + sin(2*theta) - PI*sin(phi), whose
-      // derivative is 2 + 2*cos(2*theta) (the step used 2 + 2*cos(theta), which
-      // made the iteration converge only linearly)
+      // Newton step for f(theta) = 2*theta + sin(2*theta) - PI*sin(phi), Snyder
+      // eq. (31-3) pg 251, whose derivative is 2 + 2*cos(2*theta). This is
+      // Snyder's eq. (31-4), delta theta' = -(theta' + sin(theta') - PI*sin(phi))
+      // / (1 + cos(theta')), with theta' = 2*theta. (The step used
+      // 2 + 2*cos(theta), which made the iteration converge only linearly.)
       theta[1] = theta[0] - (2*theta[0]+sin(2*theta[0]) -(Isis::PI)*sin(phi))/(2+2*cos(2*theta[0]));
       dtheta = fabs(theta[1]-theta[0]);
       theta[0] = theta[1];
@@ -223,8 +236,8 @@ namespace Isis {
     double deltaLon = lonRadians - m_centerLongitude;
 
     if (fabs(latRadians) > HALFPI - 0.5) {
-      // cos(theta) = sin(s / 2) and sin(theta) = cos(s / 2), with s as in
-      // mollweidePolarS()
+      // Snyder eqs. (31-1), (31-2) pg 251 with cos(theta) = sin(s / 2) and
+      // sin(theta) = cos(s / 2), s as in mollweidePolarS()
       double s = mollweidePolarS(HALFPI - fabs(latRadians));
       double x = (2*sqrt(2)/PI) * m_equatorialRadius * deltaLon * sin(0.5 * s);
       double y = sqrt(2) * m_equatorialRadius * cos(0.5 * s);
@@ -270,10 +283,12 @@ namespace Isis {
 
     double ymax = m_equatorialRadius * sqrt(2);
     if (fabs(GetY()) > 0.5 * ymax && fabs(GetY()) <= ymax) {
-      // Close to the poles: cos(s / 2) = |y| / ymax, with s as in
-      // mollweidePolarS(), and the colatitude chi from
-      // 2 * sin(chi / 2)^2 = (s - sin(s)) / pi, instead of asin() of a value
-      // close to 1
+      // Close to the poles: Snyder (1987) eqs. (31-6), (31-7) pg 252,
+      // theta = asin(y / (sqrt(2) * R)) and
+      // phi = asin((2 * theta + sin(2 * theta)) / pi), computed as
+      // cos(s / 2) = |y| / ymax, with s as in mollweidePolarS(), and the
+      // colatitude chi from 2 * sin(chi / 2)^2 = (s - sin(s)) / pi, instead of
+      // asin() of a value close to 1
       double halfS = 2. * asin(sqrt(0.5 * (ymax - fabs(GetY())) / ymax));
       double chi = 2. * asin(sqrt(sMinusSinS(2. * halfS) / (2. * PI)));
       double den = (2*sqrt(2)/PI) * m_equatorialRadius * sin(halfS);
