@@ -749,8 +749,7 @@ namespace Isis {
       // computed from rho * sin(phi), rho * cos(phi) * cos(lambda) and
       // rho * cos(phi) * sin(lambda) with atan2() (d and e are the denominator
       // and numerator of eq. (20-15), so n^2 + d^2 + e^2 = rho^2): asin() of a
-      // value close to 1
-      // lost half the digits close to the poles
+      // value close to 1 lost half the digits close to the poles
       double n = rho*cosC*m_sinPhi1 + y*sinC*m_cosPhi1;
       double d = rho*cosC*m_cosPhi1 - y*sinC*m_sinPhi1;
       double e = x*sinC;

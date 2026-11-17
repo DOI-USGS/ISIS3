@@ -64,7 +64,14 @@ namespace {
     // the Newton iteration used the wrong derivative and did not converge near the poles
     {"Mollweide", 0, 1, 0, 0, 0, 45.0, 89.3, 252308.41375123063, 8995812.573492255},
     // oblique latitude from asin() near 1 close to the oblique pole
-    {"ObliqueCylindrical", 0, 1, 0, 40, 10, 10.0, 39.9999999, 0.0, 10007543.386890793}
+    {"ObliqueCylindrical", 0, 1, 0, 40, 10, 10.0, 39.9999999, 0.0, 10007543.386890793},
+    // the Newton iteration with a DBL_EPSILON tolerance alternated between two values
+    // 3 ulp apart and never stopped (about 1 in 70 latitudes between 60 and 61.35)
+    {"Mollweide", 0, 1, 0, 0, 0, 100.0, 61.352, 6306929.371798125, 6997115.258326934},
+    // centre close to a pole: the longitude denominator cosz - sin(lat0) * sin(lat) cancelled
+    {"Orthographic", -89.99999, 1, 0, 0, 0, 100.0, -60.0, 3137105.0972203887, -553157.2329343109},
+    // centre close to a pole: the longitude denominator cosz - sin(lat0) * sin(lat) cancelled
+    {"PointPerspective", 89.9999, 1, 3000, 0, 0, -120.0, 60.0, -2147671.9331918405, 1239966.4655467223}
   };
 
   const double radius = 6371000.0;
