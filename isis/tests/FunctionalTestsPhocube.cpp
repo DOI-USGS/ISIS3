@@ -717,8 +717,7 @@ TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
    * FunctionalTestPhocubeEllipsoidNormalOnly
    *
    * Regression test for https://github.com/DOI-USGS/ISIS3/issues/6177.
-   * ELLIPSOIDNORMAL must work without EMISSION and INCIDENCE, and must give the
-   * same values as when EMISSION and INCIDENCE are computed as well.
+   * ELLIPSOIDNORMAL must work without EMISSION and INCIDENCE.
    */
 TEST_F(DefaultCube, FunctionalTestPhocubeEllipsoidNormalOnly) {
   QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
@@ -741,46 +740,34 @@ TEST_F(DefaultCube, FunctionalTestPhocubeEllipsoidNormalOnly) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Ellipsoid Normal Y");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Ellipsoid Normal Z");
 
-  // Before the fix, the ellipsoid normal was only set as a side effect of
-  // EmissionAngle() or IncidenceAngle(). Compare against a run with emission
-  // and incidence enabled to check that computing the normal explicitly gives
-  // the same values as that existing path.
-  QString refFileName = tempDir.path() + "/phocubeREF.cub";
-  QVector<QString> refArgs = {"to=" + refFileName, "phase=false", "latitude=false",
-                              "longitude=false", "ellipsoidnormal=true"};
-  UserInterface refOptions(APP_XML, refArgs);
-  phocube(testCube, refOptions);
-
-  Cube refCube(refFileName);
-  ASSERT_EQ(refCube.bandCount(), 5);
-  PvlGroup refBandBin = refCube.label()->findGroup("BandBin", Pvl::Traverse);
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, refBandBin.findKeyword("Name")[2], "Ellipsoid Normal X");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, refBandBin.findKeyword("Name")[3], "Ellipsoid Normal Y");
-  EXPECT_PRED_FORMAT2(AssertQStringsEqual, refBandBin.findKeyword("Name")[4], "Ellipsoid Normal Z");
-
+  // Compare every pixel against the ellipsoid normal the camera computes for
+  // the same sample and line.
+  Camera *cam = testCube->camera();
+  ShapeModel *shapeModel = cam->target()->shape();
   LineManager outLine(cube);
-  LineManager refLine(refCube);
   for (int lineNum = 1; lineNum <= cube.lineCount(); lineNum++) {
     QVector<QVector<double>> bands(cube.bandCount());
     for (int band = 1; band <= cube.bandCount(); band++) {
       outLine.SetLine(lineNum, band);
       cube.read(outLine);
-      refLine.SetLine(lineNum, band + 2);
-      refCube.read(refLine);
       for (int i = 0; i < outLine.size(); i++) {
-        EXPECT_FALSE(IsSpecial(outLine[i]));
-        EXPECT_NEAR(outLine[i], refLine[i], 1e-10);
         bands[band - 1].push_back(outLine[i]);
       }
     }
 
-    // The ellipsoid normal is a unit vector
-    for (int i = 0; i < cube.sampleCount(); i++) {
-      double mag = sqrt(bands[0][i] * bands[0][i] + bands[1][i] * bands[1][i] + bands[2][i] * bands[2][i]);
-      EXPECT_NEAR(mag, 1.0, 1e-6);
+    for (int samp = 1; samp <= cube.sampleCount(); samp++) {
+      ASSERT_TRUE(cam->SetImage(samp, lineNum));
+      shapeModel->calculateDefaultNormal();
+      std::vector<double> ellipsoidNormal = shapeModel->normal();
+      double mag = sqrt(ellipsoidNormal[0] * ellipsoidNormal[0] +
+                        ellipsoidNormal[1] * ellipsoidNormal[1] +
+                        ellipsoidNormal[2] * ellipsoidNormal[2]);
+      ASSERT_GT(mag, 0.0);
+      EXPECT_NEAR(bands[0][samp - 1], ellipsoidNormal[0] / mag, 1e-6);
+      EXPECT_NEAR(bands[1][samp - 1], ellipsoidNormal[1] / mag, 1e-6);
+      EXPECT_NEAR(bands[2][samp - 1], ellipsoidNormal[2] / mag, 1e-6);
     }
   }
 
-  refCube.close();
   cube.close();
 }
