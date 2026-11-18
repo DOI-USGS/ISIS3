@@ -741,8 +741,10 @@ TEST_F(DefaultCube, FunctionalTestPhocubeEllipsoidNormalOnly) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Ellipsoid Normal Y");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Ellipsoid Normal Z");
 
-  // Reference run with emission and incidence enabled (the default), which
-  // computes the ellipsoid normal as a side effect.
+  // Before the fix, the ellipsoid normal was only set as a side effect of
+  // EmissionAngle() or IncidenceAngle(). Compare against a run with emission
+  // and incidence enabled to check that computing the normal explicitly gives
+  // the same values as that existing path.
   QString refFileName = tempDir.path() + "/phocubeREF.cub";
   QVector<QString> refArgs = {"to=" + refFileName, "phase=false", "latitude=false",
                               "longitude=false", "ellipsoidnormal=true"};

@@ -434,9 +434,7 @@ namespace Isis {
             }
             if (ellipsoidNormal) {
               ShapeModel *shapeModel = cam->target()->shape();
-              // The ellipsoid normal is normally computed as a side effect of
-              // EmissionAngle() or IncidenceAngle(). If neither was requested,
-              // compute it here so normal() does not throw.
+              // Ensure that the ellipsoid normal is computed before accessing it
               if (!shapeModel->hasNormal()) {
                 shapeModel->calculateDefaultNormal();
               }
