@@ -33,11 +33,12 @@ namespace Isis {
    *   @history 2017-08-04 Kristin Berry - Removed checks for a 'CubeSupported' IsisPreferences Pvl
    *                           Keyword. ISIS Cube DEMs are not supported by Embree and Bullet
    *                           at this time.
+   *   @history 2026-04-14 Kris J Becker - Integrated support for the PSMRTS system
    */
   class ShapeModelFactory {
     public:
     static ShapeModel *create(Target *target, Pvl &pvl);
-
+    
     private:
       ShapeModelFactory();
       ~ShapeModelFactory();
@@ -51,7 +52,8 @@ namespace Isis {
         Stack,
         NaifDSK,
         Bullet,
-        Embree};
+        Embree,
+        Psmrts};
   };
 }
 

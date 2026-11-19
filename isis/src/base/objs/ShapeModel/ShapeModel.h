@@ -61,6 +61,8 @@ namespace Isis {
    *                                       as the surface normal. This ensures that the currently
    *                                       stored m_normal is always the surface normal, and that 
    *                                       the local normal is always stored in m_localNormal.
+   *   @history 2026-10-07 Kris Becker - Added plate_index() virtual method to return the facet
+   *                            index if applicable to shape model, otherwise returns -1.
    */
   class ShapeModel {
     public:
@@ -154,6 +156,8 @@ namespace Isis {
       // Determine if the internal intercept is occluded from the observer/lookdir
       virtual bool isVisibleFrom(const std::vector<double> observerPos,
                                  const std::vector<double> lookDirection);
+
+      virtual int plate_index() const;
 
     protected:
 

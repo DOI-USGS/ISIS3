@@ -1,6 +1,8 @@
 #include "BulletDskShape.h"
 #include "IException.h"
 #include "SpecialPixel.h"
+#include "TestUtilities.h"
+
 
 #include <gtest/gtest.h>
 
@@ -18,7 +20,7 @@ TEST(BulletDskShapeTests, SingleSegment) {
   QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/hay_a_amica_5_itokawashape_v1_0_64q.bds");
 
   BulletDskShape itokawaShape(dskfile);
-  EXPECT_EQ(itokawaShape.name(), "");
+  EXPECT_PRED_FORMAT2( AssertQStringsEqual, itokawaShape.name(), dskfile);
   EXPECT_DOUBLE_EQ(itokawaShape.maximumDistance(), 0.68395571742620886);
   EXPECT_TRUE((bool) itokawaShape.body());
   EXPECT_EQ(itokawaShape.getNumTriangles(), 49152);
@@ -49,7 +51,7 @@ TEST(BulletDskShapeTests, MutiSegment) {
   QString dskfile("$ISISTESTDATA/isis/src/base/unitTestData/test_shape.bds");
 
   BulletDskShape multiseg(dskfile);
-  EXPECT_EQ(multiseg.name(), "");
+  EXPECT_PRED_FORMAT2( AssertQStringsEqual, multiseg.name(), dskfile);
   EXPECT_DOUBLE_EQ(multiseg.maximumDistance(), 7.3484692283495345);
   EXPECT_TRUE((bool) multiseg.body());
   EXPECT_EQ(multiseg.getNumTriangles(), 28);

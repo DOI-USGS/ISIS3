@@ -25,6 +25,7 @@ find files of those names at the top level of this repository. **/
 #include "PlaneShape.h"
 #include "Projection.h"
 #include "Preference.h"
+#include "PsmrtsShapeModel.h"
 #include "Pvl.h"
 #include "PvlFlatMap.h"
 #include "PvlGroup.h"
@@ -152,6 +153,10 @@ namespace Isis {
       QString fileErrorMsg = "Invalid shape model file ["
                              + shapeModelFilenames + "] in Kernels group.";
       IException fileError(IException::Io, fileErrorMsg, _FILEINFO_);
+
+      const bool PsmrtsThrowOnError = false;
+      PsmrtsShapeModel *model_p = PsmrtsShapeModel::create( target, pvl, PsmrtsThrowOnError );
+      if ( nullptr != model_p ) return ( model_p );
 
       //-------------- Check for bullet engine first -------------------------------//
       if ( "bullet" == preferred ) {

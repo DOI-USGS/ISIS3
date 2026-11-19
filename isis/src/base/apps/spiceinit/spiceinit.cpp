@@ -249,12 +249,15 @@ namespace Isis {
         getUserEnteredKernel(ui, "MODEL", dem);
 
         QString modelPath = dem[0];
-        FileName modelFile(modelPath);
-
-        if (!modelFile.fileExists()) {
-          QString msg = "Shape model file [" + modelPath + "] does not exist";
-          throw IException(IException::User, msg, _FILEINFO_);
+        // Check only if doesn't contain a PSMRTS specification
+        if ( !modelPath.contains( "::" ) ) {
+          FileName modelFile(modelPath);
+          if (!modelFile.fileExists()) {
+            QString msg = "Shape model file [" + modelPath + "] does not exist";
+            throw IException(IException::User, msg, _FILEINFO_);
+          }
         }
+
       }
       else if (ui.GetString("SHAPE") == "SYSTEM") {
         dem = baseKernels.dem(lab);
