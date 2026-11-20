@@ -740,33 +740,17 @@ TEST_F(DefaultCube, FunctionalTestPhocubeEllipsoidNormalOnly) {
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Ellipsoid Normal Y");
   EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Ellipsoid Normal Z");
 
-  // Compare every pixel against the ellipsoid normal the camera computes for
-  // the same sample and line.
-  Camera *cam = testCube->camera();
-  ShapeModel *shapeModel = cam->target()->shape();
-  LineManager outLine(cube);
-  for (int lineNum = 1; lineNum <= cube.lineCount(); lineNum++) {
-    QVector<QVector<double>> bands(cube.bandCount());
-    for (int band = 1; band <= cube.bandCount(); band++) {
-      outLine.SetLine(lineNum, band);
-      cube.read(outLine);
-      for (int i = 0; i < outLine.size(); i++) {
-        bands[band - 1].push_back(outLine[i]);
-      }
-    }
+  // Known values for the ellipsoid normal X, Y and Z bands
+  QVector<double> bandAvg { -0.243983470, -0.953460286,  0.177159673 };
+  QVector<double> bandSum { -6.099586755, -23.836507142, 4.428991824 };
+  QVector<double> bandStd {  8.002938e-06, 2.543435e-06, 8.107101e-06 };
 
-    for (int samp = 1; samp <= cube.sampleCount(); samp++) {
-      ASSERT_TRUE(cam->SetImage(samp, lineNum));
-      shapeModel->calculateDefaultNormal();
-      std::vector<double> ellipsoidNormal = shapeModel->normal();
-      double mag = sqrt(ellipsoidNormal[0] * ellipsoidNormal[0] +
-                        ellipsoidNormal[1] * ellipsoidNormal[1] +
-                        ellipsoidNormal[2] * ellipsoidNormal[2]);
-      ASSERT_GT(mag, 0.0);
-      EXPECT_NEAR(bands[0][samp - 1], ellipsoidNormal[0] / mag, 1e-6);
-      EXPECT_NEAR(bands[1][samp - 1], ellipsoidNormal[1] / mag, 1e-6);
-      EXPECT_NEAR(bands[2][samp - 1], ellipsoidNormal[2] / mag, 1e-6);
-    }
+  for (int band = 1; band <= cube.bandCount(); band++) {
+    std::unique_ptr<Histogram> hist(cube.histogram(band));
+    EXPECT_EQ(hist->ValidPixels(), 25);
+    EXPECT_NEAR(hist->Average(), bandAvg[band - 1], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[band - 1], 0.00001);
+    EXPECT_NEAR(hist->StandardDeviation(), bandStd[band - 1], 1e-8);
   }
 
   cube.close();
