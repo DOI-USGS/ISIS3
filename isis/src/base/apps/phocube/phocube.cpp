@@ -434,6 +434,10 @@ namespace Isis {
             }
             if (ellipsoidNormal) {
               ShapeModel *shapeModel = cam->target()->shape();
+              // Ensure that the ellipsoid normal is computed before accessing it
+              if (!shapeModel->hasNormal()) {
+                shapeModel->calculateDefaultNormal();
+              }
               std::vector<double> ellipsoidNormal = shapeModel->normal();
 
               LinearAlgebra::Vector ellipsoidNormalXYZ = LinearAlgebra::vector(ellipsoidNormal[0], ellipsoidNormal[1], ellipsoidNormal[2]);

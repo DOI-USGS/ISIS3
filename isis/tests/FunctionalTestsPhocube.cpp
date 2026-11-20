@@ -712,3 +712,46 @@ TEST_F(DefaultCube, FunctionalTestPhocubeCsm) {
 
   cube.close();
 }
+
+/**
+   * FunctionalTestPhocubeEllipsoidNormalOnly
+   *
+   * Regression test for https://github.com/DOI-USGS/ISIS3/issues/6177.
+   * ELLIPSOIDNORMAL must work without EMISSION and INCIDENCE.
+   */
+TEST_F(DefaultCube, FunctionalTestPhocubeEllipsoidNormalOnly) {
+  QString cubeFileName = tempDir.path() + "/phocubeTEMP.cub";
+  QVector<QString> args = {"to=" + cubeFileName, "phase=false", "emission=false",
+                           "incidence=false", "latitude=false", "longitude=false",
+                           "ellipsoidnormal=true"};
+  UserInterface options(APP_XML, args);
+  resizeCube(5, 5, 1);
+  ASSERT_NO_THROW(phocube(testCube, options));
+
+  Cube cube(cubeFileName);
+  Pvl *isisLabel = cube.label();
+
+  ASSERT_EQ(cube.sampleCount(), testCube->sampleCount());
+  ASSERT_EQ(cube.lineCount(), testCube->lineCount());
+  ASSERT_EQ(cube.bandCount(), 3);
+
+  PvlGroup bandBin = isisLabel->findGroup("BandBin", Pvl::Traverse);
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[0], "Ellipsoid Normal X");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[1], "Ellipsoid Normal Y");
+  EXPECT_PRED_FORMAT2(AssertQStringsEqual, bandBin.findKeyword("Name")[2], "Ellipsoid Normal Z");
+
+  // Known values for the ellipsoid normal X, Y and Z bands
+  QVector<double> bandAvg { -0.243983470, -0.953460286,  0.177159673 };
+  QVector<double> bandSum { -6.099586755, -23.836507142, 4.428991824 };
+  QVector<double> bandStd {  8.002938e-06, 2.543435e-06, 8.107101e-06 };
+
+  for (int band = 1; band <= cube.bandCount(); band++) {
+    std::unique_ptr<Histogram> hist(cube.histogram(band));
+    EXPECT_EQ(hist->ValidPixels(), 25);
+    EXPECT_NEAR(hist->Average(), bandAvg[band - 1], 0.000001);
+    EXPECT_NEAR(hist->Sum(), bandSum[band - 1], 0.00001);
+    EXPECT_NEAR(hist->StandardDeviation(), bandStd[band - 1], 1e-8);
+  }
+
+  cube.close();
+}
