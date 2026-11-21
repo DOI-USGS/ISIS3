@@ -240,7 +240,11 @@ namespace Isis {
       m_latitude = m_centerLatitude;
     }
     else {
-      if (rp <= epsilon) {
+      // Snyder (1987) pg 175: if rho = 0, eqs. (20-14) to (20-17) are
+      // indeterminate, but lat = lat0 and lon = lon0.
+      // Only at the centre itself: within epsilon * R of it, sinz = 0 put the
+      // point at the centre (up to 1e-10 * R off)
+      if (rp == 0.0) {
         sinz = 0.0;
       }
       else {
@@ -249,10 +253,16 @@ namespace Isis {
       z = asin(sinz);
       sinz = sin(z);
       cosz = cos(z);
-      con = cosz * m_sinph0 + GetY() * sinz * m_cosph0 / rho;
-      if (con > 1.0) con = 1.0;
-      if (con < -1.0) con = -1.0;
-      m_latitude = asin(con);
+      // Snyder (1987) eq. (20-14) pg 175, lat = asin(n / rho), with n, d and e
+      // rho * sin(lat), rho * cos(lat) * cos(lon) and rho * cos(lat) * sin(lon)
+      // (d and e are the denominator and numerator of eq. (20-15)), so
+      // n^2 + d^2 + e^2 = rho^2:
+      // the latitude from atan2() keeps full precision close to the poles,
+      // where asin() of a value close to 1 lost half the digits
+      double n = rho * cosz * m_sinph0 + GetY() * sinz * m_cosph0;
+      double d = rho * cosz * m_cosph0 - GetY() * sinz * m_sinph0;
+      double e = GetX() * sinz;
+      m_latitude = atan2(n, sqrt(e * e + d * d));
 
       con = fabs(m_centerLatitude) - HALFPI;
       if (fabs(con) <= epsilon) {
@@ -260,14 +270,18 @@ namespace Isis {
           m_longitude += atan2(GetX(), -GetY());
         }
         else {
-          m_longitude += atan2(-GetX(), GetY());
+          // x = R * k * cos(lat) * sin(lon), y = R * k * cos(lat) * cos(lon) for the
+          // south polar aspect (see SetGround), Snyder eq. (20-17) pg 150,
+          // lon = lon0 + atan(x / y): atan2(-x, y) mirrored the longitude
+          m_longitude += atan2(GetX(), GetY());
         }
       }
       else {
-        con = cosz - m_sinph0 * sin(m_latitude);
-        if ((fabs(con) >= epsilon) || (fabs(GetX()) >= epsilon)) {
-          m_longitude += atan2(GetX() * sinz * m_cosph0, con * rho);
-        }
+        // Snyder (1987) eq. (20-15), lon = lon0 + atan(e / d). The form used
+        // before, atan(x * sinz * cos(lat0) / (rho * (cosz - sin(lat0) * sin(lat)))),
+        // is the same angle, but cosz - sin(lat0) * sin(lat) cancels when the
+        // centre is close to a pole, which lost up to 2 mm on the Moon.
+        m_longitude += atan2(e, d);
       }
     }
 

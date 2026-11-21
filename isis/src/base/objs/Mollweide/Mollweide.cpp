@@ -20,6 +20,50 @@ find files of those names at the top level of this repository. **/
 
 using namespace std;
 
+namespace {
+  // s - sin(s), accurate also for small |s|, where the subtraction would lose
+  // most of the digits. For |s| < 0.25 it is the Taylor series
+  // s - sin(s) = s^3/3! - s^5/5! + s^7/7! - s^9/9! + s^11/11! - s^13/13!,
+  // in Horner form: the constants are factorials (6 = 3!, 120 = 5!, 5040 = 7!,
+  // 362880 = 9!, 39916800 = 11!, 6227020800 = 13!). At |s| = 0.25 the relative
+  // truncation error is 2.7e-19, below double epsilon (stopping at 11! would
+  // leave 9.2e-16).
+  double sMinusSinS(double s) {
+    if (fabs(s) < 0.25) {
+      double s2 = s * s;
+      return s * s2 * (1. / 6 - s2 * (1. / 120 - s2 * (1. / 5040 - s2 * (1. / 362880
+             - s2 * (1. / 39916800 - s2 / 6227020800.)))));
+    }
+    return s - sin(s);
+  }
+
+  // Close to the poles, where Snyder (1987) pg 251 notes that the iteration
+  // (31-4) converges slowly. Snyder's eq. (31-3) is
+  // 2 * theta + sin(2 * theta) = pi * sin(phi). With s = pi - 2 * theta
+  // (s = pi - theta' in Snyder's eq. (31-4)) and chi = pi/2 - |phi| the
+  // colatitude, it becomes pi - s + sin(s) = pi * cos(chi), i.e.
+  // s - sin(s) = pi * (1 - cos(chi)) = 2 * pi * sin(chi / 2)^2.
+  // Its derivative in s, 1 - cos(s) = 2 * sin(s / 2)^2, does not vanish at the
+  // poles, so Newton's method converges quadratically there, where the
+  // iteration on theta (whose derivative vanishes at the poles) does not.
+  // The start value cbrt(6 * w) is <= the root, as s - sin(s) <= s^3 / 3!.
+  // Returns s.
+  double mollweidePolarS(double chi) {
+    double sh = sin(0.5 * chi);
+    double w = 2. * Isis::PI * sh * sh;
+    double s = cbrt(6. * w); // <= the root, as s - sin(s) <= s^3 / 6
+    for (int i = 0; i < 20; i++) {
+      double sh2 = sin(0.5 * s);
+      double d = 2. * sh2 * sh2; // 1 - cos(s)
+      if (d == 0.) break;
+      double ds = (sMinusSinS(s) - w) / d;
+      s -= ds;
+      if (fabs(ds) <= 1e-12 * s) break;
+    }
+    return s;
+  }
+}
+
 
 namespace Isis {
 
@@ -137,16 +181,24 @@ namespace Isis {
     theta[0] = asin(2*phi/PI);
     theta[1]=0.0;
     
-    //If this condition is too strict, a larger epsilon value than DBL_EPSILON
-    //can be used to decrease the number of iterations.
-    while (dtheta > DBL_EPSILON) {
+    // The iteration converges quadratically, so once a step is below 1e-14 the
+    // next one would be below 1e-28: theta is exact to rounding. A tolerance of
+    // DBL_EPSILON is below the rounding noise of the step above about 60
+    // degrees, where the iteration could then alternate between two values
+    // 3 ulp apart and never stop.
+    while (dtheta > 1e-14) {
 
-      theta[1] = theta[0] - (2*theta[0]+sin(2*theta[0]) -(Isis::PI)*sin(phi))/(2+2*cos(theta[0]));
+      // Newton step for f(theta) = 2*theta + sin(2*theta) - PI*sin(phi), Snyder
+      // eq. (31-3) pg 251, whose derivative is 2 + 2*cos(2*theta). This is
+      // Snyder's eq. (31-4), delta theta' = -(theta' + sin(theta') - PI*sin(phi))
+      // / (1 + cos(theta')), with theta' = 2*theta. (The step used
+      // 2 + 2*cos(theta), which made the iteration converge only linearly.)
+      theta[1] = theta[0] - (2*theta[0]+sin(2*theta[0]) -(Isis::PI)*sin(phi))/(2+2*cos(2*theta[0]));
       dtheta = fabs(theta[1]-theta[0]);
       theta[0] = theta[1];
       niter++;
       
-      if (niter > 15000000) {
+      if (niter > 100) {
         //cout << setprecision(10) << phi*(180/PI) << "," << niter << endl;
         return false;
       }
@@ -186,6 +238,17 @@ namespace Isis {
     // Compute the coordinate
     double deltaLon = lonRadians - m_centerLongitude;
 
+    if (fabs(latRadians) > HALFPI - 0.5) {
+      // Snyder eqs. (31-1), (31-2) pg 251 with cos(theta) = sin(s / 2) and
+      // sin(theta) = cos(s / 2), s as in mollweidePolarS()
+      double s = mollweidePolarS(HALFPI - fabs(latRadians));
+      double x = (2*sqrt(2)/PI) * m_equatorialRadius * deltaLon * sin(0.5 * s);
+      double y = sqrt(2) * m_equatorialRadius * cos(0.5 * s);
+      SetComputedXY(x, latRadians < 0 ? -y : y);
+      m_good = true;
+      return m_good;
+    }
+
     if (newton_rapheson(latRadians,theta) ) {
 
       double x = (2*sqrt(2)/PI )*m_equatorialRadius*(deltaLon)*cos(theta);   
@@ -220,7 +283,22 @@ namespace Isis {
     // Save the coordinate
     
     SetXY(x, y);
-  
+
+    double ymax = m_equatorialRadius * sqrt(2);
+    if (fabs(GetY()) > 0.5 * ymax && fabs(GetY()) <= ymax) {
+      // Close to the poles: Snyder (1987) eqs. (31-6), (31-7) pg 252,
+      // theta = asin(y / (sqrt(2) * R)) and
+      // phi = asin((2 * theta + sin(2 * theta)) / pi), computed as
+      // cos(s / 2) = |y| / ymax, with s as in mollweidePolarS(), and the
+      // colatitude chi from 2 * sin(chi / 2)^2 = (s - sin(s)) / pi, instead of
+      // asin() of a value close to 1
+      double halfS = 2. * asin(sqrt(0.5 * (ymax - fabs(GetY())) / ymax));
+      double chi = 2. * asin(sqrt(sMinusSinS(2. * halfS) / (2. * PI)));
+      double den = (2*sqrt(2)/PI) * m_equatorialRadius * sin(halfS);
+      m_latitude = GetY() < 0 ? chi - HALFPI : HALFPI - chi;
+      m_longitude = m_centerLongitude + (den == 0. ? 0. : GetX() / den);
+    }
+    else {
     double theta = asin(y/(m_equatorialRadius*sqrt(2)));
 
     // Compute latitude and make sure it is not above 90
@@ -249,6 +327,7 @@ namespace Isis {
 
     else {
     m_longitude = m_centerLongitude+(Isis::PI)*GetX()/(2*m_equatorialRadius*sqrt(2)*cos(theta));
+    }
     }
 
 

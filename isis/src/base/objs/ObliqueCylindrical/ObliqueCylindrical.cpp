@@ -225,14 +225,20 @@ namespace Isis {
     double poleLongitude = (m_poleLongitude * PI / 180.0);
     double poleRotation = (m_poleRotation * PI / 180.0);
 
-    obliqueLat = asin(sin(poleLatitude) * sin(normalLat) +
-                      cos(poleLatitude) * cos(normalLat) 
-                      * cos(normalLon - poleLongitude));
+    // Snyder (1987) eqs. (5-9) and (5-10b) pg 32: the oblique latitude is
+    // asin(n) and the oblique longitude atan(e / d).
+    // The rotated unit vector is (d, e, n), d^2 + e^2 + n^2 = 1; its
+    // latitude from atan2() keeps
+    // full precision close to the oblique poles, where asin() lost half the
+    // digits
+    double e = cos(normalLat) * sin(normalLon - poleLongitude);
+    double d = sin(poleLatitude) * cos(normalLat) * cos(normalLon - poleLongitude) -
+               cos(poleLatitude) * sin(normalLat);
+    double n = sin(poleLatitude) * sin(normalLat) +
+               cos(poleLatitude) * cos(normalLat) * cos(normalLon - poleLongitude);
+    obliqueLat = atan2(n, sqrt(e * e + d * d));
 
-    obliqueLon = atan2(cos(normalLat) * sin(normalLon - poleLongitude),
-                       sin(poleLatitude) * cos(normalLat) 
-                       * cos(normalLon - poleLongitude) -
-                         cos(poleLatitude) * sin(normalLat)) - poleRotation;
+    obliqueLon = atan2(e, d) - poleRotation;
 
     while(obliqueLon < - PI) {
       obliqueLon += (2.0 * PI);
@@ -292,12 +298,16 @@ namespace Isis {
     double poleLongitude = (m_poleLongitude * PI / 180.0);
     double poleRotation = (m_poleRotation * PI / 180.0);
 
-    obliqueLat = asin(sin(poleLatitude) * sin(m_latitude) -
-                      cos(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation));
+    // Snyder (1987) eqs. (5-7) and (5-8b) pg 31. As in SetGround: atan2()
+    // instead of asin() for the latitude
+    double e = cos(m_latitude) * sin(m_longitude + poleRotation);
+    double d = sin(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation) +
+               cos(poleLatitude) * sin(m_latitude);
+    double n = sin(poleLatitude) * sin(m_latitude) -
+               cos(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation);
+    obliqueLat = atan2(n, sqrt(e * e + d * d));
 
-    obliqueLon = atan2(cos(m_latitude) * sin(m_longitude + poleRotation),
-                       sin(poleLatitude) * cos(m_latitude) * cos(m_longitude + poleRotation) +
-                       cos(poleLatitude) * sin(m_latitude)) + poleLongitude;
+    obliqueLon = atan2(e, d) + poleLongitude;
 
     /***************************************************************************
     * Convert the latitude/longitude to degrees and apply target longitude  
