@@ -1,6 +1,9 @@
 #include <iostream>
 #include <QTemporaryFile>
 
+#include <gdal_priv.h>
+#include <ogr_spatialref.h>
+
 #include "cam2map.h"
 
 #include "Cube.h"
@@ -181,6 +184,83 @@ TEST_F(DefaultCube, FunctionalTestCam2mapDefault) {
 
   ASSERT_EQ(cubeMapGroup.findKeyword("PixelResolution"), userGrp.findKeyword("PixelResolution"));
   ASSERT_EQ(cubeMapGroup.findKeyword("Scale"), userGrp.findKeyword("Scale"));
+}
+
+// Test cam2map with GTiff output and saving the projection string.
+TEST_F(DefaultCube, FunctionalTestCam2mapGTiffOutputDefault) {
+  std::istringstream labelStrm(R"(
+    Group = Mapping
+      ProjectionName  = Sinusoidal
+      CenterLongitude = 0.0 <degrees>
+
+      TargetName         = MARS
+      EquatorialRadius   = 3396190.0 <meters>
+      PolarRadius        = 3376200.0 <meters>
+
+      LatitudeType       = Planetocentric
+      LongitudeDirection = PositiveEast
+      LongitudeDomain    = 360 <degrees>
+
+      MinimumLatitude    = 0 <degrees>
+      MaximumLatitude    = 5 <degrees>
+      MinimumLongitude   = 0 <degrees>
+      MaximumLongitude   = 5 <degrees>
+
+      PixelResolution    = 100000 <meters/pixel>
+      Scale              = 512.0 <pixels/degree>
+    End_Group
+  )");
+
+  Pvl userMap;
+  labelStrm >> userMap;
+  PvlGroup &userGrp = userMap.findGroup("Mapping", Pvl::Traverse);
+
+  QString tifPath = tempDir.path() + "/level2.tif";
+  QVector<QString> args = {"to=" + tempDir.path() + "/level2+gtiff",
+                           "pixres=map"};
+  UserInterface ui(APP_XML, args);
+
+  GDALAllRegister();
+
+  Pvl log;
+  cam2map(testCube, userMap, userGrp, ui, &log);
+
+  GDALDataset *ds =
+    (GDALDataset *) GDALOpen(tifPath.toStdString().c_str(), GA_ReadOnly);
+  ASSERT_NE(ds, nullptr);
+  const OGRSpatialReference *srs = ds->GetSpatialRef();
+  ASSERT_NE(srs, nullptr);
+  EXPECT_DOUBLE_EQ(srs->GetSemiMajor(nullptr), 3396190.0);
+  const char *proj = srs->GetAttrValue("PROJECTION");
+  ASSERT_NE(proj, nullptr);
+  EXPECT_STREQ(proj, "Sinusoidal");
+  GDALClose(ds);
+}
+
+// Test cam2map useproj=true with GTiff output: exercises the ProjStr
+// override path in Cube::writeLabels (the Mapping group already has
+// ProjStr from the user's projstring=, so PvlToWkt is bypassed).
+TEST_F(DefaultCube, FunctionalTestCam2mapGTiffOutputUseproj) {
+  QString outStem = tempDir.path() + "/level2_useproj";
+  QString tifPath = outStem + ".tif";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + outStem + "+gtiff",
+                           "useproj=true",
+                           "projstring=+proj=eqc +R=3396190 +units=m"};
+  UserInterface ui(APP_XML, args);
+  Pvl log;
+
+  GDALAllRegister();
+  cam2map(ui, &log);
+
+  GDALDataset *ds =
+    (GDALDataset *) GDALOpen(tifPath.toStdString().c_str(), GA_ReadOnly);
+  ASSERT_NE(ds, nullptr);
+  const OGRSpatialReference *srs = ds->GetSpatialRef();
+  ASSERT_NE(srs, nullptr);
+  EXPECT_DOUBLE_EQ(srs->GetSemiMajor(nullptr), 3396190.0);
+  GDALClose(ds);
 }
 
 TEST_F(DefaultCube, FunctionalTestCam2mapMismatch) {
@@ -680,6 +760,36 @@ TEST_F(DemCube, FunctionalTestCam2mapAspMap) {
 
   // Check pixel values across all bands
   checkPixelValues(ocube, ocube.bandCount());
+}
+
+// Test cam2map asp_map=true with GTiff output: verify the projection
+// string is written to the output GeoTIFF.
+TEST_F(DemCube, FunctionalTestCam2mapAspMapGTiffOutput) {
+  QString heightDemPath = createHeightDem(tempDir.path(),
+                                          -35.0, 55.0, 200.0, 290.0, 245.0);
+
+  QString outStem = tempDir.path() + "/aspmap_gtiff";
+  QString tifPath = outStem + ".tif";
+
+  QVector<QString> args = {"from=" + testCube->fileName(),
+                           "to=" + outStem + "+gtiff",
+                           "asp_map=true",
+                           "dem=" + heightDemPath,
+                           "pixres=mpp",
+                           "resolution=500"};
+  UserInterface ui(APP_XML, args);
+  Pvl log;
+
+  GDALAllRegister();
+  cam2map(ui, &log);
+
+  GDALDataset *ds =
+    (GDALDataset *) GDALOpen(tifPath.toStdString().c_str(), GA_ReadOnly);
+  ASSERT_NE(ds, nullptr);
+  const OGRSpatialReference *srs = ds->GetSpatialRef();
+  ASSERT_NE(srs, nullptr);
+  EXPECT_DOUBLE_EQ(srs->GetSemiMajor(nullptr), 3396190.0);
+  GDALClose(ds);
 }
 
 // Test ASP_MAP matchmap=true with a PVL .map file.

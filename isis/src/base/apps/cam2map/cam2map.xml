@@ -306,14 +306,17 @@
         <type>cube</type>
         <fileMode>input</fileMode>
         <brief>
-          Input cube to project
+          Input cube or ISIS GeoTIFF to project
         </brief>
         <description>
           The specification of the input cube to be projected.  The cube must
           have been initialized using the <i>spiceinit</i> program.
+          The input may also be a GeoTIFF previously written by ISIS or by
+          <i>gdal_translate</i> from an ISIS cube. GeoTIFF input is new in
+          ISIS 10 and is still being evaluated.
         </description>
         <filter>
-          *.cub
+          *.cub *.tif
         </filter>
       </parameter>
 
@@ -356,9 +359,14 @@
         </brief>
         <description>
           This file is the map projected (level2) image.
+          Append <tt>+gtiff</tt> to write a GeoTIFF instead of a native cube.
+          Use <tt>to=out+gtiff</tt> to write <tt>out.tif</tt>. When the input
+          is a GeoTIFF, the output defaults to GeoTIFF as well; use
+          <tt>+tile</tt> or <tt>+bsq</tt> to force a native cube. GeoTIFF
+          output is new in ISIS 10 and is still being evaluated.
         </description>
         <filter>
-          *.cub
+          *.cub *.tif
         </filter>
       </parameter>
       <parameter name="MATCHMAP">
