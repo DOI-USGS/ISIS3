@@ -113,7 +113,10 @@ for FILE in $FILES; do
       if [ $res != 0 ]; then
         COMPRESULT="ERROR"
       else
-        COMPRESULT="identical"
+        COMPRESULT=$($ISISROOT/bin/getkey   \
+		             from=$FAILURE_REPORT   \
+	                 grp=Results            \
+				     keyword=Compare | tr '[:upper:]' '[:lower:]');
       fi
       if [ "$COMPRESULT" != "identical" ]; then
         echo "Failed ... File [$FILE]"
@@ -122,8 +125,10 @@ for FILE in $FILES; do
           cat "$FAILURE_REPORT" >> errors.txt
         fi
         echo "Failed comparing cubes. Report: $(pwd)/$FAILURE_REPORT"
-        echo "Add/update the truth cube tolerance in the test Makefile."
-        echo "Truth cube that needs tolerance: $FILE"
+        echo "Please check the output from the program. If this difference"
+        echo "is intentional add/update the truth cube tolerance in the"
+        echo "test Makefile."
+        echo "Truth cube that may need tolerance: $FILE"
         echo "File with fields to ignore: $DIFFFILE_CANDIDATE"
         tail -n 1 "$FAILURE_REPORT"
       else
