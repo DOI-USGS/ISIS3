@@ -216,9 +216,6 @@ void importQubs(QString coreParamName, QString suffixParamName) {
   importPds.SetDimensions(importPds.Samples(),importPds.Lines(),g_coreBands);
   importPds.SetPixelType(g_corePixelType);
 
-  Isis::CubeAttributeOutput coreatt;
-  coreatt = CubeAttributeOutput("+REAL");
-
   g_coreCube = importPds.SetOutputCube("CORE");
 
   g_coreCube->addCachingAlgorithm(new BoxcarCachingAlgorithm());

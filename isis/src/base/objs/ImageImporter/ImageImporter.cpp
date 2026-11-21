@@ -106,7 +106,7 @@ namespace Isis {
    * @param outputName The filename of the output cube
    */
   Cube * ImageImporter::import(FileName outputName) {
-    CubeAttributeOutput att;
+    CubeAttributeOutput att(outputName);
     return import(outputName, att);
   }
 

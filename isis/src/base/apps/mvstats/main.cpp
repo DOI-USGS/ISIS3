@@ -110,8 +110,7 @@ void IsisMain() {
 
     //Set up the Process and the OutputCube, and Process
     ProcessByLine p;
-    CubeAttributeOutput set;
-    set.setPixelType(Real);
+    CubeAttributeOutput set = ui.GetOutputAttribute("CUBE");
     Cube *ocube = p.SetOutputCube(ui.GetCubeName("CUBE"),
                                   set, bands, bands, 2);
     p.StartProcess(WriteCube);
