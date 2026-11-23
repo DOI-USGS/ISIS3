@@ -44,7 +44,7 @@ dependencies:
   - libxml2
   - make
   - mesalib
-  - mkl
+  - mkl=2025.3.1
   - mysql
   - mysql-connector-c
   - nanoflann>=1.4.2,<1.5
