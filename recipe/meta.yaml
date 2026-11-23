@@ -23,7 +23,7 @@
 # This is the build number for the current version you are building. If this is the first build of
 # this version, the build number will be 0. It is incremented by 1 with every consecutive build of
 # the same version.
-{% set build_number = "1" %}
+{% set build_number = "2" %}
 
 package:
   name: isis
@@ -87,7 +87,7 @@ requirements:
    - libxml2
    - make
    - mesalib
-   - mkl                         # [not (osx and arm64)]
+   - mkl=2025.3.1                # [x86_64]
    - mysql
    - mysql-connector-c           # [not (osx and arm64)]
    - nanoflann >=1.4.2,<1.5
@@ -155,7 +155,7 @@ requirements:
   - {{ pin_compatible('libpng') }}
   - libtiff
   - mesalib
-  - {{ pin_compatible('mkl', min_pin='x', max_pin='x.x') }}  # [not (osx and arm64)]
+  - {{ pin_compatible('mkl', min_pin='x', max_pin='x.x') }}  # [x86_64]
   - mysql
   - nanoflann >=1.4.2,<1.5
   - nlohmann_json
